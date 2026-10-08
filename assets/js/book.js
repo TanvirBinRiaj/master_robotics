@@ -20,6 +20,30 @@
 
   var THEME_KEY = "mr-theme";
 
+  /* file:// pages often block localStorage, so persist in two places:
+     localStorage first, cookie as fallback. */
+  function readStored() {
+    try {
+      var v = localStorage.getItem(THEME_KEY);
+      if (v === "dark" || v === "light") return v;
+    } catch (e) {}
+    try {
+      var m = document.cookie.match(/(?:^|;\s*)mr-theme=(dark|light)/);
+      if (m) return m[1];
+    } catch (e) {}
+    return null;
+  }
+  function writeStored(t) {
+    try { localStorage.setItem(THEME_KEY, t); } catch (e) {}
+    try { document.cookie = THEME_KEY + "=" + t + "; max-age=31536000; path=/; SameSite=Lax"; } catch (e) {}
+  }
+  function systemTheme() {
+    try {
+      if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) return "dark";
+    } catch (e) {}
+    return null;
+  }
+
   function el(tag, cls, html) {
     var n = document.createElement(tag);
     if (cls) n.className = cls;
@@ -28,11 +52,11 @@
   }
 
   function getTheme() {
-    try { return localStorage.getItem(THEME_KEY) || "light"; } catch (e) { return "light"; }
+    return readStored() || systemTheme() || "light";
   }
   function setTheme(t) {
     document.documentElement.setAttribute("data-theme", t);
-    try { localStorage.setItem(THEME_KEY, t); } catch (e) {}
+    writeStored(t);
     var btn = document.getElementById("themeToggle");
     if (btn) {
       btn.innerHTML = '<i class="bi ' + (t === "dark" ? ICON.sun : ICON.moon) + '"></i>';
