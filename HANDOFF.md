@@ -150,3 +150,10 @@ relay-dark beats OS-light, cookie-light beats OS-dark, empty state keeps
 the old default. Validator **PASS**. (A literal `~/probe-test` dir from
 the Chromium probe was briefly committed with `d3f9398` and removed in
 `ba3c244`; probe files outside the repo were deleted.)
+
+## 11. Private GitHub repo (same day)
+Local `.git` (branch `main`) previously had no commits and no remote.
+Created **private** repo `TanvirBinRiaj/master_robotics` via
+`gh repo create master_robotics --private --source=. --push` and pushed
+all commits: https://github.com/TanvirBinRiaj/master_robotics
+(`main` tracks `origin/main`). Nothing public; working tree clean.
