@@ -43,6 +43,21 @@
     } catch (e) {}
     return null;
   }
+  /* Same-tab relay: window.name travels with the tab across page loads even
+     when storage is partitioned (file://). Other name content is preserved. */
+  function readRelay() {
+    try {
+      var rm = String(window.name || "").match(/mr-theme=(dark|light)/);
+      if (rm) return rm[1];
+    } catch (e) {}
+    return null;
+  }
+  function writeRelay(t) {
+    try {
+      var rest = String(window.name || "").replace(/(^|;)mr-theme=(dark|light)(?=$|;)/g, "").replace(/^;+|;+$/g, "");
+      window.name = "mr-theme=" + t + (rest ? ";" + rest : "");
+    } catch (e) {}
+  }
 
   function el(tag, cls, html) {
     var n = document.createElement(tag);
@@ -52,11 +67,12 @@
   }
 
   function getTheme() {
-    return readStored() || systemTheme() || "light";
+    return readStored() || readRelay() || systemTheme() || "light";
   }
   function setTheme(t) {
     document.documentElement.setAttribute("data-theme", t);
     writeStored(t);
+    writeRelay(t);
     var btn = document.getElementById("themeToggle");
     if (btn) {
       btn.innerHTML = '<i class="bi ' + (t === "dark" ? ICON.sun : ICON.moon) + '"></i>';
