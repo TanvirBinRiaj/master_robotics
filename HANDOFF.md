@@ -78,3 +78,32 @@ New: `ch25`, `ch26`, `ch27`, `ch28`, `ch29`, `ch30`, `appendix-c`,
 `appendix-d`, `HANDOFF.md`. Edited: `data.js`, `index.html`, `glossary.html`,
 `resources.html`, `ch02`, `ch03`, `ch06`, `ch10`, `ch15`, `ch16`, `ch18`,
 `ch19`, `ch21`, `ch24`, `_build/RESEARCH-NOTES.md`.
+
+## 8. Follow-up fix — theme toggle icon + dark/light switching (same day)
+Reported from screenshot: the top-right toggle button rendered as an empty
+box, and dark/light switching felt broken.
+
+Root causes found in `assets/js/book.js`:
+1. `init()` called `setTheme(getTheme())` **before** `buildTopbar()`, so
+   `#themeToggle` did not exist when the icon HTML was painted; `buildTopbar()`
+   then created the button with **no inner icon** — the empty box in the
+   screenshot. Icon only appeared after the first click.
+2. Icon name `bi-moon-stars` used; switched to guaranteed `bi-moon`/`bi-sun`.
+
+Fixes applied:
+- `assets/js/book.js`: init order is now `buildTopbar()` → `setTheme()`;
+  the button is built with the correct icon for the stored theme via a new
+  `currentIcon()` helper; `setTheme()` still refreshes icon + aria-label on
+  every toggle.
+- `assets/css/base.css`: added `color-scheme: light` / `dark` so native
+  controls (scrollbars, search input) follow the theme.
+- All 35 HTML files: tiny pre-paint `<script>` in `<head>` applies the saved
+  `mr-theme` before first render — no light-flash on reload, theme persists
+  across pages via localStorage.
+- Verified with a Node DOM-stub harness: fresh load paints moon icon in
+  light mode; click → `dark` + sun icon; click → `light` + moon icon;
+  persisted value round-trips; stored `dark` restores dark + sun on load.
+  `node --check` clean, `node _build/validate.mjs` **PASS**.
+
+Git: baseline committed as `6eeeba3` ("Phase-1 gap-analysis pass"), this
+handoff update committed separately on top.
