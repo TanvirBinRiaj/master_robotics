@@ -107,3 +107,24 @@ Fixes applied:
 
 Git: baseline committed as `6eeeba3` ("Phase-1 gap-analysis pass"), this
 handoff update committed separately on top.
+
+## 9. Follow-up fix — theme resets when changing chapters (same day)
+Symptom (screenshots): Chapter 1 stayed dark, but opening Chapter 2 loaded
+light. Toggle icon was correct on each page, so the choice simply did not
+travel across pages.
+
+Root cause: persistence relied only on `localStorage`, which this browser
+blocks for `file://` pages. The toggle changed the live page and the write
+failed silently, so every new chapter fell back to the hardcoded `light`.
+
+Fixes applied (commit `7945d72`):
+- `assets/js/book.js`: three-layer theme resolution — stored value first
+  (`localStorage`, then **cookie fallback**), then OS `prefers-color-scheme`,
+  then light. Writes go to both `localStorage` and cookie.
+- Same resolution logic mirrored into the pre-paint `<script>` in all 35
+  HTML files, so the right theme is on before first paint.
+- Side benefit: on a dark-OS machine every page now loads dark even with no
+  stored choice (previously everything defaulted to light).
+- Verified with a Node DOM-stub harness simulating blocked storage + dark
+  OS: fresh load → dark; toggle writes cookie; next page reads cookie →
+  same theme and icon. Validator **PASS**.
