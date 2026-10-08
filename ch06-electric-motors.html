@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>try{var __t=localStorage.getItem("mr-theme");if(__t==="dark"||__t==="light")document.documentElement.setAttribute("data-theme",__t);}catch(e){}</script>
+  <title>Chapter 6: Electric Motors and How They Move Things — Master Robotics</title>
+  <meta name="description" content="Learn how electric motors work and how to pick one. Plain-English guide to torque, speed, DC, stepper and servo motors, drivers, encoders and motor sizing.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/prose.css">
+</head>
+<body data-file="ch06-electric-motors.html">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="topbar" id="topbar"></header>
+  <div class="progress-bar" id="progressBar"></div>
+
+  <div class="layout">
+    <div class="sidebar__backdrop" id="navBackdrop"></div>
+    <nav class="sidebar" id="sidebar" aria-label="Book contents"></nav>
+
+    <main class="main" id="main">
+      <div class="container">
+
+        <header class="chapter-head">
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="index.html">Home</a>
+            <i class="bi bi-chevron-right"></i>
+            <a href="index.html#mechanics">Part 2 &middot; Mechanics and Motion</a>
+            <i class="bi bi-chevron-right"></i>
+            <span>Chapter 6</span>
+          </nav>
+          <span class="chapter-kicker"><i class="bi bi-gear-wide-connected"></i> Part 2 &middot; Mechanics and Motion</span>
+          <h1>Electric Motors and How They Move Things</h1>
+          <p class="lede">A motor is a robot's muscle. By the end of this chapter you will understand torque and speed, know the difference between the main motor types, and be able to pick a sensible motor for a simple moving task.</p>
+          <div class="chapter-meta">
+            <span><i class="bi bi-clock"></i> ~24 min read</span>
+            <span><i class="bi bi-bar-chart"></i> Beginner</span>
+            <span><i class="bi bi-list-check"></i> Chapter 6 of 30</span>
+          </div>
+          <div class="goals">
+            <h2>What you will learn</h2>
+            <ul>
+              <li><i class="bi bi-check-circle-fill"></i> Explain torque and speed in everyday language.</li>
+              <li><i class="bi bi-check-circle-fill"></i> Compare DC, stepper and servo motors.</li>
+              <li><i class="bi bi-check-circle-fill"></i> Choose a motor for a simple moving task.</li>
+            </ul>
+          </div>
+        </header>
+
+        <article class="article">
+
+          <p class="lead">You press a button on your little rover. The wheels turn, the rover rolls forward, and it stops neatly at the far wall. Nothing else about the rover changed. It has no new sensors and no new code. The only thing that made it move was a small metal can with a spinning shaft: the motor.</p>
+
+          <p>Motors are where a robot's thinking becomes real movement. A controller can decide anything it likes, but nothing happens until a motor spins. That is why motors are called the muscles of a robot.</p>
+
+          <p>This chapter is about choosing and using those muscles well. We will keep the language simple and use everyday pictures. By the end, you will look at a motor listing online and understand every number on it.</p>
+
+          <h2>How a motor works</h2>
+
+          <p>Let us start with the basic idea, with no difficult physics. A motor turns electricity into spinning movement. It does this with magnets.</p>
+
+          <h3>Electricity makes a magnetic field</h3>
+
+          <p>When electricity flows through a wire, the wire becomes a magnet. A coil of wire, with electricity flowing through it, becomes a strong magnet. This is the whole trick behind every electric motor.</p>
+
+          <p>Inside the motor there are also permanent magnets. These are the ordinary kind of magnet, like the ones on your fridge. They do not need any electricity. They always have a north pole and a south pole.</p>
+
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> The key idea</div>
+            <p>Two magnets push apart when the same poles face each other. They pull together when opposite poles face each other. A motor uses this push and pull to keep something spinning.</p>
+          </div>
+
+          <h3>The rotor and the stator</h3>
+
+          <p>A motor has two main parts. The <strong>rotor</strong> is the part that spins. The <strong>stator</strong> is the part that stays still. The words come from "rotate" and "stationary".</p>
+
+          <p>Here is one way to picture it. The stator holds the permanent magnets. The rotor carries the coil of wire. When electricity flows through the coil, the coil becomes a magnet. Its north pole is pulled towards a south pole on the stator, and pushed away from a north pole. The rotor turns.</p>
+
+          <p>But the rotor cannot just turn once and stop. As it turns, its poles line up with the wrong ones and it would get stuck. Real motors solve this in different ways, and that is one thing that separates motor types. Some motors use a clever switch that flips the current as the rotor turns. Others use electronics to change the current many times a second. Either way, the result is the same: the rotor keeps spinning.</p>
+
+          <figure class="figure">
+            <div class="figure__box">
+              <svg viewBox="0 0 640 300" width="100%" role="img" aria-label="Cross-section of a simple motor showing the spinning rotor inside the still stator, with magnets on the stator and a coil on the rotor">
+                <circle cx="200" cy="150" r="110" fill="#eef2ff" stroke="#2d5bff" stroke-width="3"></circle>
+                <circle cx="200" cy="150" r="72" fill="#ffffff" stroke="#7b849b" stroke-width="2"></circle>
+                <rect x="182" y="66" width="36" height="34" rx="5" fill="#fde2e2" stroke="#d94b4b" stroke-width="2"></rect>
+                <text x="200" y="88" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#d94b4b">N</text>
+                <rect x="182" y="200" width="36" height="34" rx="5" fill="#e2f6ef" stroke="#0f9d78" stroke-width="2"></rect>
+                <text x="200" y="222" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#0f9d78">S</text>
+
+                <circle cx="200" cy="150" r="46" fill="#f0e9fd" stroke="#7a4ddb" stroke-width="2"></circle>
+                <line x1="200" y1="106" x2="200" y2="194" stroke="#1c2230" stroke-width="4"></line>
+                <line x1="156" y1="150" x2="244" y2="150" stroke="#1c2230" stroke-width="4"></line>
+                <circle cx="200" cy="150" r="7" fill="#1c2230"></circle>
+                <path d="M150 122 A58 58 0 0 1 250 122" fill="none" stroke="#7a4ddb" stroke-width="2.5" marker-end="url(#sp)"></path>
+                <text x="200" y="118" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#7a4ddb">rotor spins</text>
+
+                <text x="200" y="282" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#4a5266">the rotor</text>
+                <text x="200" y="34" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#4a5266">the stator (outer ring)</text>
+
+                <text x="430" y="96" font-family="Inter, sans-serif" font-size="15" font-weight="700" fill="#1c2230">How the push happens</text>
+                <text x="430" y="128" font-family="Inter, sans-serif" font-size="13" fill="#4a5266">1. Current flows in the coil.</text>
+                <text x="430" y="152" font-family="Inter, sans-serif" font-size="13" fill="#4a5266">2. The coil becomes a magnet.</text>
+                <text x="430" y="176" font-family="Inter, sans-serif" font-size="13" fill="#4a5266">3. Like poles push apart.</text>
+                <text x="430" y="200" font-family="Inter, sans-serif" font-size="13" fill="#4a5266">4. Unlike poles pull together.</text>
+                <text x="430" y="224" font-family="Inter, sans-serif" font-size="13" fill="#4a5266">5. The rotor turns.</text>
+                <text x="430" y="252" font-family="Inter, sans-serif" font-size="13" fill="#4a5266">6. The current switches;</text>
+                <text x="430" y="272" font-family="Inter, sans-serif" font-size="13" fill="#4a5266">    the rotor keeps going.</text>
+                <defs>
+                  <marker id="sp" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+                    <path d="M0,0 L9,4.5 L0,9 z" fill="#7a4ddb"></path>
+                  </marker>
+                </defs>
+              </svg>
+            </div>
+            <figcaption>Figure 6.1 — A simple motor cut in half. The stator holds the magnets and stands still. The rotor carries the coil and spins. Pushing and pulling between the magnets makes the rotor turn.</figcaption>
+          </figure>
+
+          <p>That is the heart of it. You do not need to know the maths of magnetic fields to build robots. You only need to know that current makes a magnet, magnets push and pull, and that push and pull becomes a spin.</p>
+
+          <h2>Torque and speed</h2>
+
+          <p>A motor does two useful things at once. It spins, and it pushes while it spins. We give each of these a name.</p>
+
+          <p><strong>Speed</strong> is how fast the shaft turns. We usually measure it in <strong>RPM</strong>, which means "revolutions per minute". If a motor spins at 1,000 RPM, its shaft makes 1,000 full turns in one minute.</p>
+
+          <p><strong>Torque</strong> is the turning force of the motor. It is not quite the same as how strong a motor is in a straight line. Torque is about twisting. A motor with high torque can turn something heavy or held tight. A motor with low torque will slow down or stop when the load resists it.</p>
+
+          <h3>Think of a jar lid</h3>
+
+          <p>Picture a tight jar lid. Your hand is the motor. The lid is the load. If the lid is loose, it turns easily; that is low torque needed. If the lid is stuck, you must push much harder to turn it; that is high torque needed.</p>
+
+          <p>Now here is the useful part. To open a stuck lid, you do not just push harder. You also use a tool. You grip the lid with a cloth or a jar opener, which gives you more turning force for the same effort. That tool is doing what a gear does on a motor.</p>
+
+          <h3>Think of a wrench</h3>
+
+          <p>Another picture: a wrench on a nut. A long wrench lets you turn a stiff nut with little effort. A short wrench makes you strain. The long wrench gives you more torque. This is why mechanics reach for the long handle when a bolt is stuck.</p>
+
+          <p>Torque depends on two things: how hard you push, and how far from the turning point you push. A longer handle, or a bigger wheel, gives more torque for the same push.</p>
+
+          <h3>The trade-off: speed or torque</h3>
+
+          <p>Here is a rule that surprises people. Most motors cannot give you both high speed and high torque at the same time. As the load gets harder to turn, the motor slows down. As the load gets lighter, the motor speeds up.</p>
+
+          <div class="callout note">
+            <div class="callout__head"><i class="bi bi-info-circle-fill"></i> Note</div>
+            <p>A motor running with no load spins at its fastest. The moment you ask it to turn something heavy, it slows down. If the load becomes too heavy, the motor stops completely while still trying. That stopped-but-trying state is called a stall, and we will look at it soon.</p>
+          </div>
+
+          <h3>How gearing fixes the trade-off</h3>
+
+          <p>You cannot beat the physics, but you can trade. <strong>Gears</strong> are wheels with teeth that pass turning force from one to another. A <strong>gear ratio</strong> tells you how many turns the fast side makes for one turn of the slow side.</p>
+
+          <p>If a gear ratio is 50 to 1, the motor must turn 50 times to turn the output once. So the output turns slowly, but with about 50 times more torque. You traded speed for torque.</p>
+
+          <p>A bicycle shows the same idea. In a low gear, you pedal fast and the wheel turns slowly, but you can climb a steep hill. In a high gear, the wheel turns faster for every pedal, but hills become hard. A robot uses gears for exactly this reason: to turn a fast, weak motor into a slow, strong one.</p>
+
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> Tip</div>
+            <p>Almost every robot wheel drive uses a gearbox. Straight from the motor, the shaft is fast and weak. With a gearbox, it becomes slow and strong — which is exactly what moving a robot needs.</p>
+          </div>
+
+          <h2>Power, stall torque and stall current</h2>
+
+          <p>Torque and speed are useful on their own, but together they tell you how much work a motor can do each second. That is called <strong>power</strong>.</p>
+
+          <div class="formula"><span class="label">Mechanical power of a motor</span> P = &tau; &times; &omega;</div>
+
+          <p>Here <code>P</code> is power in watts, <code>&tau;</code> (the Greek letter tau) is torque, and <code>&omega;</code> (omega) is angular speed — how fast it turns, measured in radians per second. A radian is just a tidy way to measure angles, where one full turn is about 6.28 radians.</p>
+
+          <p>You do not need to memorise the maths. The important idea is that power is torque times speed. A motor that pushes hard and spins fast makes a lot of power. A motor that pushes hard but barely spins makes little power, because the speed part is nearly zero.</p>
+
+          <h3>One worked calculation</h3>
+
+          <p>Suppose a motor gives a torque of 0.2 newton-metres and spins at 10 radians per second. What power does it deliver?</p>
+
+          <div class="formula"><span class="label">Put the numbers in</span> P = 0.2 N&middot;m &times; 10 rad/s = 2 W</div>
+
+          <p>So the motor delivers about 2 watts of mechanical power. If you doubled the torque and kept the same speed, power would double to 4 watts. If you doubled the speed and kept the same torque, it would also double. Both ways add power.</p>
+
+          <h3>What stall torque and stall current mean</h3>
+
+          <p>Now imagine the worst case. You command the motor to turn, but the load is so heavy that the shaft cannot move at all. The motor is still trying hard, but the speed is zero.</p>
+
+          <p>This is called a <strong>stall</strong>. At a stall, the motor produces its maximum torque, called <strong>stall torque</strong>. But because the speed is zero, the power it turns into movement is also zero. All the electrical energy becomes heat inside the motor instead.</p>
+
+          <p>At the same time, the motor draws a large amount of current — far more than normal. This is the <strong>stall current</strong>. Stall current is often many times the normal running current. If it lasts too long, the motor and the driver can overheat and be damaged.</p>
+
+          <div class="callout warn">
+            <div class="callout__head"><i class="bi bi-exclamation-triangle-fill"></i> Watch out</div>
+            <p>Stall is not always a crash. It also happens when a robot pushes against a wall, gets its wheel jammed, or holds a heavy arm still. A stalled motor can burn out in seconds if nothing protects it. We will see how to protect against this later in the chapter.</p>
+          </div>
+
+          <h3>The torque-speed curve</h3>
+
+          <p>If you plot torque on one axis and speed on the other, most simple motors make a straight sloping line. At one end the motor spins fast with no load. At the other end it is stalled, producing maximum torque with zero speed. Figure 6.2 shows this shape.</p>
+
+          <figure class="figure">
+            <div class="figure__box">
+              <svg viewBox="0 0 640 320" width="100%" role="img" aria-label="A torque-speed curve showing maximum speed with no load at one end and maximum torque at stall with zero speed at the other end">
+                <line x1="90" y1="270" x2="580" y2="270" stroke="#7b849b" stroke-width="2"></line>
+                <line x1="90" y1="270" x2="90" y2="50" stroke="#7b849b" stroke-width="2"></line>
+                <text x="335" y="305" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" fill="#1c2230">Torque &rarr;</text>
+                <text x="40" y="160" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" fill="#1c2230" transform="rotate(-90 40 160)">Speed &rarr;</text>
+
+                <line x1="90" y1="60" x2="540" y2="270" stroke="#2d5bff" stroke-width="3"></line>
+                <circle cx="90" cy="60" r="6" fill="#0f9d78"></circle>
+                <text x="104" y="50" font-family="Inter, sans-serif" font-size="13" fill="#0f9d78">no-load speed</text>
+                <text x="104" y="68" font-family="Inter, sans-serif" font-size="12" fill="#4a5266">(fast, no load)</text>
+
+                <circle cx="540" cy="270" r="6" fill="#d94b4b"></circle>
+                <text x="470" y="252" font-family="Inter, sans-serif" font-size="13" fill="#d94b4b">stall torque</text>
+                <text x="455" y="270" font-family="Inter, sans-serif" font-size="12" fill="#4a5266">(strong, but stopped)</text>
+
+                <line x1="315" y1="270" x2="315" y2="165" stroke="#7b849b" stroke-width="1.5" stroke-dasharray="5 5"></line>
+                <line x1="90" y1="165" x2="315" y2="165" stroke="#7b849b" stroke-width="1.5" stroke-dasharray="5 5"></line>
+                <circle cx="315" cy="165" r="5" fill="#7a4ddb"></circle>
+                <text x="322" y="160" font-family="Inter, sans-serif" font-size="12" fill="#7a4ddb">a good working point</text>
+              </svg>
+            </div>
+            <figcaption>Figure 6.2 — The torque-speed curve. As torque rises, speed falls. The green dot is free spinning. The red dot is stalled. Real robot work happens in between, near the middle.</figcaption>
+          </figure>
+
+          <p>The middle of the curve is where motors work best. Here they give a good balance of speed, torque and power, and they do not get dangerously hot. When you choose a motor, you want your normal task to sit in that healthy middle region, not at either end.</p>
+
+          <h2>The main types of motor</h2>
+
+          <p>Not all motors are the same inside. Different types solve the "keep spinning" problem in different ways, and that changes what they are good at. Let us meet the five you will use most.</p>
+
+          <h3>Brushed DC motor</h3>
+
+          <p>A <strong>brushed DC motor</strong> is the simple, classic motor. "DC" means direct current — a steady flow from a battery. Inside, two small carbon blocks called <strong>brushes</strong> press against the spinning part. They feed current into the coil and switch it at just the right moment to keep the rotor turning.</p>
+
+          <p>The good news: it is cheap, simple and easy to drive. Give it more voltage and it spins faster. Reverse the voltage and it spins the other way. The bad news: the brushes rub as the motor spins, so they wear down over time. They also make a little electrical noise. This is the motor you will meet in the cheapest robot kits.</p>
+
+          <h3>Brushless DC motor (BLDC)</h3>
+
+          <p>A <strong>brushless DC motor</strong> removes the brushes. Instead, a small electronic unit switches the current in the coils at the right time. Because nothing rubs, there is far less wear and the motor lasts much longer. It is also more efficient.</p>
+
+          <p>The cost is more complexity: a BLDC needs a special electronic controller that knows the rotor's position to switch at the right moment. This is the motor used in drones, electric bikes and good quality robot wheels.</p>
+
+          <h3>Stepper motor</h3>
+
+          <p>A <strong>stepper motor</strong> moves in small, exact steps instead of spinning freely. Give it one electrical "pulse" and the shaft turns a fixed small angle — perhaps 1.8 degrees. Give it 200 pulses and it makes one full turn.</p>
+
+          <p>This is wonderful for tasks where you must count position. A 3D printer moves its print head in exact steps so it lands in the right place every time. The catch: a stepper has low torque for its size at high speed, and if you push it too hard it can "skip" a step without telling you, losing its position.</p>
+
+          <h3>Servo motor (hobby servo)</h3>
+
+          <p>A <strong>servo motor</strong> is not really a different motor inside. It is a small motor plus a gearbox plus a control board, all in one box. You send it a command like "go to 90 degrees", and the servo moves there and holds that position.</p>
+
+          <p>The control board inside reads a small sensor that measures the output angle, and keeps correcting until it reaches the target. That is why a servo can hold a position strongly. Hobby servos are perfect for steering, small arms and grippers. But they have a limited range of motion, often only about 180 degrees, and you can damage them by forcing them to push past a hard stop.</p>
+
+          <h3>Geared DC motor</h3>
+
+          <p>A <strong>geared DC motor</strong>, often called a gearmotor, is a brushed or brushless motor with a gearbox already attached. The gearbox slows the output and multiplies the torque. This is the everyday choice for robot wheels, because it gives the slow, strong output that driving needs.</p>
+
+          <p>Now compare them all side by side in Table 6.1.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Motor type</th><th>How it works (simply)</th><th>Pros</th><th>Cons</th><th>Typical robot use</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Brushed DC</td><td>Brushes switch the current as it spins</td><td>Cheap, simple, easy to drive</td><td>Brushes wear out, some noise</td><td>Cheap wheels, fans, toys</td></tr>
+                <tr><td>Brushless DC (BLDC)</td><td>Electronics switch the current, no brushes</td><td>Long life, efficient, strong</td><td>Needs a special controller</td><td>Drone rotors, good wheels</td></tr>
+                <tr><td>Stepper</td><td>Moves in fixed small steps on command</td><td>Exact position, no sensor needed to move</td><td>Low high-speed torque, can skip steps</td><td>3D printers, small CNC</td></tr>
+                <tr><td>Servo (hobby)</td><td>Motor plus gearbox plus position control</td><td>Holds a position, easy to command</td><td>Limited range, easy to damage by stalling</td><td>Steering, arms, grippers</td></tr>
+                <tr><td>Geared DC</td><td>DC motor with a gearbox attached</td><td>Strong and slow — ideal for wheels</td><td>Gearbox adds cost and some friction</td><td>Most wheeled robots</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 6.1 — A quick comparison of the five motors you will meet most often.</p>
+
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> In simple words</div>
+            <p>Brushed DC is the cheap all-rounder. Brushless lasts longer. Stepper is for counting exact steps. Servo is for holding an angle. Geared DC is what you put on robot wheels.</p>
+          </div>
+
+          <h2>Reading a motor datasheet</h2>
+
+          <p>When you shop for a motor, you will see a list of numbers called a <strong>datasheet</strong>. At first it looks like a wall of jargon. In fact, each number answers a simple question. Let us translate them one by one.</p>
+
+          <h3>Rated voltage</h3>
+
+          <p>This is the voltage the motor is designed to run on, such as 6 V or 12 V. It answers the question "what battery should I use?" Run it far above its rated voltage and it spins too fast, gets hot and may fail. Run it below and it will be weak and slow.</p>
+
+          <h3>No-load speed (RPM)</h3>
+
+          <p>This is how fast the shaft spins when nothing is attached. It is the fastest the motor goes. Your real speed will always be lower, because any real load slows it down. Treat this number as the "best case", not the normal case.</p>
+
+          <h3>Stall torque</h3>
+
+          <p>This is the maximum turning force the motor can produce when it is stopped and still trying. It is the strongest the motor can ever pull. You should never plan to run at this value, because that is the stall we warned about. Keep your normal torque well below it.</p>
+
+          <h3>Rated current and stall current</h3>
+
+          <p><strong>Rated current</strong> is how much current the motor draws when working normally. <strong>Stall current</strong> is how much it draws when stopped. The stall value is often five to ten times bigger. This number is critical, because your driver and battery must handle it — even if only for a moment.</p>
+
+          <div class="callout note">
+            <div class="callout__head"><i class="bi bi-info-circle-fill"></i> Note</div>
+            <p>Always size your driver and battery for the stall current, not the rated current. A robot wheel can jam for a split second many times a day. The electronics must survive those moments.</p>
+          </div>
+
+          <h3>Gear ratio</h3>
+
+          <p>If the motor has a gearbox, the datasheet lists the <strong>gear ratio</strong>, such as 30 to 1 or 100 to 1. It tells you how much the output is slowed and strengthened. A higher ratio means a slower, stronger output. The no-load speed and stall torque on the sheet are usually given for the output shaft, after the gears.</p>
+
+          <h3>Encoder</h3>
+
+          <p>Some motors come with an <strong>encoder</strong>. The datasheet will say something like "quadrature encoder, 11 counts per revolution". We will explain encoders fully in the next section. For now, know that an encoder lets the motor measure its own turning, which is a huge advantage for control.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Datasheet term</th><th>The question it answers</th><th>Simple meaning</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Rated voltage</td><td>What battery?</td><td>The voltage it is made to run on</td></tr>
+                <tr><td>No-load speed</td><td>How fast at best?</td><td>Speed with nothing attached</td></tr>
+                <tr><td>Stall torque</td><td>How strong at most?</td><td>Maximum turning force when stopped</td></tr>
+                <tr><td>Rated current</td><td>What does it sip normally?</td><td>Current during normal work</td></tr>
+                <tr><td>Stall current</td><td>What does it gulp when stuck?</td><td>Current when stopped and trying</td></tr>
+                <tr><td>Gear ratio</td><td>How much is it slowed?</td><td>Speed traded for torque</td></tr>
+                <tr><td>Encoder</td><td>Can it sense its own turn?</td><td>A sensor that counts shaft movement</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 6.2 — Every datasheet number answers one plain question.</p>
+
+          <h2>Encoders: a motor that can feel itself</h2>
+
+          <p>By itself, a plain motor is blind. It spins when you give it power, but it has no idea how far or how fast it turned. You tell it "go", and it goes — but it cannot tell you where it ended up.</p>
+
+          <p>An <strong>encoder</strong> fixes this. It is a sensor attached to the motor shaft that counts how much the shaft turns. As the shaft spins, the encoder sends out pulses. Each pulse is a small slice of rotation. Count the pulses and you know the angle; count them per second and you know the speed.</p>
+
+          <p>A common type is the <strong>quadrature encoder</strong>. It has two output signals that are slightly out of step. By looking at which signal comes first, the robot can tell not only how far the shaft turned, but also which direction it turned.</p>
+
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> The key idea</div>
+            <p>An encoder turns a blind motor into one that can report its own position and speed. With that feedback, you can make the robot go exactly the distance and speed you want, even when the load changes.</p>
+          </div>
+
+          <p>Why does this matter so much? Without feedback, if the robot hits a slope, it slows down and you never know. With an encoder, the robot notices it is going slower than asked, adds power, and keeps the speed steady. This idea is called <strong>closed-loop control</strong>. You will build on it heavily in later chapters on control and navigation, but the seed is here: an encoder is the motor's sense of touch.</p>
+
+          <h2>Motor drivers: why you cannot connect a motor straight to a controller</h2>
+
+          <p>Beginners often try to wire a motor directly to a microcontroller pin. It rarely ends well. Here is why.</p>
+
+          <p>A controller pin is a tiny signal. It can push a small amount of current, often only about 20 milliamps. But a motor can need one or two <em>amps</em> — a hundred times more. Asking a controller pin to drive a motor is like asking a small child to push a car. The pin will overheat and die.</p>
+
+          <p>A <strong>motor driver</strong> is the strong middle-man. The controller sends a small, safe signal to the driver. The driver then lets a large, controlled current flow from the battery through the motor. The controller decides; the driver does the heavy lifting.</p>
+
+          <h3>The H-bridge idea</h3>
+
+          <p>How does a driver make a motor spin both ways? With a clever circuit called an <strong>H-bridge</strong>. It contains four electronic switches arranged in the shape of a letter H, with the motor across the middle. By opening and closing different pairs of switches, the driver can send current through the motor in either direction.</p>
+
+          <p>Current one way spins the motor forward. Current the other way spins it backward. And by switching the current on and off very fast, the driver can also control the speed. This fast on-off trick is called <strong>PWM</strong>, short for pulse-width modulation.</p>
+
+          <figure class="figure">
+            <div class="figure__box">
+              <svg viewBox="0 0 640 260" width="100%" role="img" aria-label="A simple H-bridge diagram with four switches and a motor in the middle, showing how current flows in two directions">
+                <text x="320" y="28" text-anchor="middle" font-family="Inter, sans-serif" font-size="15" font-weight="700" fill="#1c2230">H-bridge: two directions from one circuit</text>
+
+                <line x1="150" y1="70" x2="150" y2="200" stroke="#7b849b" stroke-width="2"></line>
+                <line x1="330" y1="70" x2="330" y2="200" stroke="#7b849b" stroke-width="2"></line>
+                <line x1="150" y1="70" x2="330" y2="70" stroke="#7b849b" stroke-width="2"></line>
+                <line x1="150" y1="200" x2="330" y2="200" stroke="#7b849b" stroke-width="2"></line>
+
+                <rect x="132" y="96" width="36" height="28" rx="5" fill="#e8eeff" stroke="#2d5bff" stroke-width="2"></rect>
+                <text x="150" y="115" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#2d5bff">S1</text>
+                <rect x="132" y="150" width="36" height="28" rx="5" fill="#e8eeff" stroke="#2d5bff" stroke-width="2"></rect>
+                <text x="150" y="169" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#2d5bff">S2</text>
+                <rect x="312" y="96" width="36" height="28" rx="5" fill="#f0e9fd" stroke="#7a4ddb" stroke-width="2"></rect>
+                <text x="330" y="115" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#7a4ddb">S3</text>
+                <rect x="312" y="150" width="36" height="28" rx="5" fill="#f0e9fd" stroke="#7a4ddb" stroke-width="2"></rect>
+                <text x="330" y="169" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#7a4ddb">S4</text>
+
+                <circle cx="240" cy="135" r="34" fill="#e2f6ef" stroke="#0f9d78" stroke-width="2"></circle>
+                <text x="240" y="140" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#0f9d78">M</text>
+                <line x1="150" y1="135" x2="206" y2="135" stroke="#0f9d78" stroke-width="2"></line>
+                <line x1="274" y1="135" x2="330" y2="135" stroke="#0f9d78" stroke-width="2"></line>
+
+                <text x="430" y="90" font-family="Inter, sans-serif" font-size="13" fill="#2d5bff">Forward:</text>
+                <text x="430" y="110" font-family="Inter, sans-serif" font-size="12" fill="#4a5266">close S1 and S4.</text>
+                <text x="430" y="150" font-family="Inter, sans-serif" font-size="13" fill="#7a4ddb">Backward:</text>
+                <text x="430" y="170" font-family="Inter, sans-serif" font-size="12" fill="#4a5266">close S2 and S3.</text>
+                <text x="430" y="210" font-family="Inter, sans-serif" font-size="13" fill="#d94b4b">Never:</text>
+                <text x="430" y="230" font-family="Inter, sans-serif" font-size="12" fill="#4a5266">S1 with S2, or S3 with S4.</text>
+              </svg>
+            </div>
+            <figcaption>Figure 6.3 — The H-bridge. Four switches let current flow either way through the motor. Good driver boards handle the tricky part of never closing the wrong pair at once.</figcaption>
+          </figure>
+
+          <h3>Driver boards you can buy</h3>
+
+          <p>You rarely build an H-bridge yourself. You buy a driver board with the circuit ready to use. Popular beginner boards have names like L298N, TB6612, DRV8833 and the BTS7960 for bigger motors. Each board has a current limit printed in its datasheet. Rule one: pick a board whose current limit is higher than your motor's stall current, with some room to spare.</p>
+
+          <div class="callout danger">
+            <div class="callout__head"><i class="bi bi-shield-exclamation"></i> Danger</div>
+            <p>Never connect a motor's power wires to a controller's logic pins. The motor will pull far too much current and destroy the pin. Always use a motor driver, and always connect the driver's ground to the controller's ground.</p>
+          </div>
+
+          <h2>Sizing a motor: a step-by-step method</h2>
+
+          <p>Choosing a motor is not guesswork. Follow a fixed set of steps and you will land on a sensible choice. The steps go from what you want the robot to do, back to the motor and gearing it needs.</p>
+
+          <ol>
+            <li><strong>Find the force needed.</strong> Estimate how hard the robot must push to move, and to climb any slope. This force comes from the weight of the robot and how steep the hill is.</li>
+            <li><strong>Choose the wheel radius.</strong> Bigger wheels need more torque but roll further per turn. Pick a wheel size that suits the robot's size and the ground.</li>
+            <li><strong>Find the required torque.</strong> Torque equals force times wheel radius. This is the turning force each motor must give at the wheel.</li>
+            <li><strong>Add a safety margin.</strong> Multiply by about 1.5 to 2. Real robots have friction and bumps. A small margin keeps the motor out of trouble.</li>
+            <li><strong>Check the speed.</strong> Work out the turns per second the wheel needs, then convert to RPM. Compare with the motor's no-load RPM.</li>
+            <li><strong>Check the current.</strong> Make sure the driver and battery can supply the motor's stall current, not just its rated current.</li>
+          </ol>
+
+          <p>Two of these steps need a small formula. Torque at the wheel is force times radius:</p>
+
+          <div class="formula"><span class="label">Torque from force and wheel</span> &tau; = F &times; r</div>
+
+          <p>And if you know the wheel radius and the speed you want, the wheel's turning rate in RPM is:</p>
+
+          <div class="formula"><span class="label">Wheel speed</span> RPM = (v &times; 60) &divide; (2 &times; &pi; &times; r)</div>
+
+          <p>Do not fear these. They are just multiplication and division, and we will use them in full below.</p>
+
+          <h2>A full worked example</h2>
+
+          <p>Let us size a motor for a real small robot. The goal: move a 1.5 kg robot at 0.5 metres per second up a small slope of about 5 degrees. The robot has two driven wheels, each 60 mm in diameter, and each wheel has its own motor.</p>
+
+          <h3>Step 1 — find the force needed</h3>
+
+          <p>First, the robot must beat friction on flat ground. For a small robot on a hard floor, a rough rule is that the push needed is about 0.1 times the weight. The weight of 1.5 kg is about 15 newtons (using 10 N per kg as an easy value). So the flat-ground force is about 0.1 &times; 15 = 1.5 N.</p>
+
+          <p>Next, add the slope. On a small slope, the extra force is roughly the weight times the slope angle in radians. Five degrees is about 0.087 radians. So the slope force is about 15 &times; 0.087 = 1.3 N.</p>
+
+          <p>Total force = 1.5 N + 1.3 N = 2.8 N. That is the push the robot needs at the ground.</p>
+
+          <h3>Step 2 — choose the wheel radius</h3>
+
+          <p>The wheels are 60 mm across, so the radius is 30 mm. In metres that is 0.03 m. Always convert to metres before using a formula.</p>
+
+          <h3>Step 3 — find the required torque</h3>
+
+          <p>Torque is force times radius. But we have two driven wheels, so each motor shares half the force. Each motor handles 2.8 &divide; 2 = 1.4 N at the ground.</p>
+
+          <div class="formula"><span class="label">Torque per wheel</span> &tau; = 1.4 N &times; 0.03 m = 0.042 N&middot;m</div>
+
+          <p>Each motor must give about 0.042 newton-metres at the wheel.</p>
+
+          <h3>Step 4 — add a safety margin</h3>
+
+          <p>Double it, to allow for friction, bumps and carpet: 0.042 &times; 2 = 0.084 N&middot;m. Round up to about 0.1 N&middot;m per motor. This is the torque you want your gearmotor to provide comfortably.</p>
+
+          <h3>Step 5 — check the speed</h3>
+
+          <p>The wheel must roll at 0.5 m/s. The wheel diameter is 0.06 m, so one turn of the wheel covers a distance of &pi; &times; 0.06 = 0.188 m.</p>
+
+          <div class="formula"><span class="label">Wheel speed needed</span> RPM = (0.5 &times; 60) &divide; (2 &times; 3.14 &times; 0.03) = 30 &divide; 0.188 &asymp; 160 RPM</div>
+
+          <p>So the output shaft of each gearmotor should turn at about 160 RPM or a little more. Look for a motor with a no-load speed comfortably above this, because it will slow under load.</p>
+
+          <h3>Step 6 — check the current</h3>
+
+          <p>Now read the motor's datasheet. Suppose it lists a stall current of 2.5 A per motor. With two motors, the worst case is 5 A at once. Your driver and battery must handle that moment. A driver board rated at 7 A per channel, and a battery that can supply 5 A, will be safe. If your battery cannot give 5 A, the robot may reset or brown out when both wheels jam.</p>
+
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> Tip</div>
+            <p>The result: a geared DC motor with an output of roughly 160 RPM and at least 0.1 N&middot;m of torque, a driver good for about 3 A per channel, and a battery that can supply at least 5 A. Those three numbers are your shopping list.</p>
+          </div>
+
+          <h2>Common beginner mistakes</h2>
+
+          <p>Most failed first robots are not failed by bad ideas. They are failed by a few repeated mistakes. Learn them here and you skip a lot of frustration.</p>
+
+          <h3>Choosing a motor by size alone</h3>
+
+          <p>A big motor is not always the right motor. What matters is torque, speed and current for your task, as we just worked out. A huge motor adds weight and drains the battery. Match the numbers, not the looks.</p>
+
+          <h3>Ignoring stall current</h3>
+
+          <p>This is the most common and most costly error. Beginners pick a driver by the motor's normal current, then wonder why the driver dies the first time the robot pushes against a wall. Always check stall current, and leave a margin above it.</p>
+
+          <h3>No motor driver</h3>
+
+          <p>Connecting a motor straight to a controller destroys the pin. The controller is a brain, not a muscle. Always route the power through a proper driver board.</p>
+
+          <h3>No encoder when you need one</h3>
+
+          <p>If your task needs exact speed or distance, a plain motor will not do it. Two identical motors never spin at exactly the same speed, so a robot driven by two plain motors drifts to one side. An encoder fixes this. Decide early whether you need feedback.</p>
+
+          <h3>Damaging a servo by stalling it</h3>
+
+          <p>A hobby servo tries very hard to reach the angle you command. If something blocks it, it keeps pushing, drawing a large current and heating up. Push a servo against a hard stop for a few seconds and you can burn it out. Make sure the servo can move freely to its target.</p>
+
+          <div class="callout danger">
+            <div class="callout__head"><i class="bi bi-shield-exclamation"></i> Danger</div>
+            <p>Never hold a stalled motor or servo on purpose to "test its strength". That test turns electrical energy into heat inside a small space, and the windings can fail quickly. If a motor feels hot, cut the power and let it cool.</p>
+          </div>
+
+          <h2>How professionals do it</h2>
+
+          <p>At small scale, you pick a motor from a hobby catalogue. At industrial scale, engineers think differently. Here is what changes.</p>
+
+          <h3>Gearmotor families</h3>
+
+          <p>Professionals rarely buy a bare motor and a separate gearbox. They buy a whole <strong>gearmotor family</strong>: one motor line with a range of gear ratios, so they can pick the exact output speed and torque they need. This makes swapping and scaling designs easy. Common families use planetary gears, which are compact and strong.</p>
+
+          <h3>Closed-loop drivers</h3>
+
+          <p>Instead of driving a motor blindly, professionals use drivers that read an encoder and correct continuously. This <strong>closed-loop</strong> approach holds speed steady under changing loads and holds position under changing forces. It is the difference between "roughly move" and "move exactly".</p>
+
+          <h3>Thermal limits</h3>
+
+          <p>Professional designers treat heat as a first-class problem. Motors have a thermal limit — how much heat they can shed before the windings are damaged. Engineers add heatsinks, limit the duty cycle (how long the motor runs at high power), and use temperature sensors. In a robot, the question is not only "can it move?" but "can it move all day without cooking itself?"</p>
+
+          <h3>Efficiency maps</h3>
+
+          <p>A motor is not equally efficient everywhere. Efficiency is how much of the electrical power becomes useful movement, versus how much is lost as heat. Professionals use <strong>efficiency maps</strong> — charts that show the best operating region. They try to keep the motor near its sweet spot, where it does the most work for the least heat.</p>
+
+          <h3>Brushed versus brushless trade-offs</h3>
+
+          <p>Professionals weigh brushed against brushless by the job. Brushed is cheaper and simpler for occasional use. Brushless costs more but lasts longer, runs cooler and is more efficient, so it wins for continuous industrial duty. The right answer depends on hours of use, budget and how much maintenance is acceptable.</p>
+
+          <div class="callout note">
+            <div class="callout__head"><i class="bi bi-info-circle-fill"></i> Note</div>
+            <p>The gap between beginner and professional is not a secret formula. It is the same six sizing steps, done carefully, with real measurements and a healthy respect for heat and current.</p>
+          </div>
+
+          <h2>Try it yourself</h2>
+
+          <p>Reading is useful, but motors are understood with your hands. Try these exercises in order. Each one teaches a piece of the chapter in a way you can feel.</p>
+
+          <ol>
+            <li><strong>Feel torque with a jar.</strong> Tighten a jar lid. Now open it with a short grip, then with a cloth or a longer grip. Describe in one sentence why the longer grip felt easier. <em>Hint:</em> the longer grip gives more turning force for the same effort — that is what a gear does.</li>
+            <li><strong>Stop a small fan or motor gently.</strong> With adult supervision and a low-power toy motor, feel how it slows when you add a light load. Notice that it gets harder to hold as it slows. <em>Hint:</em> this is the torque-speed trade-off in your fingers. Do not stall it for long.</li>
+            <li><strong>Read a real datasheet.</strong> Find any brushed DC motor listing online. Write down its rated voltage, no-load RPM, and stall current. Say out loud what each number means. <em>Hint:</em> use Table 6.2 as your translator.</li>
+            <li><strong>Do the sizing maths for your own robot.</strong> Pick a weight and a target speed for a robot you want to build. Follow the six steps and find the torque and RPM you need. <em>Hint:</em> reuse the worked example values and change only the weight and speed.</li>
+            <li><strong>Plan your driver and battery.</strong> For the motor from exercise 3, choose a driver board whose current limit beats the stall current, and a battery that can supply it. <em>Hint:</em> multiply stall current by the number of motors, then add space.</li>
+          </ol>
+
+          <h2>Going deeper (optional)</h2>
+
+          <p>If you want one advanced idea, let it be this: motors are chosen twice. First you size the motor for the peak job, such as starting from rest or climbing a hill. Then you check it again for the continuous job, such as driving on the flat all day. A motor that is perfect for the peak may overheat in steady use, and a motor that is cool and calm all day may be too weak to start. Good designers check both, and they often choose a slightly bigger motor for the continuous case and use careful control to tame the peak. This two-lens habit — peak and continuous — will serve you through every actuator you ever choose.</p>
+
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> Where this leads</div>
+            <p>You can now pick a motor and read its datasheet. Real robots use <strong>torque-controlled joints</strong> on fast networks like EtherCAT with CiA 402 drives. Learn the production stack in <a href="ch27-production-software-robotics.html">Chapter 27: Production Software for Robotics</a> and the control behind it in <a href="ch26-whole-body-control-mpc.html">Chapter 26: Whole-Body Control and MPC</a>.</p>
+          </div>
+
+          <section class="takeaways">
+            <h2><i class="bi bi-pin-angle-fill"></i> Key takeaways</h2>
+            <ul>
+              <li><i class="bi bi-check2-circle"></i> A motor turns electricity into spinning movement using magnets.</li>
+              <li><i class="bi bi-check2-circle"></i> The rotor spins; the stator stays still and holds the magnets.</li>
+              <li><i class="bi bi-check2-circle"></i> Torque is turning force and speed is how fast the shaft spins. More of one usually means less of the other.</li>
+              <li><i class="bi bi-check2-circle"></i> Power equals torque times angular speed. At stall, torque is high but speed and power are zero — and current is huge.</li>
+              <li><i class="bi bi-check2-circle"></i> Brushed DC, brushless, stepper, servo and geared DC each suit different jobs; geared DC motors drive most robot wheels.</li>
+              <li><i class="bi bi-check2-circle"></i> A motor needs a driver because a controller is too weak, and an encoder gives it position and speed feedback.</li>
+              <li><i class="bi bi-check2-circle"></i> Size a motor with six steps: force, wheel, torque, margin, speed, current. Always check stall current.</li>
+            </ul>
+          </section>
+
+          <section class="quiz">
+            <div class="quiz__head"><i class="bi bi-patch-question-fill"></i> Check your understanding</div>
+            <details>
+              <summary><span class="q-num">Q1.</span><span>Which part of a motor spins, and which part stays still?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> The rotor spins. The stator stays still and usually holds the permanent magnets.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q2.</span><span>In plain words, what is torque?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Torque is the turning force of a motor — how strongly it can twist something, like opening a tight jar lid.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q3.</span><span>A gear ratio of 20 to 1 slows the output. What do you gain in return?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> You gain torque. The output turns about 20 times slower but with about 20 times more turning force.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q4.</span><span>What is stall, and why is stall current dangerous?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Stall is when the motor is commanded to turn but cannot move. Speed and power are zero, so all the energy becomes heat, and the current is far higher than normal. If it lasts, the motor or driver can burn out.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q5.</span><span>Why can you not connect a motor straight to a controller pin?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> A controller pin can only supply a tiny current, but a motor needs far more. The pin would overheat and break. Use a motor driver to handle the big current.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q6.</span><span>Name two jobs a stepper motor is good at, and two where a servo is better.</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Steppers are good for exact step positions, such as 3D printers and small CNC machines. Servos are better for holding an angle, such as steering, small arms and grippers.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q7.</span><span>Your robot drives with two plain motors and drifts to the left. What is likely missing, and how does it help?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Encoders are likely missing. Two plain motors never spin at exactly the same speed. Encoders let the robot measure each wheel's speed and correct, keeping it straight.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q8.</span><span>List the six steps for sizing a motor.</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> 1) Find the force needed. 2) Choose the wheel radius. 3) Find the required torque. 4) Add a safety margin. 5) Check the speed. 6) Check the current.</div>
+            </details>
+          </section>
+        </article>
+
+        <nav class="pager" id="pager" aria-label="Chapter navigation"></nav>
+      </div>
+    </main>
+  </div>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/book.js"></script>
+</body>
+</html>

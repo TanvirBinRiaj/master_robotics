@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>try{var __t=localStorage.getItem("mr-theme");if(__t==="dark"||__t==="light")document.documentElement.setAttribute("data-theme",__t);}catch(e){}</script>
+  <title>Chapter 18: ROS 2: The Robot Operating System — Master Robotics</title>
+  <meta name="description" content="A plain-English guide to ROS 2, the Robot Operating System, with ros2_control and real-time ideas. Learn what ROS is, how nodes, topics and messages work, and run your first ROS-style program idea.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/prose.css">
+</head>
+<body data-file="ch18-ros.html">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="topbar" id="topbar"></header>
+  <div class="progress-bar" id="progressBar"></div>
+
+  <div class="layout">
+    <div class="sidebar__backdrop" id="navBackdrop"></div>
+    <nav class="sidebar" id="sidebar" aria-label="Book contents"></nav>
+
+    <main class="main" id="main">
+      <div class="container">
+
+        <header class="chapter-head">
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="index.html">Home</a>
+            <i class="bi bi-chevron-right"></i>
+            <a href="index.html#software">Part 4 &middot; Software and Control</a>
+            <i class="bi bi-chevron-right"></i>
+            <span>Chapter 18</span>
+          </nav>
+          <span class="chapter-kicker"><i class="bi bi-code-slash"></i> Part 4 &middot; Software and Control</span>
+          <h1>ROS 2: The Robot Operating System</h1>
+          <p class="lede">As robots grow, one big program stops working. ROS lets you split the job into small programs that talk to each other. By the end, you will understand nodes, topics and messages, and you will design a ROS graph for your own robot.</p>
+          <div class="chapter-meta">
+            <span><i class="bi bi-clock"></i> ~27 min read</span>
+            <span><i class="bi bi-bar-chart"></i> Intermediate</span>
+            <span><i class="bi bi-list-check"></i> Chapter 18 of 30</span>
+          </div>
+          <div class="goals">
+            <h2>What you will learn</h2>
+            <ul>
+              <li><i class="bi bi-check-circle-fill"></i> Explain what ROS is and why it exists.</li>
+              <li><i class="bi bi-check-circle-fill"></i> Describe nodes, topics and messages.</li>
+              <li><i class="bi bi-check-circle-fill"></i> Run a first ROS-style program idea.</li>
+            </ul>
+          </div>
+        </header>
+
+        <article class="article">
+
+          <p class="lead">Imagine you are building a delivery robot. One small program reads the camera. Another reads the wheels. Another decides where to go. Another drives the motors. Now imagine keeping all of that inside one giant file. Every small change risks breaking everything else. This is the exact problem ROS was built to solve.</p>
+
+          <h2>The problem ROS solves</h2>
+
+          <p>A robot has many jobs to do at the same time. It must read sensors. It must decide what to do. It must drive motors. It must watch its battery. It must talk to a screen or a phone. If you write all of this as one program, the program quickly becomes huge.</p>
+
+          <p>A huge program is hard to change. Fix the wheel code and you might break the camera code. Two people cannot work on the same file easily. You cannot test one small part on its own. And you cannot copy a good piece of code from an old robot into a new one.</p>
+
+          <p>Engineers solve this the same way a busy restaurant does. They do not hire one cook who does everything. They hire many workers, each with one clear job. The vegetable cook chops vegetables. The sauce cook makes sauce. They pass plates to each other. The kitchen runs smoothly because each person has one task and a clear way to hand work to the next person.</p>
+
+          <p><strong>ROS</strong> does this for robot software. It lets you split a robot into many small programs, each with one job. It also gives those programs a shared language so they can pass data to each other. And it gives you a shared toolbox, so you can reuse work that other people already did.</p>
+
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> The key idea</div>
+            <p>ROS is a shared set of software tools and a shared language for building robot programs. It lets many small programs work together, and it lets people reuse each other's work.</p>
+          </div>
+
+          <h2>What ROS actually is</h2>
+
+          <p>First, let us clear up the name. The full name of ROS is <strong>Robot Operating System</strong>. This name confuses almost everyone at first, so read this part carefully.</p>
+
+          <h3>ROS is not an operating system</h3>
+
+          <p>An <strong>operating system</strong> is the main software that runs a computer. Windows, macOS and Linux are operating systems. They manage memory, files, screens and hardware. ROS does none of that. You cannot install ROS on a bare computer and use it instead of Linux.</p>
+
+          <p>ROS runs <em>on top of</em> a normal operating system, usually Linux. It also works on Windows and macOS. So the name is misleading. ROS is not an operating system at all.</p>
+
+          <h3>What ROS really is</h3>
+
+          <p><strong>ROS</strong> is three things bundled into one project:</p>
+
+          <ul>
+            <li><strong>Middleware.</strong> This is the hidden plumbing that moves data between programs. Middleware sits in the middle and carries messages from one program to another without you writing the network code yourself.</li>
+            <li><strong>A set of libraries.</strong> A library is ready-made code you can call. ROS libraries handle common tasks like reading a sensor, moving a robot, or talking to a camera.</li>
+            <li><strong>A set of tools.</strong> These are small programs that help you watch, test and control your robot while it runs.</li>
+          </ul>
+
+          <p>Put together, ROS is the shared toolbox and the shared language for robot software. It is not the robot's brain by itself. It is the workshop where you build the brain.</p>
+
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> In simple words</div>
+            <p>ROS is not Windows or Linux. It runs on top of those. ROS is a box of ready-made tools plus a way for your robot's programs to talk to each other.</p>
+          </div>
+
+          <h2>Nodes: one program, one job</h2>
+
+          <p>The smallest building block in ROS is a <strong>node</strong>. A node is one program that does one job. That is the whole rule. If a program has one clear job, it is a good node. If a program tries to do five jobs at once, it should be split into five nodes.</p>
+
+          <p>Examples of nodes in a real robot:</p>
+
+          <ul>
+            <li>A node that reads the distance sensor and reports the numbers.</li>
+            <li>A node that reads the camera and finds lines on the floor.</li>
+            <li>A node that plans a path from one place to another.</li>
+            <li>A node that sends speed commands to the motors.</li>
+            <li>A node that watches the battery and warns when it is low.</li>
+          </ul>
+
+          <p>Each of those is a separate, small program. Each one is easy to test alone. Each one can be replaced or improved without touching the others.</p>
+
+          <h3>Why one job per node matters</h3>
+
+          <p>Think of a team of workers again. If one worker has a single clear task, you can tell exactly who is responsible when something goes wrong. You can swap that worker for a better one. You can give the same task to two workers and compare them. Nodes work the same way.</p>
+
+          <p>The usual exception is a tiny robot with only one useful job. Then one node is fine. But as soon as your robot grows, splitting the work pays off.</p>
+
+          <div class="callout note">
+            <div class="callout__head"><i class="bi bi-info-circle-fill"></i> Note</div>
+            <p>A node usually does not care where its data comes from or who uses its output. It just asks ROS for data and sends its own data out. This is what makes nodes so easy to connect and reuse.</p>
+          </div>
+
+          <h2>Topics: named channels for data</h2>
+
+          <p>Nodes need to share data. ROS does this with <strong>topics</strong>. A topic is a named channel that carries a stream of data. Think of a name like <code>/camera/image</code> or <code>/motor/speed</code>.</p>
+
+          <p>Topics use a simple pattern called <strong>publish and subscribe</strong>. A node that has data <strong>publishes</strong> it by putting it on a topic. A node that wants that data <strong>subscribes</strong> to the topic and receives it. Publishers send. Subscribers listen.</p>
+
+          <h3>The notice board picture</h3>
+
+          <p>Imagine an office with many notice boards on the wall. Each board has a name, like "Weather" or "Lunch menu". Anyone who has news pins a note to the right board. Anyone who wants to know reads the board. The people pinning notes never meet the people reading them. They only share the board.</p>
+
+          <p>A ROS topic is exactly that board. The publisher pins a message to a topic. Every subscriber reads it. The publisher does not know or care who is reading.</p>
+
+          <figure class="figure">
+            <div class="figure__box">
+              <svg viewBox="0 0 640 260" width="100%" role="img" aria-label="A publish and subscribe diagram: one publisher node sends messages along a topic to two subscriber nodes">
+                <rect x="24" y="100" width="150" height="64" rx="12" fill="#e8eeff" stroke="#2d5bff" stroke-width="2"></rect>
+                <text x="99" y="128" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#2d5bff">Publisher</text>
+                <text x="99" y="147" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#4a5266">sends data</text>
+
+                <rect x="238" y="112" width="164" height="40" rx="20" fill="#e6f4ff" stroke="#2d5bff" stroke-width="2"></rect>
+                <text x="320" y="137" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#2d5bff">/camera/image</text>
+
+                <rect x="466" y="34" width="150" height="58" rx="12" fill="#e2f6ef" stroke="#0f9d78" stroke-width="2"></rect>
+                <text x="541" y="58" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#0f9d78">Subscriber A</text>
+                <text x="541" y="77" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#4a5266">line finder</text>
+
+                <rect x="466" y="172" width="150" height="58" rx="12" fill="#e2f6ef" stroke="#0f9d78" stroke-width="2"></rect>
+                <text x="541" y="196" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#0f9d78">Subscriber B</text>
+                <text x="541" y="215" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#4a5266">video screen</text>
+
+                <line x1="174" y1="132" x2="238" y2="132" stroke="#7b849b" stroke-width="2" marker-end="url(#ar18)"></line>
+                <path d="M402 122 C440 122 440 63 466 63" fill="none" stroke="#7b849b" stroke-width="2" marker-end="url(#ar18)"></path>
+                <path d="M402 142 C440 142 440 201 466 201" fill="none" stroke="#7b849b" stroke-width="2" marker-end="url(#ar18)"></path>
+                <text x="320" y="248" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#7b849b">one publisher, many subscribers, no direct link</text>
+                <defs>
+                  <marker id="ar18" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+                    <path d="M0,0 L9,4.5 L0,9 z" fill="#7b849b"></path>
+                  </marker>
+                </defs>
+              </svg>
+            </div>
+            <figcaption>Figure 18.1 — Publish and subscribe. The publisher writes to a named topic. Many subscribers can read the same topic at once, and they never talk to the publisher directly.</figcaption>
+          </figure>
+
+          <h3>Many-to-many and asynchronous</h3>
+
+          <p>Two words describe how topics work. They sound technical but they are simple.</p>
+
+          <p><strong>Many-to-many</strong> means any number of publishers and any number of subscribers can share one topic. One camera node might publish an image, and five different nodes might read it.</p>
+
+          <p><strong>Asynchronous</strong> means the publisher does not wait for a reply. It pins its note and moves on. If no one is listening, nothing breaks. This keeps nodes fast and independent. That is the opposite of a phone call, where you must wait for the other person to answer.</p>
+
+          <div class="formula"><span class="label">Message rate on a topic</span> rate = number of messages &divide; time in seconds</div>
+
+          <p>Here is a small, useful calculation. Suppose a camera node publishes 30 images every second. If you record it for 10 minutes, how many messages do you have?</p>
+
+          <p>30 messages per second &times; 600 seconds = 18,000 messages. If you recorded for one hour, it would be 30 &times; 3,600 = 108,000 messages. This is why professionals record data carefully. A fast topic fills up storage very quickly.</p>
+
+          <h2>Messages: the typed data on a topic</h2>
+
+          <p>A topic carries data in small packages called <strong>messages</strong>. A message has a fixed shape and fixed types. Think of it like a form with labelled boxes, so every reader knows exactly what to expect.</p>
+
+          <p>For example, a distance message might hold one number: a distance in metres. The type of that number is a <strong>float</strong>, which means a number with a decimal point, like 1.25. An image message is bigger. It holds the image width, the image height, how the colours are stored, and the picture data itself.</p>
+
+          <h3>Why types matter</h3>
+
+          <p>Computers take types very seriously. A float is a number with decimals. An integer is a whole number. A string is text. A boolean is true or false. If you try to put text where a number belongs, the program fails.</p>
+
+          <p>Types protect you. Because the message shape is agreed in advance, a subscriber knows exactly what it will receive. It knows the distance is a float in metres, not a string of text or a picture. The publisher and subscriber do not need to guess. This rule catches many mistakes before the robot ever moves.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Message idea</th><th>Typical fields</th><th>Type of each field</th><th>Example use</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Distance</td><td>range</td><td>float (metres)</td><td>Front sensor reads 0.42 m</td></tr>
+                <tr><td>Image</td><td>height, width, encoding, data</td><td>integers, text, byte list</td><td>Camera frame for line finding</td></tr>
+                <tr><td>Motor command</td><td>left speed, right speed</td><td>two floats</td><td>Drive wheels forward</td></tr>
+                <tr><td>Battery state</td><td>voltage, percentage</td><td>float, float</td><td>Warn at 20 percent charge</td></tr>
+                <tr><td>Laser scan</td><td>ranges, angle start, angle step</td><td>float list, floats</td><td>Map walls around the robot</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 18.1 — Common ROS message shapes. Every topic must agree on one message type.</p>
+
+          <h2>Services: a request and a reply</h2>
+
+          <p>Topics are great for steady streams, but sometimes you want an answer. You want to ask one node a question and get one reply. That is a <strong>service</strong>.</p>
+
+          <p>A service works like a phone call. One node asks a question and waits for the answer. This is called <strong>request and reply</strong>, and it is <strong>one-to-one</strong>. Only one node answers your request.</p>
+
+          <p>Good uses for a service:</p>
+
+          <ul>
+            <li>"Take a picture right now and send it to me."</li>
+            <li>"Switch the lights on."</li>
+            <li>"What is your battery level?"</li>
+            <li>"Save a map of this room."</li>
+          </ul>
+
+          <p>Notice the pattern. Each of these is a one-time job with a clear answer, not a continuous stream. If you asked a camera to publish pictures on a topic, that is a stream. If you asked it to snap one photo and hand it back, that is a service.</p>
+
+          <div class="callout warn">
+            <div class="callout__head"><i class="bi bi-exclamation-triangle-fill"></i> Watch out</div>
+            <p>A service blocks the caller until the reply arrives. If the service is slow, the asking node freezes while it waits. That is why long jobs are not done with services. For long jobs, ROS gives us actions.</p>
+          </div>
+
+          <h2>Actions: long jobs with progress</h2>
+
+          <p>Some jobs take a while and should report progress along the way. Think of "drive to the kitchen". That is not instant. The robot must move for many seconds and you may want to know how far along it is. It should also be possible to cancel it halfway.</p>
+
+          <p>An <strong>action</strong> is built for exactly this. You send a goal, such as "drive to the kitchen". The robot accepts it. While it works, it keeps sending <strong>feedback</strong>, such as "60 percent of the way there". When it finishes, it sends a final result. At any moment you can cancel the goal, and the robot will stop safely.</p>
+
+          <p>So the three ways to communicate in ROS fit three different needs. A topic is a fire hose of data. A service is a phone call with one answer. An action is a long errand with progress updates and a cancel button. Choose the one that matches your job.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Pattern</th><th>Shape</th><th>Waits for reply?</th><th>Best for</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Topic</td><td>Many-to-many stream</td><td>No</td><td>Sensor data, wheel commands</td></tr>
+                <tr><td>Service</td><td>One-to-one</td><td>Yes, one reply</td><td>Snap a photo, read a setting</td></tr>
+                <tr><td>Action</td><td>One goal, feedback, result</td><td>Yes, with progress</td><td>Drive somewhere, pick up an object</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 18.2 — Three ways to communicate in ROS. Pick by how the job behaves, not by habit.</p>
+
+          <h2>Parameters: settings a node reads at start</h2>
+
+          <p>A <strong>parameter</strong> is a named setting that a node reads when it starts or while it runs. Wheel diameter, robot width, maximum speed and camera resolution are all parameters.</p>
+
+          <p>Why not just write those numbers inside the code? Because you will change them. If the wheel diameter is buried deep in the code, you must edit the program and rebuild it every time you swap a wheel. With a parameter, you set the number in one place and the node reads it.</p>
+
+          <p>Parameters make one node reusable. The same motor-driver node can drive a tiny robot or a large one. Only the wheel diameter parameter changes. The code stays the same.</p>
+
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> Tip</div>
+            <p>A good habit: if a number describes the robot or the world, make it a parameter. If a number is a fixed rule of maths, keep it in the code.</p>
+          </div>
+
+          <h2>Seeing the graph: the whole robot at a glance</h2>
+
+          <p>When you connect many nodes with topics, a picture appears. ROS calls it the <strong>graph</strong>. Nodes are circles. Topics are the arcs or arrows between them. Services and actions also appear.</p>
+
+          <p>The graph is one of the best ideas in ROS. It lets you look at your whole robot as one clear picture. You can see which node sends data and which node receives it. If a topic has no publisher, you can spot the missing piece at once.</p>
+
+          <figure class="figure">
+            <div class="figure__box">
+              <svg viewBox="0 0 680 300" width="100%" role="img" aria-label="A small robot graph: a sensor node publishes to a scan topic, a controller node subscribes to the scan topic and publishes to a motor command topic, and a motor node subscribes to that topic">
+                <rect x="20" y="118" width="150" height="64" rx="12" fill="#e2f6ef" stroke="#0f9d78" stroke-width="2"></rect>
+                <text x="95" y="145" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#0f9d78">Sensor node</text>
+                <text x="95" y="164" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#4a5266">reads range</text>
+
+                <rect x="252" y="130" width="150" height="40" rx="20" fill="#e6f4ff" stroke="#2d5bff" stroke-width="2"></rect>
+                <text x="327" y="155" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#2d5bff">/scan (float)</text>
+
+                <rect x="252" y="40" width="150" height="64" rx="12" fill="#e8eeff" stroke="#2d5bff" stroke-width="2"></rect>
+                <text x="327" y="67" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#2d5bff">Controller node</text>
+                <text x="327" y="86" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#4a5266">decides speed</text>
+
+                <rect x="504" y="130" width="156" height="40" rx="20" fill="#f0e9fd" stroke="#7a4ddb" stroke-width="2"></rect>
+                <text x="582" y="155" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#7a4ddb">/motor/cmd (2 floats)</text>
+
+                <rect x="504" y="200" width="156" height="64" rx="12" fill="#f0e9fd" stroke="#7a4ddb" stroke-width="2"></rect>
+                <text x="582" y="227" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#7a4ddb">Motor node</text>
+                <text x="582" y="246" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#4a5266">turns wheels</text>
+
+                <line x1="170" y1="150" x2="252" y2="150" stroke="#7b849b" stroke-width="2" marker-end="url(#g18)"></line>
+                <line x1="327" y1="130" x2="327" y2="104" stroke="#7b849b" stroke-width="2" marker-end="url(#g18)"></line>
+                <path d="M402 72 C450 72 450 150 504 150" fill="none" stroke="#7b849b" stroke-width="2" marker-end="url(#g18)"></path>
+                <line x1="582" y1="170" x2="582" y2="200" stroke="#7b849b" stroke-width="2" marker-end="url(#g18)"></line>
+                <text x="340" y="288" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#7b849b">circles are nodes, rounded boxes are topics</text>
+                <defs>
+                  <marker id="g18" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+                    <path d="M0,0 L9,4.5 L0,9 z" fill="#7b849b"></path>
+                  </marker>
+                </defs>
+              </svg>
+            </div>
+            <figcaption>Figure 18.2 — A small robot graph. The sensor node publishes a scan. The controller node reads it and publishes a motor command. The motor node reads that and drives the wheels. Data flows left to right.</figcaption>
+          </figure>
+
+          <p>Read Figure 18.2 like a story. The sensor node measures the distance and publishes a float on the <code>/scan</code> topic. The controller node subscribes to <code>/scan</code>, decides what to do, and publishes two floats on <code>/motor/cmd</code>. The motor node subscribes to <code>/motor/cmd</code> and turns the wheels. Each node has one job, and each topic carries one type of message.</p>
+
+          <h2>The toolbox: commands, viewers and simulators</h2>
+
+          <p>ROS comes with tools that help you see and control your robot. You use them from a terminal, which is a text window where you type commands. You do not need to memorise all of them. You need to know what each one is for.</p>
+
+          <h3>The command line</h3>
+
+          <p>Every ROS command starts with the word <code>ros2</code>. That is the name of the current ROS line. Here are the commands you will use most, in plain words:</p>
+
+          <ul>
+            <li><code>ros2 node list</code> — show every running node. "Who is working right now?"</li>
+            <li><code>ros2 topic list</code> — show every topic. "What channels exist?"</li>
+            <li><code>ros2 topic echo &lt;name&gt;</code> — print the messages flowing on a topic. "What data is on this channel?"</li>
+            <li><code>ros2 run &lt;package&gt; &lt;node&gt;</code> — start one node from a package.</li>
+            <li><code>ros2 launch &lt;package&gt; &lt;file&gt;</code> — start many nodes at once from a launch file.</li>
+          </ul>
+
+          <div class="code">
+            <div class="code__bar">
+              <span class="code__dots"><span></span><span></span><span></span></span>
+              <span class="code__lang">Terminal</span>
+              <button class="code__copy" type="button"><i class="bi bi-clipboard"></i> Copy</button>
+            </div>
+            <pre><code># see what is running
+ros2 node list
+ros2 topic list
+
+# watch the data on a topic, one message at a time
+ros2 topic echo /scan
+
+# start a single node, then start a whole robot
+ros2 run my_robot distance_node
+ros2 launch my_robot bringup.launch.py</code></pre>
+          </div>
+
+          <h3>Seeing the data and testing without hardware</h3>
+
+          <p><strong>RViz</strong> is a viewer. It shows your robot's data as pictures: point clouds, maps, camera images and the robot's guessed position. Instead of reading numbers, you watch the robot's world on screen. It is built into ROS and needs no external images.</p>
+
+          <p><strong>Gazebo</strong> is a simulator. It is a pretend world with gravity, physics and virtual sensors. You can test your robot software in Gazebo before you own the real robot. If the robot crashes in simulation, only the pixels get hurt. This is one of the biggest reasons professionals love ROS.</p>
+
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> In simple words</div>
+            <p>The command line lets you peek at your robot. RViz draws what the robot senses. Gazebo is a practice world where you can crash safely.</p>
+          </div>
+
+          <h2>Packages, workspaces and launch files</h2>
+
+          <p>Before you write real code, three words explain how a ROS project is organised.</p>
+
+          <h3>Package</h3>
+          <p>A <strong>package</strong> is one folder that holds related nodes, messages and settings. A package is the unit you share. For example, a "motor" package might hold the motor node, its message types and its parameter file. When someone says "use the navigation package", they mean one ready-made folder of code you can drop into your robot.</p>
+
+          <h3>Workspace</h3>
+          <p>A <strong>workspace</strong> is a folder that holds many packages for one project. Think of it as a workbench. You keep all your own packages in one workspace, build them once, and ROS knows where to find them. You build a workspace with a single command, and ROS creates the setup files that your terminal must load before it can find your code.</p>
+
+          <h3>Launch file</h3>
+          <p>A <strong>launch file</strong> is a recipe that starts many nodes at once. A real robot may need ten nodes running together. Instead of typing ten <code>ros2 run</code> commands every time, you write one launch file. You run it with <code>ros2 launch</code>, and every node starts in the right order with the right parameters. This one file turns "start the robot" into a single command.</p>
+
+          <div class="callout note">
+            <div class="callout__head"><i class="bi bi-info-circle-fill"></i> Note</div>
+            <p>Launch files matter for beginners too. Many first-run failures happen only because one node was forgotten. A launch file makes sure every node of the robot is started together, every time.</p>
+          </div>
+
+          <h2>Your first idea: moving a virtual turtle</h2>
+
+          <p>The classic first ROS program uses a small simulator called <strong>turtlesim</strong>. It shows a flat window with a turtle. If you send it a speed command, the turtle draws a line as it moves. Nothing can crash, so it is a safe place to learn.</p>
+
+          <p>Here is how the pieces fit. One node is the turtle itself. It subscribes to a command topic. When it receives a message holding a forward speed and a turn speed, it moves the turtle. So the way to move the turtle is to publish a message to that command topic. You become a publisher node.</p>
+
+          <ol>
+            <li><strong>Start the turtle node.</strong> Run the turtlesim node. A window opens with the turtle in the middle.</li>
+            <li><strong>Look at the topics.</strong> Run <code>ros2 topic list</code> and find the command topic. It is usually called <code>/turtle1/cmd_vel</code>.</li>
+            <li><strong>Read the message shape.</strong> Ask ROS for the message type on that topic. You will see it holds two parts: a linear speed and an angular speed.</li>
+            <li><strong>Publish a command.</strong> Send a message with forward speed 2 and turn speed 0. The turtle drives straight.</li>
+            <li><strong>Watch it echo.</strong> In another terminal, run <code>ros2 topic echo</code> on the same topic and watch your own messages appear.</li>
+          </ol>
+
+          <p>This is the heart of ROS in one exercise. A node waits on a topic. You publish to that topic. The node reacts. That is a complete publish and subscribe loop, and it repeats everywhere in real robots.</p>
+
+          <p>Now look at it as code. This is a simple publisher in Python style. Read the comments to follow the steps.</p>
+
+          <div class="code">
+            <div class="code__bar">
+              <span class="code__dots"><span></span><span></span><span></span></span>
+              <span class="code__lang">Python (ROS 2 style)</span>
+              <button class="code__copy" type="button"><i class="bi bi-clipboard"></i> Copy</button>
+            </div>
+            <pre><code>import rclpy
+from rclpy.node import Node
+from geometry_msgs.msg import Twist
+
+class TurtleDriver(Node):
+    def __init__(self):
+        super().__init__('turtle_driver')
+        # publish speed messages on the turtle's command topic
+        self.pub = self.create_publisher(Twist, '/turtle1/cmd_vel', 10)
+        # send a command twice per second
+        self.timer = self.create_timer(0.5, self.send_command)
+
+    def send_command(self):
+        msg = Twist()
+        msg.linear.x = 2.0     # forward speed
+        msg.angular.z = 0.5    # gentle left turn
+        self.pub.publish(msg)  # pin the note to the topic
+
+rclpy.init()
+node = TurtleDriver()
+rclpy.spin(node)           # keep the node alive and working</code></pre>
+          </div>
+
+          <p>Do not worry about every symbol yet. Notice the shape of the program. It makes a node. It creates one publisher on one topic. On a timer, it builds a message, fills the numbers, and publishes. The turtle reads the topic and moves. That is the whole idea of a ROS program.</p>
+
+          <h2>A worked example: the line-following robot</h2>
+
+          <p>Let us design a complete ROS graph from scratch. This is the kind of thinking professionals do before writing a single line of code. We will design a mobile robot that follows a line on the floor.</p>
+
+          <h3>Step 1: write the job in plain words</h3>
+
+          <p>The robot must drive along a dark line on a light floor. A camera looks down at the floor. The robot should keep the line in the middle of its view. If the line drifts left, the robot turns left. If the line drifts right, the robot turns right. It should move forward at a steady speed while doing this.</p>
+
+          <h3>Step 2: list the jobs, one per node</h3>
+
+          <p>Now split the work into single jobs. Four nodes are enough to start.</p>
+
+          <ol>
+            <li><strong>Camera node.</strong> Reads the camera and publishes images. One job: capture pictures.</li>
+            <li><strong>Line finder node.</strong> Reads images and finds the line's position. One job: turn a picture into a number that says how far the line is left or right of centre.</li>
+            <li><strong>Controller node.</strong> Reads the line position and decides the wheel speeds. One job: choose the commands.</li>
+            <li><strong>Motor node.</strong> Reads the speed commands and drives the wheels. One job: make the robot move.</li>
+          </ol>
+
+          <h3>Step 3: name every topic and choose a message type</h3>
+
+          <p>Now connect the nodes with topics and give every topic a message type. Table 18.3 is the full design.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>From node</th><th>Topic name</th><th>Message type</th><th>To node</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Camera node</td><td>/camera/image</td><td>Image (width, height, encoding, data)</td><td>Line finder node</td></tr>
+                <tr><td>Line finder node</td><td>/line/offset</td><td>Float (metres from centre, minus is left)</td><td>Controller node</td></tr>
+                <tr><td>Controller node</td><td>/motor/cmd</td><td>Two floats (left speed, right speed)</td><td>Motor node</td></tr>
+                <tr><td>Camera node</td><td>/camera/image</td><td>Image</td><td>RViz viewer (optional)</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 18.3 — The full ROS graph for the line-following robot.</p>
+
+          <h3>Step 4: follow the data flow</h3>
+
+          <p>The camera node publishes an image on <code>/camera/image</code> thirty times a second. The line finder subscribes to that topic. It looks at each picture and works out where the line sits. It publishes one float on <code>/line/offset</code>. A negative number means the line is to the left. A positive number means it is to the right. Zero means the line is centred.</p>
+
+          <p>The controller subscribes to <code>/line/offset</code>. If the number is zero, it sends equal speeds to both wheels, so the robot goes straight. If the number is slightly negative, it slows the left wheel and speeds the right wheel, so the robot curves left. It publishes those two speeds on <code>/motor/cmd</code>. The motor node reads them and drives the wheels. Then the camera takes the next picture, and the loop repeats.</p>
+
+          <h3>Step 5: add the settings as parameters</h3>
+
+          <p>We keep the robot's numbers out of the code. The motor node reads the wheel diameter and the wheel spacing as parameters. The controller reads the forward speed and the turn gain as parameters. If the robot's wheels change size, we update one parameter. The nodes never change.</p>
+
+          <h3>Step 6: check the graph</h3>
+
+          <p>Run <code>ros2 node list</code> and you should see four nodes. Run <code>ros2 topic list</code> and you should see <code>/camera/image</code>, <code>/line/offset</code> and <code>/motor/cmd</code>. Run <code>ros2 topic echo /line/offset</code> and wiggle a piece of tape under the camera. The number should change. If it does, your design is alive.</p>
+
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> Tip</div>
+            <p>Design the graph on paper first. List the nodes, then the topics, then the message type for each topic. Most ROS bugs are found at this stage, before any code exists.</p>
+          </div>
+
+          <h2>Why professionals use ROS, and its trade-offs</h2>
+
+          <p>ROS is not the only way to build robot software. So why do so many professionals choose it? Because it gives them several big wins at once.</p>
+
+          <ul>
+            <li><strong>Reuse.</strong> Thousands of ready-made packages exist. Need navigation? Someone already wrote it. You build on their work instead of starting from zero.</li>
+            <li><strong>Modularity.</strong> Each node is small and replaceable. You can improve one node without touching the rest.</li>
+            <li><strong>Community.</strong> A large community shares code, answers questions and fixes bugs. You are never alone with a hard problem.</li>
+            <li><strong>Simulation.</strong> You can test in Gazebo before owning hardware, which saves money and prevents real damage.</li>
+            <li><strong>Standard tools.</strong> Commands, viewers and recording tools work the same on every ROS robot, so skills transfer between jobs.</li>
+          </ul>
+
+          <p>But ROS is not free of cost. It has real trade-offs you should know before you commit.</p>
+
+          <ul>
+            <li><strong>Learning curve.</strong> Nodes, topics, packages and launch files take time to learn. The first week feels slow.</li>
+            <li><strong>Overhead.</strong> Splitting work into nodes adds message-passing cost. For a tiny task, a single simple program can be faster and simpler.</li>
+            <li><strong>Not for tiny microcontrollers.</strong> A small microcontroller with little memory cannot run full ROS. The usual answer is to run a tiny ROS client on the board, or pair the board with a larger computer that runs ROS and talks to the board over a serial link.</li>
+          </ul>
+
+          <div class="callout warn">
+            <div class="callout__head"><i class="bi bi-exclamation-triangle-fill"></i> Watch out</div>
+            <p>Do not put ROS on everything just because you can. A motor driver on a small chip does not need ROS. Let the big computer run ROS, and let the small chip do its one simple job well.</p>
+          </div>
+
+          <h2>Common mistakes beginners make</h2>
+
+          <p>These are the usual traps. Knowing them in advance will save you many hours.</p>
+
+          <ul>
+            <li><strong>One giant node.</strong> Beginners put every job in one node. Then it is hard to test and impossible to reuse. Split it. One job per node is the rule.</li>
+            <li><strong>Hard-coded parameters.</strong> Wheel size, speed and robot width written inside the code. Change the robot and you must rewrite the program. Put these in parameters instead.</li>
+            <li><strong>Blocking callbacks.</strong> A callback is the small function that runs when a message arrives. If it does slow work, such as waiting three seconds, it stops every other message. Keep callbacks short and move slow work elsewhere.</li>
+            <li><strong>Ignoring timestamps.</strong> Every message carries the time it was made. If you mix old and new data, your robot reacts to the past. Always check the timestamp before you trust a reading.</li>
+            <li><strong>Wrong message types.</strong> A subscriber expects one exact type. If the publisher sends a different one, nothing connects and no data flows. Always confirm the type on the topic.</li>
+            <li><strong>Running before sourcing the setup.</strong> Before your terminal can find your packages, it must load the workspace setup file. If you forget, ROS says the package does not exist. Load the setup first, every new terminal.</li>
+          </ul>
+
+          <div class="callout danger">
+            <div class="callout__head"><i class="bi bi-shield-exclamation"></i> Dangerous habit</div>
+            <p>Do not test a new ROS graph on a real moving robot at full speed. Test node by node, then in a simulator, then on blocks with the wheels off the floor. Only then let it drive. A wrong topic can send a robot across a room.</p>
+          </div>
+
+          <h2>How professionals do it</h2>
+
+          <p>Once you understand the basics, this is how working engineers use ROS every day.</p>
+
+          <h3>ROS 2 is the current line</h3>
+          <p>There are two generations. The older one is called <strong>ROS 1</strong>. The current one is <strong>ROS 2</strong>, and it is what new projects use. ROS 2 has named releases, called distributions, such as Foxy, Humble and Jazzy. Each release is supported for a set number of years. Professionals pick a long-support release for a product, so they do not have to upgrade constantly.</p>
+
+          <h3>DDS under the hood</h3>
+          <p>ROS 2 sends messages using a proven system called <strong>DDS</strong>, the Data Distribution Service. In one line: DDS is the reliable plumbing that finds nodes and moves their data across the network, even between different computers on the robot. You almost never touch it, but it is why ROS 2 works smoothly across many machines.</p>
+
+          <h3>Real-time concerns</h3>
+          <p>Some robots must react within a guaranteed time, every time. This is called <strong>real-time</strong> behaviour. A normal computer and normal ROS do not promise this. Professionals use special real-time settings and often keep the most time-critical loop on a dedicated controller, not in the main ROS graph.</p>
+
+          <h3>Bag files for recording</h3>
+          <p>A <strong>bag file</strong> records the messages flowing on your topics while the robot runs. Later you can replay that recording, exactly as if the robot were live. This is how professionals debug a rare failure. They record the bag, replay it on their desk, and watch the same event again and again.</p>
+
+          <h3>Continuous testing</h3>
+          <p>Professional teams run automatic tests every time they change the code. This is called <strong>continuous integration</strong>, or CI. The tests check that nodes start, topics publish the right message types, and the robot behaves in the simulator. This catches mistakes before they reach a real robot.</p>
+
+          <h2>Try it yourself</h2>
+
+          <p>These exercises need no ROS installation to start. They build the thinking you need before you touch real code.</p>
+
+          <ol>
+            <li><strong>Draw your own robot's graph.</strong> Pick any robot you can imagine, such as a robot that waters a plant. Draw each node as a circle. Draw each topic as an arrow. Write the message type on every topic. Hint: if two nodes share a topic, they must agree on the same message type.</li>
+            <li><strong>Split a big program.</strong> Take a single program that does five jobs, such as a robot vacuum. List five nodes and the topic between each pair. Hint: one node should only ever do one job.</li>
+            <li><strong>Choose the right pattern.</strong> For each task, decide if it is a topic, a service or an action: (a) stream of wheel speeds, (b) "what is the time?", (c) "drive to the charging station". Hint: stream, one answer, or long job with progress.</li>
+            <li><strong>Make it a parameter.</strong> Look at any robot code you have written. Find every number that describes the robot or the world. Move those into a settings list. Explain why each one is now easier to change.</li>
+            <li><strong>Run the turtle.</strong> If you have ROS installed, start the turtlesim node and move the turtle with a command on its command topic. Then echo the topic in a second terminal and watch your own messages appear. Hint: the topic is usually <code>/turtle1/cmd_vel</code>.</li>
+          </ol>
+
+          <h2>Going deeper (optional)</h2>
+
+          <p>One advanced idea for curious readers. On a real robot, many nodes are not on one computer. The camera may be a small board at the front, the main computer may sit in the middle, and a motor controller may be near the wheels. ROS 2 can spread the same graph across all of them. DDS finds the nodes over the network and moves messages between machines as easily as between programs on one machine.</p>
+
+          <p>This is called <strong>distributed computing</strong>, and it is why ROS scales from a toy turtle to a warehouse fleet. When you are ready, read about <strong>quality of service</strong>, or QoS. It lets you choose between "lose old data and stay current" and "never lose a message" for each topic.</p>
+
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> Where this leads</div>
+            <p>You know nodes, topics, services and actions. The modern line is <strong>ROS 2</strong> (Humble/Jazzy) with <strong>ros2_control</strong>, DDS tuning and EtherCAT hardware. The production upgrade path is <a href="ch27-production-software-robotics.html">Chapter 27: Production Software for Robotics</a>.</p>
+          </div>
+
+          <section class="takeaways">
+            <h2><i class="bi bi-pin-angle-fill"></i> Key takeaways</h2>
+            <ul>
+              <li><i class="bi bi-check2-circle"></i> One huge program does not scale. ROS splits a robot into many small programs.</li>
+              <li><i class="bi bi-check2-circle"></i> ROS is not an operating system. It runs on top of Linux, Windows or macOS.</li>
+              <li><i class="bi bi-check2-circle"></i> A node is one program with one clear job.</li>
+              <li><i class="bi bi-check2-circle"></i> Topics carry streaming data with publish and subscribe.</li>
+              <li><i class="bi bi-check2-circle"></i> Messages are typed data, so every reader knows the exact shape.</li>
+              <li><i class="bi bi-check2-circle"></i> Services are one-to-one request and reply. Actions are long jobs with feedback and a cancel button.</li>
+              <li><i class="bi bi-check2-circle"></i> Parameters are settings a node reads, so you never hard-code the robot's size or speed.</li>
+            </ul>
+          </section>
+
+          <section class="quiz">
+            <div class="quiz__head"><i class="bi bi-patch-question-fill"></i> Check your understanding</div>
+            <details>
+              <summary><span class="q-num">Q1.</span><span>Is ROS an operating system? Explain your answer.</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> No. Despite the name, ROS is not an operating system. It runs on top of a real operating system such as Linux, and it gives you middleware, libraries and tools for building robot software.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q2.</span><span>What is a node, and what is the rule for a good node?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> A node is one program that does one job. A good node has one clear task, so it is easy to test, replace and reuse.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q3.</span><span>What does publish and subscribe mean?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> A publisher sends data onto a named topic. Subscribers read that topic. The publisher does not wait for a reply and does not need to know who is listening.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q4.</span><span>Why do messages have types?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Types fix the shape of the data. A subscriber knows exactly what it will receive, such as a float distance in metres, so it does not have to guess and common mistakes are caught early.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q5.</span><span>When should you use a service instead of a topic?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Use a service for a one-time request that needs a single reply, such as "take a picture now" or "what is your battery level". Use a topic for continuous streams.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q6.</span><span>What does a parameter do, and why is it better than hard-coding a number?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> A parameter is a named setting a node reads at start or while running. It lets you change values like wheel diameter in one place, so the same node works on different robots without editing and rebuilding the code.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q7.</span><span>In the line-following robot, what does the <code>/line/offset</code> topic carry, and who reads it?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> It carries a single float: how far the line is from the centre, in metres, with negative meaning left. The line finder publishes it and the controller subscribes to it.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q8.</span><span>Name two reasons a professional might choose not to put full ROS on a small microcontroller.</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> A small microcontroller has limited memory and cannot run full ROS, and a simple single job does not need the extra message-passing overhead. The usual solution is a tiny ROS client on the board, or pairing the board with a larger computer that runs ROS.</div>
+            </details>
+          </section>
+        </article>
+
+        <nav class="pager" id="pager" aria-label="Chapter navigation"></nav>
+      </div>
+    </main>
+  </div>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/book.js"></script>
+</body>
+</html>

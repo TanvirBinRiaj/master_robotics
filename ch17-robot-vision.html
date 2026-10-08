@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>try{var __t=localStorage.getItem("mr-theme");if(__t==="dark"||__t==="light")document.documentElement.setAttribute("data-theme",__t);}catch(e){}</script>
+  <title>Chapter 17: Robot Vision and Perception — Master Robotics</title>
+  <meta name="description" content="A plain-English guide to robot vision. Learn how a camera image becomes numbers, how robots detect objects, and how depth sensing tells them how far away things are.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/prose.css">
+</head>
+<body data-file="ch17-robot-vision.html">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="topbar" id="topbar"></header>
+  <div class="progress-bar" id="progressBar"></div>
+
+  <div class="layout">
+    <div class="sidebar__backdrop" id="navBackdrop"></div>
+    <nav class="sidebar" id="sidebar" aria-label="Book contents"></nav>
+
+    <main class="main" id="main">
+      <div class="container">
+
+        <header class="chapter-head">
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="index.html">Home</a>
+            <i class="bi bi-chevron-right"></i>
+            <a href="index.html#software">Part 4 &middot; Software and Control</a>
+            <i class="bi bi-chevron-right"></i>
+            <span>Chapter 17</span>
+          </nav>
+          <span class="chapter-kicker"><i class="bi bi-code-slash"></i> Part 4 &middot; Software and Control</span>
+          <h1>Robot Vision and Perception</h1>
+          <p class="lede">A camera gives your robot a flood of numbers, not a picture of the world. By the end of this chapter you will turn those numbers into meaning: find objects, measure distance, and send a command your robot can act on.</p>
+          <div class="chapter-meta">
+            <span><i class="bi bi-clock"></i> ~26 min read</span>
+            <span><i class="bi bi-bar-chart"></i> Intermediate</span>
+            <span><i class="bi bi-list-check"></i> Chapter 17 of 30</span>
+          </div>
+          <div class="goals">
+            <h2>What you will learn</h2>
+            <ul>
+              <li><i class="bi bi-check-circle-fill"></i> Explain how an image becomes data</li>
+              <li><i class="bi bi-check-circle-fill"></i> Describe basic object detection</li>
+              <li><i class="bi bi-check-circle-fill"></i> Understand depth sensing</li>
+            </ul>
+          </div>
+        </header>
+
+        <article class="article">
+
+          <p class="lead">Imagine you stand in a room and someone asks, "Where is the red ball?" You look, you see it on the left, about two metres away, resting on a chair. You answered in one second. For a robot, that small answer is a huge chain of work. This chapter opens that chain, link by link, using plain words.</p>
+
+          <p>A robot does not "see" the way you do. It has no eyes that understand. It has a camera, and a camera is just a light meter with thousands of tiny cells. Each cell reports a number. That is all. The camera hands the robot a giant block of numbers, and the robot must work out the rest.</p>
+
+          <p>The magic — and the engineering — is in turning those numbers into useful meaning. "There is an object." "It is red." "Its centre is slightly left." "It is about two metres away." Each sentence is a piece of perception. Once the robot has them, it can decide and act.</p>
+
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> The key idea</div>
+            <p><strong>Perception</strong> is the job of turning raw sensor data into a useful model of the world. Raw data is a long list of numbers. The model is a short, clear statement the robot can act on, such as "red ball, centre-left, two metres away".</p>
+          </div>
+
+          <h2>Perception: from data to meaning</h2>
+
+          <p>You met sensors in Chapter 10. A sensor measures something and gives a number. A distance sensor gives one number: how far to the wall. A camera gives millions of numbers at once. That is the difference. A camera is not one sensor; it is millions of tiny sensors packed onto a chip.</p>
+
+          <p>Think of your phone camera. Behind the lens sits a small rectangle called a <strong>sensor</strong>, covered in a grid of light-sensitive cells. When you take a photo, light lands on each cell and it records how bright that light was. The camera writes those readings into a file, and the file is nothing but numbers.</p>
+
+          <p>That is the first surprise for beginners: an image on a computer is not a picture. It is a table of numbers that a screen later draws as a picture. All the work in this chapter happens on that table. Perception is the skill of turning it into facts the robot can act on without fooling yourself.</p>
+
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> In simple words</div>
+            <p>Perception means "make sense of what the robot sensed". The camera gives numbers. Perception turns those numbers into ideas like "there is a red ball on the left". The robot can only act on the ideas, not on the raw numbers.</p>
+          </div>
+
+          <h2>How a camera image becomes numbers</h2>
+
+          <p>Let us go slowly through the moment a photo turns into data. This single idea unlocks everything else in the chapter.</p>
+
+          <h3>Pixels: the tiny squares</h3>
+
+          <p>An image is made of tiny dots called <strong>pixels</strong>. Pixel is short for "picture element". Each pixel is one little block of colour. Put millions of pixels side by side in a grid, and your eye sees a smooth photo. The word "grid" matters: a computer stores an image as a rectangle of rows and columns, just like a spreadsheet.</p>
+
+          <p>The number of pixels across and down is the <strong>resolution</strong>. A camera that records 1280 pixels across and 720 pixels down is called a 1280&times;720 camera. That is about 920,000 pixels. More pixels mean more detail, but also more numbers for the robot to chew through.</p>
+
+          <h3>Colour: RGB channels</h3>
+
+          <p>How does one pixel hold a colour? It stores three numbers, one for each primary colour of light: red, green and blue. These three colour layers are called <strong>channels</strong>. A pixel of pure red is written as (255, 0, 0). Pure white is (255, 255, 255). Black is (0, 0, 0). Each number runs from 0 to 255, giving 256 steps of brightness for that colour.</p>
+
+          <p>Multiply them out: 256 &times; 256 &times; 256 is about 16.7 million possible colours, far more than any human eye can tell apart. So three numbers per pixel are plenty. The label "RGB" simply lists the three channels in that order: red, green, blue.</p>
+
+          <h3>Greyscale: one number per pixel</h3>
+
+          <p>Often a robot does not need colour. It only wants shape and brightness. Then the camera image can be converted to <strong>greyscale</strong>, where each pixel holds one number instead of three. A light pixel is near 255; a dark pixel is near 0. Greyscale files are three times smaller and much faster to process. Many vision steps start with a greyscale copy of the colour image.</p>
+
+          <h3>A tiny example you can read</h3>
+
+          <p>Real images are huge. To see the idea clearly, look at a tiny 4&times;4 greyscale image. Only 16 pixels. Each number is a brightness from 0 (black) to 255 (white).</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th></th><th>col 0</th><th>col 1</th><th>col 2</th><th>col 3</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><strong>row 0</strong></td><td>10</td><td>12</td><td>14</td><td>230</td></tr>
+                <tr><td><strong>row 1</strong></td><td>9</td><td>11</td><td>13</td><td>232</td></tr>
+                <tr><td><strong>row 2</strong></td><td>250</td><td>252</td><td>250</td><td>248</td></tr>
+                <tr><td><strong>row 3</strong></td><td>249</td><td>251</td><td>249</td><td>247</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 17.1 — A 4&times;4 greyscale image. Small numbers are dark. Large numbers are bright. Do you see the bright corner?</p>
+
+          <p>The left two columns hold small numbers, so they are dark. The right columns hold big numbers, so they are bright. The bottom two rows are bright the whole way across. So this tiny image is mostly a bright shape in the lower-right corner against a dark background. You just did perception by eye: you found a shape in a grid of numbers.</p>
+
+          <figure class="figure">
+            <div class="figure__box">
+              <svg viewBox="0 0 640 300" width="100%" role="img" aria-label="A camera image turns into a grid of numbers, then into a decision">
+                <rect x="20" y="40" width="150" height="150" rx="10" fill="#e8eeff" stroke="#2d5bff" stroke-width="2"></rect>
+                <circle cx="60" cy="80" r="16" fill="#e06a6a"></circle>
+                <rect x="60" y="120" width="80" height="40" rx="6" fill="#8fd6c0"></rect>
+                <text x="95" y="215" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#4a5266">camera scene</text>
+
+                <line x1="180" y1="115" x2="230" y2="115" stroke="#7b849b" stroke-width="2" marker-end="url(#a17)"></line>
+
+                <text x="330" y="30" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#2d5bff">pixel grid of numbers</text>
+                <g font-family="JetBrains Mono, monospace" font-size="12" fill="#1c2230">
+                  <rect x="240" y="40" width="180" height="150" rx="8" fill="#f4f7ff" stroke="#2d5bff"></rect>
+                  <text x="255" y="65">10  12  14 230</text>
+                  <text x="255" y="90"> 9  11  13 232</text>
+                  <text x="255" y="115">250 252 250 248</text>
+                  <text x="255" y="140">249 251 249 247</text>
+                  <text x="255" y="170" fill="#7b849b">4 x 4 grayscale</text>
+                </g>
+
+                <line x1="430" y1="115" x2="480" y2="115" stroke="#7b849b" stroke-width="2" marker-end="url(#a17)"></line>
+
+                <rect x="490" y="60" width="130" height="110" rx="10" fill="#e2f6ef" stroke="#0f9d78" stroke-width="2"></rect>
+                <text x="555" y="105" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#0f9d78">decision</text>
+                <text x="555" y="128" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#4a5266">"bright shape,</text>
+                <text x="555" y="146" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#4a5266">lower right"</text>
+
+                <defs>
+                  <marker id="a17" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+                    <path d="M0,0 L9,4.5 L0,9 z" fill="#7b849b"></path>
+                  </marker>
+                </defs>
+              </svg>
+            </div>
+            <figcaption>Figure 17.1 — A scene becomes a grid of numbers. The robot then turns that grid into a short, useful statement it can act on.</figcaption>
+          </figure>
+
+          <div class="callout note">
+            <div class="callout__head"><i class="bi bi-info-circle-fill"></i> Note</div>
+            <p>A colour image is a stack of three grids, one per channel. A greyscale image is a single grid. When you read "the image is a 2D array of numbers", think of a spreadsheet: row and column give the pixel position, the cell holds the brightness or colour.</p>
+          </div>
+
+          <h2>Colour spaces: RGB, greyscale and HSV</h2>
+
+          <p>You now know that a pixel can be written as red, green and blue numbers. But RGB is awkward for one very common robot task: finding a coloured object. To see why, we need a better way to describe colour.</p>
+
+          <h3>Why RGB is hard for finding colour</h3>
+
+          <p>Suppose your robot must find a red ball. A beginner checks "is red high, green low, blue low?" That works in a bright room. Then a cloud passes, the whole scene dims, and every number drops. Now the "red" is (120, 10, 10) instead of (255, 20, 20). The strict test fails. The ball is still red to your eyes, but not to the robot.</p>
+
+          <p>The problem is that RGB mixes three ideas together: which colour it is, and how bright the light is. When the light changes, all three numbers change at once.</p>
+
+          <h3>HSV: separating colour from brightness</h3>
+
+          <p>A second colour space fixes this. It is called <strong>HSV</strong>, and it describes colour in three friendlier parts:</p>
+
+          <ul>
+            <li><strong>Hue (H)</strong> is which colour it is, from 0 to 360 degrees, like points on a colour wheel.</li>
+            <li><strong>Saturation (S)</strong> is how strong or pure the colour is. High saturation is a bold red. Low saturation is a washed-out grey-pink.</li>
+            <li><strong>Value (V)</strong> is how bright it is. High value is bright. Low value is dark.</li>
+          </ul>
+
+          <p>Now think about that passing cloud. It lowers the brightness of the whole scene. In HSV terms, it mainly lowers <em>value</em>. The <em>hue</em> — the "itness" of red — stays nearly the same. So if the robot looks for a red hue, it still finds the ball even when the light dims. That is the whole reason HSV is popular in robot vision.</p>
+
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> Tip</div>
+            <p>Remember HSV with one everyday sentence: Hue is "what colour", Saturation is "how strong", Value is "how bright". If you can say that, you can use the colour space.</p>
+          </div>
+
+          <p>So the practical recipe is this: convert the camera image from RGB to HSV, then look for the hue that matches your object. You will use exactly this trick later in the chapter to find the red ball.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Space</th><th>What each number means</th><th>Best for</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>RGB</td><td>Red, green and blue light amounts</td><td>Displaying images; simple colour maths</td></tr>
+                <tr><td>Greyscale</td><td>One brightness number</td><td>Shape, edges, speed; any place colour is not needed</td></tr>
+                <tr><td>HSV</td><td>Hue, saturation, value</td><td>Finding coloured objects when the light changes</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 17.2 — The three colour spaces you will use most, and when each one earns its place.</p>
+
+          <h2>The basic image operations a robot uses</h2>
+
+          <p>Before a robot can recognise anything, it cleans and shapes the image, like preparing vegetables before cooking. A handful of simple operations fix a noisy, dark or cluttered image. Every one is just maths on the grid of numbers.</p>
+
+          <h3>Brightness and contrast</h3>
+
+          <p><strong>Brightness</strong> controls how light or dark the image is: add a number to every pixel to brighten. <strong>Contrast</strong> controls how far apart light and dark values sit: push big numbers bigger and small numbers smaller. A robot in a dim warehouse brightens the image so weak edges become visible.</p>
+
+          <h3>Blur: calming the noise</h3>
+
+          <p>Camera images contain <strong>noise</strong>: random speckles of wrong values caused by heat, low light or a cheap sensor. A <strong>blur</strong> smooths the image by averaging each pixel with its neighbours. Random speckles cancel out, and solid shapes stay solid. Blurring is the most common first step in a vision pipeline.</p>
+
+          <h3>Edge detection: finding boundaries</h3>
+
+          <p>An <strong>edge</strong> is a place where brightness changes sharply, such as the outline of a box against a wall. <strong>Edge detection</strong> hunts for these jumps and draws them as bright lines. Robots use edges to find outlines, lane markings and table borders. Edges are stable: they survive changes in lighting better than raw colour.</p>
+
+          <h3>Thresholding: grey to black and white</h3>
+
+          <p><strong>Thresholding</strong> turns a greyscale image into pure black and white. Pick a cutoff number: pixels above it become white, the rest black. Now the image is a clean mask that says "this part matters" and "this part does not".</p>
+
+          <h3>Colour masking</h3>
+
+          <p><strong>Colour masking</strong> is thresholding for colour. You say "keep pixels whose hue is red; make everything else black". The result is a mask showing only the red areas. This is the tool we will use to find the red ball.</p>
+
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> In simple words</div>
+            <p>Brightness makes the picture lighter. Blur smooths away random speckles. Edges are outlines. Thresholding makes the picture black and white. Colour masking keeps only one colour. All of these are just quick maths on numbers.</p>
+          </div>
+
+          <h2>Filters and convolution, explained simply</h2>
+
+          <p>How does a computer blur an image or find an edge? With one neat trick that appears everywhere in vision: <strong>convolution</strong>.</p>
+
+          <p>Picture a small window, three pixels by three pixels, sliding across the image like a stamp moving over a page. The window holds nine numbers, called a <strong>kernel</strong> or filter. At each position, the computer multiplies the nine image pixels by the nine kernel numbers, adds the results, and writes one new value into the output image. Then the window slides one pixel along and repeats.</p>
+
+          <p>That is the whole idea. A filter is a tiny recipe for combining each pixel with its neighbours. Change the nine numbers and you change the effect.</p>
+
+          <div class="formula"><span class="label">Convolution (output at each pixel)</span>
+            output(x, y) = &Sigma; image(x+i, y+j) &times; kernel(i, j)
+          </div>
+
+          <p>The symbol &Sigma; means "add up". The letters <em>i</em> and <em>j</em> walk over the small window. In plain words: "for each pixel, take a little neighbourhood, weight it with the kernel, and sum".</p>
+
+          <h3>A blur kernel and an edge kernel</h3>
+
+          <p>A blur kernel uses nine equal small numbers, so the output is just the average of the neighbourhood. That softens noise. An edge kernel uses positive numbers on one side and negative numbers on the other. In a flat area the positives and negatives cancel out, giving near zero. At a boundary they do not cancel, giving a big value. Big values mark the edges.</p>
+
+          <div class="code">
+            <div class="code__bar">
+              <span class="code__dots"><span></span><span></span><span></span></span>
+              <span class="code__lang">Kernels (concept)</span>
+              <button class="code__copy" type="button"><i class="bi bi-clipboard"></i> Copy</button>
+            </div>
+            <pre><code># 3x3 blur kernel: average the nine neighbours
+blur = [[1, 1, 1],
+        [1, 1, 1],
+        [1, 1, 1]]   # then divide the sum by 9
+
+# 3x3 edge kernel: left vs right difference
+edge = [[-1, 0, 1],
+        [-2, 0, 2],
+        [-1, 0, 1]]   # large result where brightness jumps</code></pre>
+          </div>
+
+          <p>Blur and edge detection are not special magic. They are the same sliding-window step with different numbers in the kernel. Once you see that, a large part of classical vision becomes simple bookkeeping.</p>
+
+          <div class="callout warn">
+            <div class="callout__head"><i class="bi bi-exclamation-triangle-fill"></i> Watch out</div>
+            <p>Blur removes noise, but it also softens real edges. Blur too much and small objects vanish. The trick is to blur just enough to calm the noise, then stop. In practice you try a small amount and look at the result.</p>
+          </div>
+
+          <h2>Features: corners and edges as landmarks</h2>
+
+          <p>A <strong>feature</strong> is a small, distinctive pattern in an image that the robot can find again in the next frame. The best features are corners — points where two edges meet, like the corner of a table or a door frame.</p>
+
+          <p>Why corners? Along a plain straight edge, you can slide your finger along and stay on the edge; the location is fuzzy. At a corner, the pattern matches in only one spot. That makes a corner a stable landmark the robot can track frame after frame.</p>
+
+          <h3>Why matching features matters</h3>
+
+          <p>Suppose your robot moves forward a little. In the new camera frame, the table's corner has shifted a few pixels because the robot moved. If the robot matches corners between the old frame and the new one, the direction and size of that shift tell it how it moved. This is how a robot knows its own motion from vision alone.</p>
+
+          <p>This idea is used in <strong>visual odometry</strong>: estimating how far the robot travelled by watching how features flow across the image. Many drones and warehouse robots use it alongside wheel sensors and a gyro.</p>
+
+          <div class="callout note">
+            <div class="callout__head"><i class="bi bi-info-circle-fill"></i> Note</div>
+            <p>A good feature is distinctive, repeatable and stable. A blank wall gives almost no features. A textured floor or a checkerboard gives thousands. This is why robots lose track in empty corridors and do well in cluttered rooms.</p>
+          </div>
+
+          <h2>Object detection: boxes and names</h2>
+
+          <p><strong>Object detection</strong> is the job of finding objects in an image and saying what they are. The usual output is a list of results, and each result has three parts:</p>
+
+          <ul>
+            <li>A <strong>bounding box</strong>: a rectangle drawn around the object. It has a left, a top, a width and a height.</li>
+            <li>A <strong>class label</strong>: the name of what is inside, such as "ball", "person" or "mug".</li>
+            <li>A <strong>confidence score</strong>: a number from 0 to 1 saying how sure the robot is. 0.95 means very sure. 0.4 means it is guessing.</li>
+          </ul>
+
+          <p>The bounding box is the most useful part for control. Its centre tells the robot where the object is left-to-right and up-to-down in the image. Its size hints how close the object is, which we will use soon for distance.</p>
+
+          <h3>Classical approach: colour, shape, template</h3>
+
+          <p>There are two families of object detection. The older, simpler one is called <strong>classical</strong> or hand-made vision. The engineer writes rules by hand: "find red pixels, group them, keep groups shaped like a circle". Another classical method is <strong>template matching</strong>, where you slide a small reference picture across the image and score how well each spot matches.</p>
+
+          <p>Classical methods are fast, tiny and easy to explain. They work brilliantly for simple, controlled tasks like finding a red ball on a plain floor. They struggle when objects vary a lot or the scene is messy.</p>
+
+          <h3>Learned approach: a trained model</h3>
+
+          <p>The newer family is <strong>learned detection</strong>. Here you do not write the rules. Instead, a <strong>model</strong> — a large pattern-finding program — is shown thousands of example images with objects marked, and it learns the patterns by itself. Later, you feed it a new image and it returns boxes, labels and confidence scores.</p>
+
+          <p>Learned detectors handle variation far better. They still find the ball when it is in shadow, partly hidden, or a slightly different red. The price is that they need training data, more computing power, and more care. Table 17.3 compares the two families.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Trait</th><th>Classical vision</th><th>Learned detector</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>How rules are made</td><td>Written by hand</td><td>Learned from examples</td></tr>
+                <tr><td>Setup effort</td><td>Low to medium</td><td>High: needs data and training</td></tr>
+                <tr><td>Computing power</td><td>Very low</td><td>Medium to high</td></tr>
+                <tr><td>Handles messy scenes</td><td>Poorly</td><td>Well</td></tr>
+                <tr><td>Easy to explain</td><td>Yes, step by step</td><td>Harder to explain</td></tr>
+                <tr><td>Good first project</td><td>Yes</td><td>No, start classical</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 17.3 — The two families of object detection. Beginners should start with classical vision, then move to learned models.</p>
+
+          <h2>A simple pipeline: find the red ball</h2>
+
+          <p>Now we put the pieces together. This is the classic beginner project, and the robot must find a red ball and report where its centre is in the image. Here is the plan, step by step.</p>
+
+          <ol>
+            <li><strong>Capture an image.</strong> Grab one frame from the camera. This is a grid of RGB numbers.</li>
+            <li><strong>Convert to HSV.</strong> Change every pixel from red-green-blue to hue-saturation-value.</li>
+            <li><strong>Mask the red hue.</strong> Keep red pixels, and set everything else to black.</li>
+            <li><strong>Remove noise.</strong> Blur the mask and delete tiny specks so only real shapes remain.</li>
+            <li><strong>Find the largest blob.</strong> A <strong>blob</strong> is a connected group of white pixels. Keep the biggest one; that is likely the ball.</li>
+            <li><strong>Compute the centre and size.</strong> Work out the blob's centre pixel and how many pixels it covers.</li>
+            <li><strong>Hand the result to the controller.</strong> Send "ball at this centre, this pixel width" to the robot's decision code.</li>
+          </ol>
+
+          <div class="code">
+            <div class="code__bar">
+              <span class="code__dots"><span></span><span></span><span></span></span>
+              <span class="code__lang">Python (OpenCV-style)</span>
+              <button class="code__copy" type="button"><i class="bi bi-clipboard"></i> Copy</button>
+            </div>
+            <pre><code>import cv2
+import numpy as np
+
+# 1. capture one frame from the camera
+frame = camera.read()                     # a grid of RGB numbers
+
+# 2. convert RGB to HSV
+hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+
+# 3. mask the red hue (red wraps around hue 0)
+low1 = np.array([0,   120,  70]);  high1 = np.array([10, 255, 255])
+low2 = np.array([170, 120,  70]);  high2 = np.array([180, 255, 255])
+mask = cv2.inRange(hsv, low1, high1) | cv2.inRange(hsv, low2, high2)
+
+# 4. remove noise: blur then drop small specks
+mask = cv2.GaussianBlur(mask, (9, 9), 2)
+
+# 5. find blobs and keep the largest
+contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL,
+                               cv2.CHAIN_APPROX_SIMPLE)
+if contours:
+    ball = max(contours, key=cv2.contourArea)
+
+    # 6. compute centre and size
+    x, y, w, h = cv2.boundingRect(ball)
+    cx, cy = x + w // 2, y + h // 2
+
+    # 7. hand the result to the controller
+    controller.aim_at(cx, cy, w)
+else:
+    controller.lost_target()</code></pre>
+          </div>
+
+          <p>Read the code in plain English. Grab a picture. Make a mask of red. Clean it. Find the biggest red blob. Its centre and width go to the controller. If no blob appears, tell the controller the target is lost.</p>
+
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> Tip</div>
+            <p>Notice the blob's pixel width <code>w</code>. We did not compute it just for fun. In the next section, that single number lets the robot work out how far away the ball is.</p>
+          </div>
+
+          <h2>Distance from a camera: the pinhole idea</h2>
+
+          <p>A single camera cannot measure depth directly. Yet it can estimate how far a known object is, using one clever clue: an object looks bigger when it is close. Hold your hand up. Near your face it covers half the room. At arm's length it is small. The same rule lets a robot estimate distance from the pixel size of a known object.</p>
+
+          <p>This comes from the <strong>pinhole model</strong>. Imagine light entering through a tiny hole and landing on a flat sensor behind it. An object of real height H, at distance D, makes an image of pixel height h on the sensor, as shown in Figure 17.2.</p>
+
+          <figure class="figure">
+            <div class="figure__box">
+              <svg viewBox="0 0 640 280" width="100%" role="img" aria-label="Pinhole model: an object of real size H at distance D forms an image of pixel size h behind the pinhole">
+                <line x1="40" y1="140" x2="600" y2="140" stroke="#7b849b" stroke-width="1" stroke-dasharray="4 4"></line>
+
+                <rect x="250" y="95" width="10" height="90" rx="2" fill="#1c2230"></rect>
+                <text x="255" y="82" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#1c2230">pinhole</text>
+
+                <line x1="60" y1="70" x2="250" y2="140" stroke="#2d5bff" stroke-width="2"></line>
+                <line x1="60" y1="210" x2="250" y2="140" stroke="#2d5bff" stroke-width="2"></line>
+                <line x1="250" y1="140" x2="560" y2="105" stroke="#0f9d78" stroke-width="2"></line>
+                <line x1="250" y1="140" x2="560" y2="175" stroke="#0f9d78" stroke-width="2"></line>
+
+                <line x1="60" y1="70" x2="60" y2="210" stroke="#2d5bff" stroke-width="3"></line>
+                <text x="52" y="145" text-anchor="end" font-family="Inter, sans-serif" font-size="13" fill="#2d5bff">H (real)</text>
+
+                <rect x="548" y="105" width="12" height="70" rx="2" fill="#0f9d78"></rect>
+                <text x="600" y="145" text-anchor="end" font-family="Inter, sans-serif" font-size="13" fill="#0f9d78">h (pixels)</text>
+
+                <line x1="60" y1="245" x2="250" y2="245" stroke="#7b849b" stroke-width="1.5" marker-end="url(#a17b)" marker-start="url(#a17b)"></line>
+                <text x="155" y="264" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#4a5266">distance D</text>
+
+                <line x1="250" y1="245" x2="554" y2="245" stroke="#7b849b" stroke-width="1.5" marker-end="url(#a17b)" marker-start="url(#a17b)"></line>
+                <text x="402" y="264" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#4a5266">focal length f (pixels)</text>
+
+                <defs>
+                  <marker id="a17b" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+                    <path d="M0,0 L8,4 L0,8 z" fill="#7b849b"></path>
+                  </marker>
+                </defs>
+              </svg>
+            </div>
+            <figcaption>Figure 17.2 — The pinhole model. The same object looks smaller on the sensor when it is farther away. The ratio of real size to distance equals the ratio of pixel size to focal length.</figcaption>
+          </figure>
+
+          <p>Geometrically, the ratio of the object's real size to its distance equals the ratio of the image's pixel size to the focal length. Turn that around and you get a formula any robot can use.</p>
+
+          <div class="formula"><span class="label">Distance from pixel size</span>
+            distance &asymp; (real size &times; focal length) &divide; pixel size
+          </div>
+
+          <p>Here <strong>focal length</strong> is measured in <em>pixels</em>, not millimetres. Think of it as the camera's zoom factor: how many pixels of image you get per unit of angle. A longer focal length means a narrower, more zoomed-in view. You find it once, by calibration, and then reuse it.</p>
+
+          <h3>Worked example: how far is the red ball?</h3>
+
+          <p>Let us plug in real numbers. Your ball has a real diameter of 0.08 metres (8 cm). You calibrated your camera and found its focal length is 700 pixels. In the current frame, the ball's bounding box is 40 pixels wide. How far away is it?</p>
+
+          <ol>
+            <li><strong>Write the formula.</strong> distance &asymp; (real size &times; focal length) &divide; pixel size.</li>
+            <li><strong>Put in the numbers.</strong> distance &asymp; (0.08 &times; 700) &divide; 40.</li>
+            <li><strong>Multiply.</strong> 0.08 &times; 700 = 56.</li>
+            <li><strong>Divide.</strong> 56 &divide; 40 = 1.4.</li>
+            <li><strong>State the answer with units.</strong> The ball is about 1.4 metres away.</li>
+          </ol>
+
+          <p>Now sanity-check it. If the robot drives closer, the ball grows to 80 pixels. distance &asymp; (0.08 &times; 700) &divide; 80 = 0.7 metres. Half the distance, double the pixels. The maths behaves exactly as your eyes expect. That consistency is a good sign your pipeline works.</p>
+
+          <div class="callout warn">
+            <div class="callout__head"><i class="bi bi-exclamation-triangle-fill"></i> Watch out</div>
+            <p>This estimate is only as good as your "known real size". If the ball is actually 9 cm, not 8 cm, every distance will be wrong by about 12 per cent. Great for a rough approach, not good enough for grabbing with a gripper. For precise work, use real depth sensing.</p>
+          </div>
+
+          <h2>Depth sensing: measuring distance directly</h2>
+
+          <p>Estimating distance from a known object is useful, but it needs the object to be known, flat and fully visible. Real robots want depth for every pixel, without knowing what is there. That is the job of <strong>depth sensing</strong>. There are three main families.</p>
+
+          <h3>Stereo cameras: two eyes</h3>
+
+          <p>A <strong>stereo camera</strong> uses two lenses side by side, like your two eyes. Each sees the scene from a slightly different angle. The robot finds the same feature in both images and measures how far apart it appears. This offset is called <strong>disparity</strong>. Nearby objects shift a lot between the two views; distant objects barely shift. Big disparity means close. Small disparity means far.</p>
+
+          <p>This is the same <strong>triangulation</strong> your brain does. If you close one eye, judging distance gets harder. Stereo gives dense, passive depth — it sends out no light, so it works around other robots. But it struggles on blank, textureless walls, where there is nothing to match.</p>
+
+          <h3>Structured light: project a pattern</h3>
+
+          <p><strong>Structured light</strong> sends out a known pattern, often a grid of dots or stripes. A camera watches how the pattern lands on objects. On a flat far wall the pattern looks regular. On a close object the pattern is bigger and shifted. By watching how the pattern bends and squashes, the robot computes depth. Many phone face-unlock systems and some industrial scanners use this.</p>
+
+          <p>Structured light gives fine, accurate depth indoors. Outdoors, sunlight can drown the projected pattern, which is its weakness.</p>
+
+          <h3>Time-of-flight and LiDAR: measure the travel time</h3>
+
+          <p>The third family measures how long light takes to travel out and bounce back. A <strong>time-of-flight</strong> camera times the round trip for each pixel. Because light is fast, the timing must be extremely precise. <strong>LiDAR</strong> does the same with a spinning or sweeping laser, building a ring of distance points around the robot. You met LiDAR in Chapter 10; here you see how it fits beside cameras.</p>
+
+          <p>Time-of-flight and LiDAR work day and night and cover long range. They are excellent for mapping and obstacle detection, less good at reading colours or text.</p>
+
+          <div class="callout note">
+            <div class="callout__head"><i class="bi bi-info-circle-fill"></i> Note</div>
+            <p>Depth sensors usually produce a <strong>depth map</strong>: an image where each pixel holds a distance instead of a colour. Nearby objects are one shade, far objects another. Programs that expect colour images can read a depth map almost the same way, so the same blob and contour tools often work on it too.</p>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Method</th><th>How it works</th><th>Strength</th><th>Weakness</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Stereo camera</td><td>Two views, match features, measure shift</td><td>Passive, dense depth, cheap sensors</td><td>Fails on blank, textureless surfaces</td></tr>
+                <tr><td>Structured light</td><td>Project pattern, watch how it bends</td><td>Fine, accurate depth indoors</td><td>Sunlight washes out the pattern</td></tr>
+                <tr><td>Time-of-flight / LiDAR</td><td>Time the light's round trip</td><td>Works day and night, long range</td><td>Infrared crosstalk; no colour detail</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 17.4 — The three ways a robot measures depth directly. Most serious robots combine two of them.</p>
+
+          <h2>Camera placement and field of view</h2>
+
+          <p>Where you put the camera changes everything. The same camera, moved ten centimetres, sees a different world. Two ideas matter most: <strong>field of view</strong> and mounting position.</p>
+
+          <h3>Field of view: wide or narrow</h3>
+
+          <p><strong>Field of view</strong> (FOV) is how much of the world the camera can see at once. A wide lens might take in 120 degrees; a narrow lens perhaps 40 degrees. Wide lenses see more around the robot, which helps avoid collisions. But each object becomes small, and straight lines look bent at the edges. Narrow lenses make far objects big and clear, which helps read a distant target, but the robot goes half-blind to the sides.</p>
+
+          <p>There is no perfect choice. A robot often uses a wide camera for navigation and a second, narrow camera for reading detail. Two cheap cameras beat one expensive compromise.</p>
+
+          <h3>Mounting height and angle</h3>
+
+          <p>Height and tilt decide what part of the world is in frame. A camera mounted low and level sees obstacles at floor level. A camera mounted high and tilted down sees more floor, useful for a robot that follows lines or maps a room. Tilt changes the maths of distance: the pinhole formula assumes the object is level with the camera. Tilt the camera and you must correct for the angle, or your distances drift.</p>
+
+          <p>Mounting position also decides how the image moves when the robot moves. A camera at the very front gives clear forward feedback. A camera stuck on a flexible arm shakes, and shaky images wreck feature tracking. Solid, rigid mounting is not a small detail; it is part of the design.</p>
+
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> In simple words</div>
+            <p>Wide lens: see a lot, objects look small. Narrow lens: see a little, objects look big. Where you mount the camera decides what it sees and how steady it is. Choose the mount for the job.</p>
+          </div>
+
+          <h2>A full worked example: chase the coloured target</h2>
+
+          <p>Let us build a complete behaviour. The task: a small wheeled robot must find a red ball and drive toward it, stopping when it is close. We will go from camera setup to the control command, and we will handle a false detection on the way.</p>
+
+          <ol>
+            <li><strong>Mount the camera.</strong> Place it at the front, level with the floor, mounted rigidly so it does not shake. A slightly wide lens (about 70 degrees) gives a good balance of peripheral vision and target size.</li>
+            <li><strong>Calibrate the camera.</strong> Photograph a known checkerboard and compute the focal length in pixels. Say it comes out as f = 700 pixels. Also record the ball's real diameter: 0.08 metres.</li>
+            <li><strong>Set the loop rate.</strong> Run perception about 15 times a second. Fast enough to react, slow enough for a small computer to keep up.</li>
+            <li><strong>Capture and convert.</strong> Grab one frame, convert to HSV.</li>
+            <li><strong>Mask red and clean.</strong> Build the red mask, then blur and drop specks smaller than 200 pixels. The speck filter is our first defence against noise.</li>
+            <li><strong>Pick the best blob.</strong> Find all red blobs, keep the largest. Note its bounding box width <code>w</code> and centre <code>cx</code>.</li>
+            <li><strong>Filter false detections.</strong> Apply two checks. First, the blob must be roughly round: its width and height should be close. A long thin red streak might be a red chair edge, not a ball. Second, it must appear in two frames in a row. A one-frame flicker is probably a glitch. If it fails, treat it as background and do nothing.</li>
+            <li><strong>Estimate distance.</strong> distance &asymp; (0.08 &times; 700) &divide; w. If w = 40, the ball is 1.4 m away.</li>
+            <li><strong>Compute the turn command.</strong> The image centre is at pixel <code>W/2</code>. If the ball's <code>cx</code> is far left of that, turn left; far right, turn right. The size of the offset sets how hard to turn.</li>
+            <li><strong>Compute the drive command.</strong> Drive forward while the distance is above a stop margin, say 0.5 metres. Below that, stop. This prevents the robot from driving over the ball.</li>
+            <li><strong>Send both to the controller.</strong> A steering value and a speed value. The controller's motor code, from earlier chapters, turns these into wheel speeds.</li>
+            <li><strong>Repeat.</strong> Go back to step four, fifteen times a second. The robot steers smoothly because it corrects a little, very often.</li>
+          </ol>
+
+          <p>Look at where the intelligence really sits. Steps two through six do perception. Step seven does the important, unglamorous job of not being fooled. Steps eight to ten turn perception into numbers a controller can use. Steps eleven and twelve close the sense-decide-act loop you have carried through this whole book.</p>
+
+          <div class="code">
+            <div class="code__bar">
+              <span class="code__dots"><span></span><span></span><span></span></span>
+              <span class="code__lang">Pseudo-code</span>
+              <button class="code__copy" type="button"><i class="bi bi-clipboard"></i> Copy</button>
+            </div>
+            <pre><code>STOP_DISTANCE = 0.5     # metres
+FOCAL         = 700     # pixels
+BALL_SIZE     = 0.08    # metres
+
+seen_last_frame = False
+
+every 1/15 second:
+    frame  = camera.read()
+    hsv    = to_hsv(frame)
+    mask   = keep_red(hsv)
+    mask   = remove_noise(mask)          # blur + drop specks
+    blob   = largest_blob(mask)
+
+    if blob is None:
+        seen_last_frame = False
+        controller.stop()
+        continue
+
+    x, y, w, h = blob.box
+    cx = x + w / 2
+
+    round_enough  = abs(w - h) &lt; 0.25 * w    # roughly circular
+    steady        = seen_last_frame          # appeared twice in a row
+    seen_last_frame = True
+
+    if not (round_enough and steady):
+        controller.stop()                    # reject false detection
+        continue
+
+    distance = (BALL_SIZE * FOCAL) / w       # metres
+
+    error  = cx - (image_width / 2)          # pixels, + is right
+    steer  = clamp(error / (image_width / 2), -1, 1)
+
+    if distance &gt; STOP_DISTANCE:
+        controller.drive(steer, speed=0.3)
+    else:
+        controller.stop()</code></pre>
+          </div>
+
+          <p>This one short program contains the heart of entry-level robot vision. It captures, masks, cleans, filters, measures, and commands. Change the colour and the real size, and the same code finds a blue cube or a yellow line. That reuse is why learning the pipeline properly matters more than memorising any single tool.</p>
+
+          <div class="callout danger">
+            <div class="callout__head"><i class="bi bi-shield-exclamation"></i> Safety note</div>
+            <p>Never chase a target with a fast, heavy robot on your first try. Start with the wheels off the floor, check the mask visually, then run at low speed on open floor. A wrong detection that drives a robot at speed can hurt someone or break the robot.</p>
+          </div>
+
+          <h2>Common mistakes beginners make</h2>
+
+          <p>Vision punishes small assumptions. These traps catch almost everyone at first. Knowing them in advance saves days.</p>
+
+          <ul>
+            <li><strong>Working in RGB when the light changes.</strong> A fixed RGB test breaks the moment a cloud passes or a lamp moves. Convert to HSV and test hue instead.</li>
+            <li><strong>Trusting one frame.</strong> A single frame can be a glitch or a flash. Require the object to appear in several frames before acting on it.</li>
+            <li><strong>No filtering.</strong> Raw masks are full of specks. A blob with 30 pixels is usually noise, not a ball. Set a minimum size.</li>
+            <li><strong>Choosing the wrong field of view.</strong> A lens too narrow makes the robot miss obstacles; too wide makes the target tiny. Match the lens to the job.</li>
+            <li><strong>Ignoring lens distortion.</strong> Wide lenses bend straight lines. If you do not correct it, your pixel measurements drift, especially near the edges.</li>
+            <li><strong>Using huge images on a small computer.</strong> A 12-megapixel photo 15 times a second will overload a small board. Downscale to 640&times;480 for speed, and keep the full image only when needed.</li>
+            <li><strong>Assuming distance from pixel size is exact.</strong> Remember it needs a known, flat, fully visible object. Any hidden part makes the ball look smaller and seem farther.</li>
+          </ul>
+
+          <div class="callout warn">
+            <div class="callout__head"><i class="bi bi-exclamation-triangle-fill"></i> Watch out</div>
+            <p>The most common failure is not a crash. It is quiet confidence in a wrong answer. A robot that reports "ball at 1.4 metres" when the ball is at 2 metres is dangerous in the wrong setting. Always check your perception against a tape measure before trusting the robot to move.</p>
+          </div>
+
+          <h2>How professionals do it</h2>
+
+          <p>At industrial scale, the ideas are the same but the care is far greater. Professionals assume the naive version will fail and build layers of defence.</p>
+
+          <h3>Calibration and distortion correction</h3>
+
+          <p>Every camera is a little different and every lens bends light slightly. Professionals <strong>calibrate</strong> each camera with a known pattern, then correct the image so straight things look straight. This makes the pinhole formula accurate instead of rough. Calibration is done once per camera and stored for reuse.</p>
+
+          <h3>Learned detectors and tracking</h3>
+
+          <p>Professionals rarely hand-write colour rules for open-ended tasks. They train a <strong>learned detector</strong> on labelled images, then run it at high speed on a graphics chip built for the maths. On top of detection, they add <strong>tracking</strong>: following an object smoothly across frames so the robot does not jump when one frame is missed. Tracking also filters junk, because a false box tends to appear once and vanish.</p>
+
+          <h3>Sensor fusion</h3>
+
+          <p>No single sensor is trusted alone. Cameras give rich detail but struggle in the dark and with distance. LiDAR (Chapter 10) gives accurate distance but no colour. An IMU tells the robot how it is tilting and turning. Professionals <strong>fuse</strong> these together, so each covers the others' weak spots. If the camera is briefly fooled, LiDAR says "there is still a wall there".</p>
+
+          <h3>Embedded hardware and latency budgets</h3>
+
+          <p>A robot cannot send every frame to a distant server; the delay would make it clumsy. Modern robots run vision on <strong>embedded</strong> hardware: small, power-efficient chips inside the robot. Professionals set a <strong>latency budget</strong>: the maximum time a full perception cycle may take. If the loop must run at 30 times a second, the budget is about 33 milliseconds. Every step is measured against it, and slow steps are trimmed or sped up.</p>
+
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> The professional habit</div>
+            <p>Professionals plan for failure. They ask, for every sensor: when will this lie? What happens if it does? Then they design a backup. A robot that knows it is unsure is far safer than one that is confidently wrong.</p>
+          </div>
+
+          <h2>Try it yourself</h2>
+
+          <p>These exercises build real intuition. Most need only a phone camera and a free vision tool; none needs a robot.</p>
+
+          <ol>
+            <li><strong>Find an edge by hand.</strong> Take a greyscale photo of a page of text. Read the brightness numbers in a small patch. Where do they jump sharply? That jump is an edge. Hint: edges are where neighbours differ a lot.</li>
+            <li><strong>Build a colour mask.</strong> Open a free tool, load a photo with a red object, and convert to HSV. Slide the hue range until only the red stays. Hint: red wraps around the ends of the hue circle, so you may need two ranges.</li>
+            <li><strong>Measure a real distance.</strong> Put a coin of known size at a measured distance from a camera. Note its pixel width. Use the formula to compute the focal length. Then move the coin and predict the new pixel width before checking. Hint: focal length = (pixel size &times; distance) &divide; real size.</li>
+            <li><strong>Count the specks.</strong> Zoom into a photo of a plain wall. Look for random speckles. Explain why a robot should blur the image before looking for objects. Hint: those specks are noise.</li>
+            <li><strong>Design a false-detection filter.</strong> Write two quick tests that would reject a red chair edge when you are hunting a round red ball. Hint: shape roundness, and requiring the object to appear in two frames.</li>
+          </ol>
+
+          <h2>Going deeper (optional)</h2>
+
+          <p>If you want one advanced idea to carry forward, let it be this: modern robot vision increasingly does not stop at "what is in this image". It builds a <strong>scene model</strong> — a running guess of where objects are in three dimensions around the robot, updated every frame. The camera feeds it colour, the depth sensor feeds it distance, and the robot's own motion ties the frames together over time.</p>
+
+          <p>That model is what lets a robot plan: "the ball is two metres ahead and slightly left; if I turn a little and drive, I will reach it". Perception is not the goal. A model good enough to act on is the goal. When you study robot learning and planning in Chapter 19, you will see how a scene model becomes the input to real decisions.</p>
+
+          <section class="takeaways">
+            <h2><i class="bi bi-pin-angle-fill"></i> Key takeaways</h2>
+            <ul>
+              <li><i class="bi bi-check2-circle"></i> Perception turns raw sensor data into a useful model of the world.</li>
+              <li><i class="bi bi-check2-circle"></i> An image is a grid of numbers, not a picture. Pixels hold brightness and colour values.</li>
+              <li><i class="bi bi-check2-circle"></i> HSV separates colour (hue) from brightness (value), so objects stay findable when light changes.</li>
+              <li><i class="bi bi-check2-circle"></i> Blur, edges, thresholding and masking are simple maths that clean the image before detection.</li>
+              <li><i class="bi bi-check2-circle"></i> Object detection returns a bounding box, a label and a confidence score.</li>
+              <li><i class="bi bi-check2-circle"></i> Distance &asymp; (real size &times; focal length) &divide; pixel size lets one camera estimate how far a known object is.</li>
+              <li><i class="bi bi-check2-circle"></i> Stereo, structured light and time-of-flight measure depth directly; professionals fuse them with cameras.</li>
+            </ul>
+          </section>
+
+          <section class="quiz">
+            <div class="quiz__head"><i class="bi bi-patch-question-fill"></i> Check your understanding</div>
+            <details>
+              <summary><span class="q-num">Q1.</span><span>In one sentence, what does perception mean for a robot?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Perception is turning raw sensor data (long lists of numbers) into a useful, short model of the world that the robot can act on.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q2.</span><span>An image is 800&times;600. How many pixels does it hold?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> 800 &times; 600 = 480,000 pixels, about half a million.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q3.</span><span>What three parts does a learned object detector usually return for each object?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> A bounding box around the object, a class label naming it, and a confidence score from 0 to 1.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q4.</span><span>A cloud dims a scene. Why can HSV still find a red ball when RGB struggles?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Dimming mostly lowers value (brightness). Hue, which says "this is red", stays nearly the same, so a hue test keeps working while a strict RGB test may fail.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q5.</span><span>What does a convolution kernel do, in plain words?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> It slides a small window across the image and combines each pixel with its neighbours using a set of weights. Different weights give blur or edge detection.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q6.</span><span>Your ball is 0.06 m wide, focal length is 600 pixels, and the ball is 30 pixels wide in the image. How far away is it?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> distance &asymp; (0.06 &times; 600) &divide; 30 = 36 &divide; 30 = 1.2 metres.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q7.</span><span>How do stereo, structured light and time-of-flight differ in how they get depth?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Stereo compares two views and measures feature shift (passive). Structured light projects a pattern and watches how it bends. Time-of-flight times a light pulse's round trip. Each trades off accuracy, range and light conditions differently.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q8.</span><span>Why is a corner a better feature to track than a point in the middle of a plain edge?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Along a plain edge the position is fuzzy; a small shift still looks the same. A corner matches in only one spot, so the robot can locate it precisely in every frame.</div>
+            </details>
+          </section>
+
+        </article>
+
+        <nav class="pager" id="pager" aria-label="Chapter navigation"></nav>
+      </div>
+    </main>
+  </div>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/book.js"></script>
+</body>
+</html>

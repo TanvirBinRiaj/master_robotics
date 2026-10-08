@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>try{var __t=localStorage.getItem("mr-theme");if(__t==="dark"||__t==="light")document.documentElement.setAttribute("data-theme",__t);}catch(e){}</script>
+  <title>Appendix A: Glossary of Robotics Terms — Master Robotics</title>
+  <meta name="description" content="Every important robotics word explained in plain English: from actuator and torque to kinematics, PID, ROS and degrees of freedom.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/prose.css">
+</head>
+<body data-file="glossary.html">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="topbar" id="topbar"></header>
+  <div class="progress-bar" id="progressBar"></div>
+
+  <div class="layout">
+    <div class="sidebar__backdrop" id="navBackdrop"></div>
+    <nav class="sidebar" id="sidebar" aria-label="Book contents"></nav>
+
+    <main class="main" id="main">
+      <div class="container">
+
+        <header class="chapter-head">
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="index.html">Home</a>
+            <i class="bi bi-chevron-right"></i>
+            <a href="index.html#contents">Appendices</a>
+            <i class="bi bi-chevron-right"></i>
+            <span>Appendix A</span>
+          </nav>
+          <span class="chapter-kicker"><i class="bi bi-collection"></i> Appendix A</span>
+          <h1>Glossary of Robotics Terms</h1>
+          <p class="lede">Every important word in this book, explained in simple English. Keep this page open while you read. If a chapter uses a word you forget, look it up here in seconds.</p>
+          <div class="chapter-meta">
+            <span><i class="bi bi-clock"></i> Reference</span>
+            <span><i class="bi bi-bar-chart"></i> All levels</span>
+            <span><i class="bi bi-list-check"></i> Appendix A of B</span>
+          </div>
+        </header>
+
+        <article class="article">
+
+          <p class="lead">The glossary is grouped by topic so related ideas sit together. Within each group, terms are alphabetical. Where a word is explained deeply in a chapter, the chapter number is shown.</p>
+
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> How to use this page</div>
+            <p>Press <strong>Ctrl + K</strong> (or <strong>Cmd + K</strong> on a Mac) and type the word to jump straight to its chapter. Or use your browser's search (Ctrl + F) to find a term on this page.</p>
+          </div>
+
+          <h2>Core ideas</h2>
+
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th style="width:22%;">Term</th><th>Plain-English meaning</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Robot</strong></td><td>A machine that can sense its world, decide what to do, and act on that decision without a person controlling every move. (Ch. 1)</td></tr>
+                <tr><td><strong>Sense</strong></td><td>To measure something about the world, such as distance, light or touch. (Ch. 1)</td></tr>
+                <tr><td><strong>Decide</strong></td><td>To choose the next action, usually by following a program. (Ch. 1)</td></tr>
+                <tr><td><strong>Act</strong></td><td>To move or do something in the world, such as turning a wheel. (Ch. 1)</td></tr>
+                <tr><td><strong>Actuator</strong></td><td>A part that creates movement. Most actuators are motors. (Ch. 1, 6)</td></tr>
+                <tr><td><strong>Controller</strong></td><td>The small computer that reads sensors and decides what to do. The robot's brain. (Ch. 1, 11)</td></tr>
+                <tr><td><strong>Sensor</strong></td><td>A part that measures the world and turns it into a signal. (Ch. 1, 10)</td></tr>
+                <tr><td><strong>Feedback</strong></td><td>Using a measurement of what happened to adjust the next action. (Ch. 15)</td></tr>
+                <tr><td><strong>Control loop</strong></td><td>The repeating cycle of sense, decide, act. Also called the robot loop. (Ch. 1, 15)</td></tr>
+                <tr><td><strong>Autonomy</strong></td><td>The ability of a robot to work on its own, without a human giving each command. (Ch. 1, 20)</td></tr>
+                <tr><td><strong>Teleoperation</strong></td><td>Controlling a robot by hand from a distance. The opposite of autonomy. (Ch. 1)</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2>Design and method</h2>
+
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th style="width:22%;">Term</th><th>Plain-English meaning</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Requirement</strong></td><td>A clear, measurable thing the design must do. "Run for 30 minutes" is a requirement. (Ch. 2)</td></tr>
+                <tr><td><strong>Specification</strong></td><td>The full written list of requirements and limits for a design. (Ch. 2)</td></tr>
+                <tr><td><strong>Constraint</strong></td><td>A limit you cannot break, such as maximum cost, weight or size. (Ch. 2)</td></tr>
+                <tr><td><strong>Trade-off</strong></td><td>Giving up one good thing to gain another, such as lighter weight for higher cost. (Ch. 2, 8)</td></tr>
+                <tr><td><strong>Decomposition</strong></td><td>Breaking a big problem into small, testable pieces. (Ch. 2)</td></tr>
+                <tr><td><strong>Prototype</strong></td><td>An early, rough version built to test an idea quickly. (Ch. 2, 22)</td></tr>
+                <tr><td><strong>Tolerance</strong></td><td>How much a real part may differ from the ideal size and still work. (Ch. 4)</td></tr>
+                <tr><td><strong>Design for manufacture (DFM)</strong></td><td>Designing parts so they are cheap and easy to make at scale. (Ch. 8)</td></tr>
+                <tr><td><strong>Design for assembly (DFA)</strong></td><td>Designing a product so it is quick and easy to put together. (Ch. 8)</td></tr>
+                <tr><td><strong>Serviceability</strong></td><td>How easy a robot is to repair and maintain. (Ch. 8)</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2>Mechanics and motion</h2>
+
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th style="width:22%;">Term</th><th>Plain-English meaning</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Chassis</strong></td><td>The frame that holds all the parts of a robot in the right place. (Ch. 5)</td></tr>
+                <tr><td><strong>Degrees of freedom (DoF)</strong></td><td>The number of independent ways a robot can move. (Ch. 5)</td></tr>
+                <tr><td><strong>Revolute joint</strong></td><td>A joint that turns, like a door hinge. (Ch. 5)</td></tr>
+                <tr><td><strong>Prismatic joint</strong></td><td>A joint that slides in a straight line, like a drawer. (Ch. 5)</td></tr>
+                <tr><td><strong>Kinematic chain</strong></td><td>Bodies joined one after another by joints, like the links of an arm. (Ch. 5, 16)</td></tr>
+                <tr><td><strong>Torque</strong></td><td>The turning force of a motor. The strength with which it can twist something. (Ch. 6)</td></tr>
+                <tr><td><strong>Stall torque</strong></td><td>The maximum twisting force a motor gives when it is held still and cannot turn. (Ch. 6)</td></tr>
+                <tr><td><strong>RPM</strong></td><td>Revolutions per minute. How many full turns a motor makes in one minute. (Ch. 6)</td></tr>
+                <tr><td><strong>Gear ratio</strong></td><td>How many times a driving gear turns for one turn of the driven gear. It trades speed for torque. (Ch. 7)</td></tr>
+                <tr><td><strong>Backlash</strong></td><td>The small free play between gears before they push each other. (Ch. 7)</td></tr>
+                <tr><td><strong>Lead screw</strong></td><td>A threaded rod that turns spinning motion into straight-line motion. (Ch. 7)</td></tr>
+                <tr><td><strong>Bearing</strong></td><td>A part that lets something spin smoothly with little friction. (Ch. 7)</td></tr>
+                <tr><td><strong>Centre of mass</strong></td><td>The balance point of a robot, where its weight acts. (Ch. 8)</td></tr>
+                <tr><td><strong>Base of support</strong></td><td>The area under a robot that touches the ground. A robot tips if its centre of mass leaves this area. (Ch. 8)</td></tr>
+                <tr><td><strong>Inertia</strong></td><td>How strongly an object resists a change in its motion. (Ch. 8)</td></tr>
+                <tr><td><strong>Stiffness</strong></td><td>How little a part bends when a force is applied. (Ch. 5, 8)</td></tr>
+                <tr><td><strong>Compliance</strong></td><td>Designed flexibility, so a part gives way a little on purpose. (Ch. 5)</td></tr>
+                <tr><td><strong>End effector</strong></td><td>The tool at the end of a robot arm, such as a gripper or a welding tip. (Ch. 21)</td></tr>
+                <tr><td><strong>Gripper</strong></td><td>The end effector that holds objects. (Ch. 21)</td></tr>
+                <tr><td><strong>Payload</strong></td><td>The weight a robot can carry or lift in addition to itself. (Ch. 21)</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2>Electronics and power</h2>
+
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th style="width:22%;">Term</th><th>Plain-English meaning</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Voltage (V)</strong></td><td>The electrical "push" or pressure that moves charge. Measured in volts. (Ch. 9)</td></tr>
+                <tr><td><strong>Current (I)</strong></td><td>The flow of electrical charge. Measured in amperes (amps). (Ch. 9)</td></tr>
+                <tr><td><strong>Resistance (R)</strong></td><td>How strongly a part slows the flow of current. Measured in ohms. (Ch. 9)</td></tr>
+                <tr><td><strong>Resistor</strong></td><td>A part that limits current, often to protect an LED. (Ch. 9)</td></tr>
+                <tr><td><strong>Capacitor</strong></td><td>A part that stores a small amount of charge and smooths sudden changes. (Ch. 9)</td></tr>
+                <tr><td><strong>Diode</strong></td><td>A part that lets current flow in one direction only. (Ch. 9)</td></tr>
+                <tr><td><strong>LED</strong></td><td>Light-emitting diode. A small light that glows when current flows through it. (Ch. 9)</td></tr>
+                <tr><td><strong>Transistor</strong></td><td>A tiny electronic switch, used to control large currents with a small signal. (Ch. 9)</td></tr>
+                <tr><td><strong>H-bridge</strong></td><td>A circuit that lets a motor spin forward or backward. (Ch. 6, 13)</td></tr>
+                <tr><td><strong>Motor driver</strong></td><td>A board or chip that supplies the strong current a motor needs, controlled by the brain. (Ch. 6, 13)</td></tr>
+                <tr><td><strong>Ground</strong></td><td>The common return path for current. The "zero" reference point of a circuit. (Ch. 9)</td></tr>
+                <tr><td><strong>Short circuit</strong></td><td>A wrong path where current flows with almost no resistance — dangerous and often damaging. (Ch. 9)</td></tr>
+                <tr><td><strong>DC</strong></td><td>Direct current. Current that flows in one direction, as from a battery. (Ch. 9)</td></tr>
+                <tr><td><strong>AC</strong></td><td>Alternating current. Current that reverses direction many times a second, as from a wall socket. (Ch. 9)</td></tr>
+                <tr><td><strong>Multimeter</strong></td><td>A tool that measures voltage, current and resistance. (Ch. 9, 13)</td></tr>
+                <tr><td><strong>Encoder</strong></td><td>A sensor inside or on a motor that reports how far or how fast it has turned. (Ch. 6, 10)</td></tr>
+                <tr><td><strong>Breadboard</strong></td><td>A reusable board with holes for building circuits without soldering. (Ch. 4, 9)</td></tr>
+                <tr><td><strong>Soldering</strong></td><td>Joining metal parts with melted metal to make a permanent electrical connection. (Ch. 13)</td></tr>
+                <tr><td><strong>Battery capacity (Ah)</strong></td><td>How much charge a battery holds, in amp-hours. (Ch. 12)</td></tr>
+                <tr><td><strong>Voltage regulator</strong></td><td>A part that gives a steady output voltage even when the input changes. (Ch. 12)</td></tr>
+                <tr><td><strong>Flyback diode</strong></td><td>A diode that safely absorbs the voltage spike from a motor when it switches off. (Ch. 9, 13)</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2>Sensing and perception</h2>
+
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th style="width:22%;">Term</th><th>Plain-English meaning</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Signal</strong></td><td>The useful, changing value a sensor produces. (Ch. 10)</td></tr>
+                <tr><td><strong>Noise</strong></td><td>Random, unwanted wobble added to a signal. (Ch. 10)</td></tr>
+                <tr><td><strong>Filtering</strong></td><td>Smoothing a noisy signal to make it more useful. (Ch. 10, 15)</td></tr>
+                <tr><td><strong>Calibration</strong></td><td>Adjusting a sensor so its readings match the real world. (Ch. 10)</td></tr>
+                <tr><td><strong>Analogue signal</strong></td><td>A signal that can take any value in a range, like a smooth dimmer. (Ch. 10)</td></tr>
+                <tr><td><strong>Digital signal</strong></td><td>A signal with only two states, on or off. (Ch. 10)</td></tr>
+                <tr><td><strong>Ultrasonic sensor</strong></td><td>A sensor that measures distance using sound too high for humans to hear. (Ch. 10)</td></tr>
+                <tr><td><strong>LiDAR</strong></td><td>A sensor that measures distance using laser light, often sweeping to build a map. (Ch. 10, 17)</td></tr>
+                <tr><td><strong>IMU</strong></td><td>Inertial measurement unit. A sensor that measures rotation and acceleration. (Ch. 10)</td></tr>
+                <tr><td><strong>Camera</strong></td><td>A sensor that turns light into an image of numbers. (Ch. 17)</td></tr>
+                <tr><td><strong>Pixel</strong></td><td>One tiny dot in an image, with colour values. (Ch. 17)</td></tr>
+                <tr><td><strong>Depth sensing</strong></td><td>Measuring how far away each part of a scene is. (Ch. 17)</td></tr>
+                <tr><td><strong>Feature</strong></td><td>A useful, recognisable pattern in an image, such as a corner or an edge. (Ch. 17)</td></tr>
+                <tr><td><strong>Object detection</strong></td><td>Software that finds and names objects in an image. (Ch. 17, 19)</td></tr>
+                <tr><td><strong>Sensor fusion</strong></td><td>Combining several sensors to get a better answer than any one alone. (Ch. 10, 20)</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2>Software and control</h2>
+
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th style="width:22%;">Term</th><th>Plain-English meaning</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Microcontroller</strong></td><td>A tiny computer that runs one program, reads sensors and drives actuators. (Ch. 11, 14)</td></tr>
+                <tr><td><strong>Single-board computer</strong></td><td>A small full computer, often running Linux, for heavier tasks like vision. (Ch. 11)</td></tr>
+                <tr><td><strong>Firmware</strong></td><td>The program stored on a microcontroller. (Ch. 14)</td></tr>
+                <tr><td><strong>Loop rate</strong></td><td>How many times per second the robot's control loop runs. (Ch. 14)</td></tr>
+                <tr><td><strong>PWM</strong></td><td>Pulse-width modulation. A way to control motor speed by switching power on and off very fast. (Ch. 14)</td></tr>
+                <tr><td><strong>Open-loop control</strong></td><td>Acting without checking the result. Simple but inaccurate. (Ch. 15)</td></tr>
+                <tr><td><strong>Closed-loop control</strong></td><td>Acting, measuring the result, and correcting. More accurate. (Ch. 15)</td></tr>
+                <tr><td><strong>Error</strong></td><td>The gap between what you want and what you have. (Ch. 15)</td></tr>
+                <tr><td><strong>PID controller</strong></td><td>A common control method that uses three terms — proportional, integral, derivative — to reduce error smoothly. (Ch. 15)</td></tr>
+                <tr><td><strong>Setpoint</strong></td><td>The target value you want the robot to reach. (Ch. 15)</td></tr>
+                <tr><td><strong>Kinematics</strong></td><td>The study of motion without worrying about forces: where parts are and how they move. (Ch. 16)</td></tr>
+                <tr><td><strong>Forward kinematics</strong></td><td>Working out where the end of an arm is, given the joint angles. (Ch. 16)</td></tr>
+                <tr><td><strong>Inverse kinematics</strong></td><td>Working out the joint angles needed to reach a target position. (Ch. 16)</td></tr>
+                <tr><td><strong>Frame</strong></td><td>A coordinate system attached to a part, used to describe positions. (Ch. 16)</td></tr>
+                <tr><td><strong>ROS</strong></td><td>Robot Operating System. Not an operating system, but a large toolbox of software for building robots. (Ch. 18)</td></tr>
+                <tr><td><strong>Node</strong></td><td>In ROS, one small program that does one job. (Ch. 18)</td></tr>
+                <tr><td><strong>Topic</strong></td><td>In ROS, a named channel where nodes publish or subscribe to data. (Ch. 18)</td></tr>
+                <tr><td><strong>Message</strong></td><td>In ROS, the typed data sent on a topic. (Ch. 18)</td></tr>
+                <tr><td><strong>Service</strong></td><td>In ROS, a request-and-reply call between nodes. (Ch. 18)</td></tr>
+                <tr><td><strong>Action</strong></td><td>In ROS, a long task that sends feedback while it runs. (Ch. 18)</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2>Intelligence and navigation</h2>
+
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th style="width:22%;">Term</th><th>Plain-English meaning</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Artificial intelligence (AI)</strong></td><td>Software that can learn or make smart choices. (Ch. 1, 19)</td></tr>
+                <tr><td><strong>Machine learning</strong></td><td>Teaching a program by showing it many examples instead of writing rules by hand. (Ch. 19)</td></tr>
+                <tr><td><strong>Training</strong></td><td>The learning stage, when the program studies examples and improves. (Ch. 19)</td></tr>
+                <tr><td><strong>Inference</strong></td><td>Running a trained model to get an answer in real time. (Ch. 19)</td></tr>
+                <tr><td><strong>Neural network</strong></td><td>A type of learning program built from many simple connected units. (Ch. 19)</td></tr>
+                <tr><td><strong>Reinforcement learning</strong></td><td>Learning by trying actions and getting rewards for good results. (Ch. 19)</td></tr>
+                <tr><td><strong>Map</strong></td><td>A model of the robot's surroundings used for planning. (Ch. 20)</td></tr>
+                <tr><td><strong>Localisation</strong></td><td>Working out where the robot is on the map. (Ch. 20)</td></tr>
+                <tr><td><strong>SLAM</strong></td><td>Building a map and finding your place in it at the same time. (Ch. 20)</td></tr>
+                <tr><td><strong>Path planning</strong></td><td>Choosing a route from here to a goal while avoiding obstacles. (Ch. 20)</td></tr>
+                <tr><td><strong>Global planner</strong></td><td>Plans the whole route using the map. (Ch. 20)</td></tr>
+                <tr><td><strong>Local planner</strong></td><td>Handles the next few metres, dodging things the map missed. (Ch. 20)</td></tr>
+                <tr><td><strong>Obstacle avoidance</strong></td><td>Reacting to nearby objects so the robot does not hit them. (Ch. 20)</td></tr>
+                <tr><td><strong>Grasp</strong></td><td>A specific way of holding an object with a gripper. (Ch. 21)</td></tr>
+                <tr><td><strong>Pick and place</strong></td><td>The common task of picking an object up and putting it somewhere else. (Ch. 21)</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2>Safety and professional practice</h2>
+
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th style="width:22%;">Term</th><th>Plain-English meaning</th></tr></thead>
+              <tbody>
+                <tr><td><strong>PPE</strong></td><td>Personal protective equipment: safety glasses, gloves, closed shoes and so on. (Ch. 3)</td></tr>
+                <tr><td><strong>E-stop</strong></td><td>Emergency stop. A big button that cuts power to the robot instantly. (Ch. 3)</td></tr>
+                <tr><td><strong>Lockout / tagout</strong></td><td>A safety rule: lock the power off and label it so no one can switch it on while you work. (Ch. 3)</td></tr>
+                <tr><td><strong>Risk assessment</strong></td><td>Writing down what could go wrong and how you will prevent it. (Ch. 3)</td></tr>
+                <tr><td><strong>Risk / reward</strong></td><td>Weighing the chance of harm against the benefit of an action. (Ch. 3)</td></tr>
+                <tr><td><strong>Portfolio</strong></td><td>A collection of your real projects that shows what you can do. (Ch. 24)</td></tr>
+                <tr><td><strong>Iteration</strong></td><td>Improving a design by repeating the build-test-improve cycle. (Ch. 2, 24)</td></tr>
+                <tr><td><strong>Version control</strong></td><td>Tracking changes to files over time so you can go back and work with others. (Ch. 2, 24)</td></tr>
+                <tr><td><strong>Test plan</strong></td><td>A written list of the checks a design must pass. (Ch. 2, 22)</td></tr>
+                <tr><td><strong>Robot as a Service (RaaS)</strong></td><td>Paying to use a robot by the month instead of buying it. (Ch. 23)</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2>Advanced foundations (Part 7)</h2>
+
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th style="width:22%;">Term</th><th>Plain-English meaning</th></tr></thead>
+              <tbody>
+                <tr><td><strong>SO(3)</strong></td><td>The set of all 3D rotations. A formal name for "every way a body can turn". (Ch. 25)</td></tr>
+                <tr><td><strong>SE(3)</strong></td><td>The set of all 3D poses: position plus rotation together. (Ch. 25)</td></tr>
+                <tr><td><strong>Quaternion</strong></td><td>A four-number way to store a rotation. No gimbal lock, easy to blend. (Ch. 25)</td></tr>
+                <tr><td><strong>Lie group</strong></td><td>A smooth set of transforms, such as rotations, that can be combined and undone. (Ch. 25)</td></tr>
+                <tr><td><strong>Convex optimization / QP</strong></td><td>Finding the best choice under limits, where the problem shape guarantees one best answer. QP means the cost is quadratic and limits are straight lines. (Ch. 25)</td></tr>
+                <tr><td><strong>OSQP / HPIPM / qpOASES</strong></td><td>Popular QP solver programs robots use to solve optimization fast. (Ch. 25, 26)</td></tr>
+                <tr><td><strong>MPC</strong></td><td>Model predictive control. Plan a short future with a model, run the first step, then replan. (Ch. 26)</td></tr>
+                <tr><td><strong>Whole-body control (WBC)</strong></td><td>Controlling all joints at once so many tasks share one body without fighting. (Ch. 26)</td></tr>
+                <tr><td><strong>Nullspace</strong></td><td>The leftover freedom after a main task is done. Used for second tasks that must not disturb the first. (Ch. 26)</td></tr>
+                <tr><td><strong>Impedance control</strong></td><td>Controlling how a robot pushes back, like a tunable spring, instead of only its position. (Ch. 30)</td></tr>
+                <tr><td><strong>ros2_control</strong></td><td>The ROS 2 framework that connects controllers to real hardware joints. (Ch. 27)</td></tr>
+                <tr><td><strong>EtherCAT / CANopen (CiA 402)</strong></td><td>Fast industrial networks and drive profiles that link controllers to motors in real time. (Ch. 27)</td></tr>
+                <tr><td><strong>PREEMPT_RT</strong></td><td>A Linux mode that makes timing predictable enough for fast control loops. (Ch. 27)</td></tr>
+                <tr><td><strong>System identification</strong></td><td>Measuring a real robot so the simulator matches it: mass, friction, motor strength. (Ch. 28)</td></tr>
+                <tr><td><strong>Domain randomization</strong></td><td>Training in many random simulated worlds so the real world feels familiar. (Ch. 28)</td></tr>
+                <tr><td><strong>Factor graph</strong></td><td>A web of measurement clues linking poses and landmarks, solved all at once for SLAM. (Ch. 25)</td></tr>
+                <tr><td><strong>Performance Level (PL)</strong></td><td>The ISO 13849 safety grade of a safety function, from a (lowest) to e (highest). (Ch. 29)</td></tr>
+                <tr><td><strong>SIL</strong></td><td>Safety integrity level. The IEC 61508 grade of how well a system avoids dangerous failure. (Ch. 29)</td></tr>
+                <tr><td><strong>FMEA</strong></td><td>Failure mode and effects analysis. Listing each way a part can fail and what happens next. (Ch. 29)</td></tr>
+                <tr><td><strong>MoveIt 2</strong></td><td>The ROS 2 arm-planning toolbox: plans collision-free motions with planners like OMPL. (Ch. 30)</td></tr>
+                <tr><td><strong>VLA</strong></td><td>Vision-language-action model. A robot brain that turns what it sees and hears into actions. (Ch. 30)</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <section class="takeaways">
+            <h2><i class="bi bi-pin-angle-fill"></i> Key takeaways</h2>
+            <ul>
+              <li><i class="bi bi-check2-circle"></i> A word you can define in your own words is a word you own.</li>
+              <li><i class="bi bi-check2-circle"></i> Most terms are simple ideas with a formal name attached.</li>
+              <li><i class="bi bi-check2-circle"></i> Jump to the chapter beside a term to see it used in context.</li>
+              <li><i class="bi bi-check2-circle"></i> Re-read a definition when you meet a word again; repetition builds fluency.</li>
+            </ul>
+          </section>
+
+        </article>
+
+        <nav class="pager" id="pager" aria-label="Chapter navigation"></nav>
+      </div>
+    </main>
+  </div>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/book.js"></script>
+</body>
+</html>

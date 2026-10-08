@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>try{var __t=localStorage.getItem("mr-theme");if(__t==="dark"||__t==="light")document.documentElement.setAttribute("data-theme",__t);}catch(e){}</script>
+  <title>Chapter 3: Safety First: Working With Robots — Master Robotics</title>
+  <meta name="description" content="Stay safe in a robotics workspace. Learn electrical, battery, tool and mechanical dangers, plus a start-up and shut-down routine, PPE and emergency steps in plain English.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/prose.css">
+</head>
+<body data-file="ch03-safety-first.html">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="topbar" id="topbar"></header>
+  <div class="progress-bar" id="progressBar"></div>
+
+  <div class="layout">
+    <div class="sidebar__backdrop" id="navBackdrop"></div>
+    <nav class="sidebar" id="sidebar" aria-label="Book contents"></nav>
+
+    <main class="main" id="main">
+      <div class="container">
+
+        <header class="chapter-head">
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="index.html">Home</a>
+            <i class="bi bi-chevron-right"></i>
+            <a href="index.html#foundations">Part 1 &middot; Foundations</a>
+            <i class="bi bi-chevron-right"></i>
+            <span>Chapter 3</span>
+          </nav>
+          <span class="chapter-kicker"><i class="bi bi-rocket-takeoff"></i> Part 1 &middot; Foundations</span>
+          <h1>Safety First: Working With Robots</h1>
+          <p class="lede">Robots mix electricity, sharp tools, hot metal and fast-moving parts. This chapter shows you the simple habits that keep you safe, so you can build and test with confidence instead of fear.</p>
+          <div class="chapter-meta">
+            <span><i class="bi bi-clock"></i> ~17 min read</span>
+            <span><i class="bi bi-bar-chart"></i> Beginner</span>
+            <span><i class="bi bi-list-check"></i> Chapter 3 of 30</span>
+          </div>
+          <div class="goals">
+            <h2>What you will learn</h2>
+            <ul>
+              <li><i class="bi bi-check-circle-fill"></i> Describe the main dangers in a robotics workspace</li>
+              <li><i class="bi bi-check-circle-fill"></i> Follow a safe start-up and shut-down routine</li>
+              <li><i class="bi bi-check-circle-fill"></i> Choose the right protective habits for a task</li>
+            </ul>
+          </div>
+        </header>
+
+        <article class="article">
+
+          <p class="lead">A small homemade robot can still give you a bad burn, a shock, or a cut finger. The danger does not care that the robot is small. It cares whether you were careful. This chapter teaches care as a habit, not a rule you memorise once.</p>
+
+          <h2>A story about a burning smell</h2>
+
+          <p>Imagine it is a normal evening. Your first robot is on the bench. You are proud of it. You connect a battery, and the wheels start to spin. You smile.</p>
+
+          <p>Then you smell something like hot plastic. It is faint. You think, "It is probably nothing." You lean closer to look. The smell gets stronger. A thin line of smoke rises from the battery wires.</p>
+
+          <p>In that moment, a beginner does one of two things. Either they panic and grab the wire with bare hands. Or they stay calm and follow a plan they decided on earlier. This chapter is that plan. If you learn it now, it will be there when you need it.</p>
+
+          <p>Safety is not boring. Safety is what lets you keep building tomorrow. A careful builder finishes more robots than a careless one, because a careful builder keeps their hands, eyes and workspace in good shape.</p>
+
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> The key idea</div>
+            <p>Almost every workshop injury comes from surprise. The robot moves when you did not expect it, the wire is hot when you did not know, or the tool slips when you did not plan. Good safety is simply removing surprises before they happen.</p>
+          </div>
+
+          <h2>Electrical safety: what electricity does to you</h2>
+
+          <p>Electricity is the flow of tiny particles called electrons moving through a wire. We call that flow <strong>current</strong>, measured in <strong>amperes</strong> (amps, or A). For it to flow, it needs a push called <strong>voltage</strong>, measured in <strong>volts</strong> (V).</p>
+
+          <p>Your body can become part of that path. If current flows through you, it can hurt you. It is the current, not the voltage, that harms the body. But higher voltage can push more current through your skin, so voltage still matters a lot.</p>
+
+          <figure class="figure">
+            <div class="figure__box">
+              <svg viewBox="0 0 620 220" width="100%" role="img" aria-label="A table comparing how different current levels affect the human body">
+                <text x="20" y="30" font-family="Inter, sans-serif" font-size="15" font-weight="700" fill="#1c2230">Current through the body and its effect</text>
+                <rect x="20" y="50" width="180" height="40" rx="8" fill="#e2f6ef" stroke="#0f9d78" stroke-width="2"></rect>
+                <text x="110" y="75" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#0f9d78">1 mA — a faint tingle</text>
+                <rect x="20" y="100" width="360" height="40" rx="8" fill="#fdf3e0" stroke="#c98a12" stroke-width="2"></rect>
+                <text x="200" y="125" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#8a5a00">10–20 mA — muscles lock, you cannot let go</text>
+                <rect x="20" y="150" width="540" height="40" rx="8" fill="#fde8ea" stroke="#d1374a" stroke-width="2"></rect>
+                <text x="290" y="175" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#a01f30">50 mA and up — dangerous; 100 mA can stop the heart</text>
+              </svg>
+            </div>
+            <figcaption>Figure 3.1 — A tiny current you can barely feel; a small current that locks your hand; a larger current that can kill. The line between them is narrow. Always treat electricity with respect.</figcaption>
+          </figure>
+
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> In simple words</div>
+            <p>Voltage is the push. Current is the flow. Your body is a path for the flow. The bigger the current, the worse the harm. Low voltage pushes less current through you, so it is usually safer.</p>
+          </div>
+
+          <h3>Why low voltage is safer</h3>
+
+          <p>Most small robots run on 5 V, 9 V or 12 V. These low voltages are called <strong>low voltage</strong> or <strong>extra-low voltage</strong>. At these levels, your dry skin resists the flow well. Touching a 9 V battery with dry fingers feels like nothing.</p>
+
+          <p>This is why we test new circuits with a low-voltage power supply first. If a beginner makes a mistake, the result is often a quiet "click" and a warm part, not a shock. Low voltage does not make you invincible, but it gives you room to learn safely.</p>
+
+          <h3>Mains voltage is a different world</h3>
+
+          <p><strong>Mains voltage</strong> is the electricity in the wall socket — about 120 V in the United States and 230 V in much of the world. Mains can easily push a deadly current through your body. It deserves a completely different level of care.</p>
+
+          <p>Inside a wall-socket device, mains power is present whenever the plug is in, even if the switch looks off. Touching the wrong place can kill you. This is why main-powered projects are a serious step up from battery projects.</p>
+
+          <div class="callout danger">
+            <div class="callout__head"><i class="bi bi-shield-exclamation"></i> Danger</div>
+            <p>Never work on mains wiring alone. Always have another adult nearby who knows how to switch off the power and call for help. If there is no one to watch, wait and do a safer task instead.</p>
+          </div>
+
+          <h3>Insulation, fuses and correct plugs</h3>
+
+          <p><strong>Insulation</strong> is the plastic or rubber coat around a wire. It keeps the current inside the wire and away from your fingers. A wire with cracked or missing insulation is an accident waiting to happen. Replace it or cover it before you use it.</p>
+
+          <p>A <strong>fuse</strong> is a small safety part that melts and breaks the circuit if too much current flows. It is a deliberate weak point. When something goes wrong, the cheap fuse dies instead of the expensive device — or you. Never bypass a fuse with foil or a nail.</p>
+
+          <p>Use the correct plug and the correct cable for the job. A plug that is loose, cracked, or forced into the wrong socket can spark or overheat. Match the plug to the socket and check it is firmly seated before you switch on.</p>
+
+          <h3>RCDs and GFCIs: the part that protects you</h3>
+
+          <p>An <strong>RCD</strong> (residual current device), called a <strong>GFCI</strong> in North America, is a switch that watches the current going out and coming back. If some current is leaking to earth — for example, through a person — the RCD cuts the power in a few hundredths of a second. It can save your life.</p>
+
+          <p>RCDs are common in kitchens, bathrooms and workshops. If you work with mains tools, an RCD socket or plug is a simple, cheap layer of protection. Test it now and then with its test button to be sure it still works.</p>
+
+          <h3>How much current flows through you?</h3>
+
+          <p>You can estimate the danger with one simple rule. <strong>Ohm's law</strong> says the current is the voltage divided by the resistance.</p>
+
+          <div class="formula"><span class="label">Ohm's law</span> I = V &divide; R</div>
+
+          <p>Here <var>I</var> is the current in amps, <var>V</var> is the voltage in volts, and <var>R</var> is the resistance in ohms. Dry skin might have a resistance of about 100,000 ohms. Wet skin can drop to about 1,000 ohms.</p>
+
+          <p>Take a 230 V mains voltage and wet skin at 1,000 ohms:</p>
+
+          <div class="formula"><span class="label">Worked example</span> I = 230 V &divide; 1,000 &Omega; = 0.23 A = 230 mA</div>
+
+          <p>That is 230 milliamps — far above the level that stops a heart. Now take the same wet skin and a 9 V battery:</p>
+
+          <div class="formula"><span class="label">Worked example</span> I = 9 V &divide; 1,000 &Omega; = 0.009 A = 9 mA</div>
+
+          <p>That is 9 milliamps — a tingle, not a deadly shock. Same body, same wet skin, but a low voltage keeps the current small. This is why we say the voltage pushes, and the resistance decides how much gets through. It is also why dry hands and dry floors matter so much.</p>
+
+          <h3>Handling live work like a professional</h3>
+
+          <ul>
+            <li><strong>Switch off first.</strong> Unplug the device before you touch any wire. Do not rely on a switch alone.</li>
+            <li><strong>One hand rule.</strong> When you must probe a live low-voltage circuit, keep one hand in your pocket. This stops current crossing your chest.</li>
+            <li><strong>Dry hands, dry bench.</strong> Water lowers your skin resistance and makes a shock far worse.</li>
+            <li><strong>No jewellery.</strong> Rings and metal watches can heat up fast or bridge two points.</li>
+          </ul>
+
+          <h2>Battery safety: the biggest danger on your bench</h2>
+
+          <p>Batteries look harmless. They are small, smooth and carry a friendly brand name. But a battery stores a lot of energy in a tiny space. When that energy is released all at once, it releases heat — and heat starts fires.</p>
+
+          <h3>Short circuits: the fast way to make fire</h3>
+
+          <p>A <strong>short circuit</strong> is a path where current can flow with almost no resistance. Normally, a circuit has a load — a motor, a light or a circuit board — that uses the energy slowly. A short circuit skips the load and lets the current race.</p>
+
+          <p>If a metal tool lies across the two terminals of a battery, you have made a short circuit. The wire or tool gets hot in seconds. On a big battery it can glow orange, melt insulation, and set nearby paper on fire.</p>
+
+          <div class="callout warn">
+            <div class="callout__head"><i class="bi bi-exclamation-triangle-fill"></i> Watch out</div>
+            <p>Never store loose batteries in a drawer with coins, keys or screws. A single coin can bridge a battery terminal and start a fire. Keep terminals covered with tape or a plastic cap.</p>
+          </div>
+
+          <h3>Lithium batteries: power and risk together</h3>
+
+          <p><strong>Lithium batteries</strong> (often called Li-ion or LiPo) give a lot of energy for their weight. That is why drones, phones and robots love them. But they are also the batteries most likely to catch fire when damaged or misused.</p>
+
+          <p>Watch for these warning signs. A swollen or puffy battery is a <strong>no-go</strong>. A punctured, dented or torn battery is a no-go. A battery that gets hot while sitting still, or smells sweet and chemical, is a no-go. Treat any of these as dangerous and remove it safely.</p>
+
+          <div class="callout danger">
+            <div class="callout__head"><i class="bi bi-shield-exclamation"></i> Danger</div>
+            <p>Never puncture, crush or open a lithium battery. Never charge a swollen battery. A damaged lithium cell can ignite with no warning and the fire is hard to put out. Move it away from anything that can burn and ask an adult for help.</p>
+          </div>
+
+          <h3>Charging and storing batteries safely</h3>
+
+          <ol>
+            <li><strong>Use the right charger.</strong> Match the charger to the battery type and voltage. A wrong charger can overcharge and overheat a cell.</li>
+            <li><strong>Charge on a fire-proof surface.</strong> Use a metal tray or a stone tile, not carpet, paper or a wooden desk.</li>
+            <li><strong>Stay in the room.</strong> Never leave a battery charging while you sleep or leave the house. If something goes wrong, you need to be there.</li>
+            <li><strong>Use a LiPo bag.</strong> A <strong>LiPo bag</strong> is a fire-resistant pouch that holds a battery while charging. It cannot stop every fire, but it slows the spread and protects the room.</li>
+            <li><strong>Store at the right charge.</strong> For long storage, keep lithium cells around half charge, cool and dry, not full and hot.</li>
+            <li><strong>Dispose of properly.</strong> Take old or swollen batteries to a battery-recycling point. Never put lithium in normal rubbish.</li>
+          </ol>
+
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> Tip</div>
+            <p>Write the date on each battery when you buy it. Old, tired batteries are more likely to swell and misbehave. A date sticker helps you retire them before they become a problem.</p>
+          </div>
+
+          <h2>Tool safety: soldering, cutting and clamping</h2>
+
+          <p>Tools do not know the difference between a wire and a finger. They do exactly what you aim them at. The good news is that most tool injuries come from three causes you can control: rushing, bad lighting, and unclamped work.</p>
+
+          <h3>Soldering irons and their fumes</h3>
+
+          <p>A <strong>soldering iron</strong> melts metal to join wires. It reaches 300&nbsp;&deg;C or more. That is hot enough to give a deep burn in less than a second, and it stays hot for minutes after you unplug it.</p>
+
+          <p>Always rest the iron in its stand, never on the bench. Treat the tip as if it is always hot. Keep the cable away from the hot tip so the insulation cannot melt and short out.</p>
+
+          <p><strong>Solder fumes</strong> come from the flux inside the solder. They are not good to breathe. Work near an open window or use a small fan to push fumes away from your face. Do not lean directly over the smoke.</p>
+
+          <h3>Sharp cutters and eye protection</h3>
+
+          <p>Wire cutters, side cutters and craft knives are sharp by design. When you cut a stiff wire, a small piece can fly off with real speed. That is why you wear <strong>safety glasses</strong> whenever you cut, strip or drill.</p>
+
+          <p>Cut away from your body, never toward your hand. Keep your fingers behind the cutting edge. A blunt cutter needs more force and slips more, so keep your tools sharp.</p>
+
+          <h3>Clamping work and heat-resistant mats</h3>
+
+          <p>A clamp holds your work still so both hands are free and the part cannot jump. Most slips happen when a part moves just as you push a tool into it. Clamp it, then work.</p>
+
+          <p>A <strong>heat-resistant mat</strong> is a fire-proof sheet you place under soldering. It catches hot solder blobs and protects the desk. Some mats also have small wells to hold screws and parts so they do not roll away.</p>
+
+          <div class="callout note">
+            <div class="callout__head"><i class="bi bi-info-circle-fill"></i> Note</div>
+            <p>Keep a small damp sponge or brass wool near the soldering iron to clean the tip. A clean tip transfers heat better, so you solder faster and touch the joint for less time.</p>
+          </div>
+
+          <h2>Mechanical safety: moving parts bite</h2>
+
+          <p>A robot that is switched off is just a heavy object. A robot that is switched on is a machine full of stored energy. That energy can move quickly and without warning.</p>
+
+          <h3>Pinch points, gears and belts</h3>
+
+          <p>A <strong>pinch point</strong> is any gap where two parts move past each other — the space between a gear and its neighbours, or where a belt meets a pulley. Fingers near a pinch point can be crushed or pulled in.</p>
+
+          <p><strong>Gears</strong> are wheels with teeth that mesh together to change speed and force. <strong>Belts</strong> are loops that carry power from one pulley to another. Both can grab loose hair, sleeves or cables. Keep them covered when the robot runs.</p>
+
+          <h3>Springs store hidden energy</h3>
+
+          <p>A <strong>spring</strong> is a coil that stores energy when you squash or stretch it. Compressed springs can jump out with surprising force when released. When you work on springs, point them away from your face and body, and wear eye protection.</p>
+
+          <h3>Sharp edges and motor surprise motion</h3>
+
+          <p>Cut metal and 3D-printed parts often have sharp edges. Run a file over them before you handle the part. A <strong>surprise motion</strong> is when a motor suddenly turns because of a loose wire, a bug, or a power glitch. Your hand should never be inside a mechanism that could move.</p>
+
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> The one rule that prevents most injuries</div>
+            <p>Remove power before you touch a mechanism. Disconnect the battery or unplug the supply, then wait a moment, then touch. Your hands stay out of the machine until the machine cannot move.</p>
+          </div>
+
+          <h2>Robot operation safety: control it before it controls you</h2>
+
+          <p>Building a robot is one risk. Running it is another. A finished robot has motors, stored power and a mind of its own once the code starts running. You need a few simple habits for every test.</p>
+
+          <h3>The emergency stop</h3>
+
+          <p>An <strong>emergency stop</strong> (or <strong>E-stop</strong>) is a switch or button that cuts power to the motors instantly. In big machines it is a big red button you can hit with your palm. In a small robot it can be a plug you can pull, or a power switch within easy reach.</p>
+
+          <p>Decide your E-stop before you start. It must be easy to reach from where you stand. If you have to look for it, it is too far. Make it a habit: every time before you switch on, point to the E-stop and say where it is.</p>
+
+          <h3>Test with the wheels off the ground</h3>
+
+          <p>Before a robot drives across the floor, lift its wheels off the bench so they spin in the air. This is called a <strong>bench test</strong> or <strong>dry run</strong>. You can check that both motors turn the right way, that nothing shakes loose, and that the E-stop works — all without the robot racing away or rolling off a table.</p>
+
+          <p>A <strong>soft start</strong> means bringing the speed up slowly instead of jumping to full power. It gives you a moment to see if something is wrong before the robot is moving fast.</p>
+
+          <h3>Keep fingers clear and define a safe zone</h3>
+
+          <p>Once the robot is on the floor, keep your hands out of its path. A <strong>safe zone</strong> is a clear area around the robot that stays free of people, pets and cables while it moves. Mark it with tape or chairs if you need to.</p>
+
+          <p>Never let a robot run near people without watching it. A wheeled robot can run into an ankle; a robot arm can swing into a face. If you must step away, switch the robot off first.</p>
+
+          <div class="callout warn">
+            <div class="callout__head"><i class="bi bi-exclamation-triangle-fill"></i> Watch out</div>
+            <p>Never reach in to fix a running robot "just for a second". Motor surprise motion is real, and a running robot can grab a finger, sleeve or cable before you react. Cut the power, then reach in.</p>
+          </div>
+
+          <h2>Set up your workspace to be safe</h2>
+
+          <p>Your bench is where most accidents start and where most of them are prevented. A good workspace is boring: clean, bright and calm. That is exactly what you want.</p>
+
+          <h3>A tidy bench and good lighting</h3>
+
+          <p>Keep the bench clear of clutter you are not using. Put tools back in their places when you finish. A tidy bench means you can see a hot iron, a live wire or a spinning wheel before it hurts you. Good lighting matters too — most slips happen in a shadow.</p>
+
+          <h3>Fire extinguisher and first-aid kit</h3>
+
+          <p>Keep a fire extinguisher near the bench, and know which type works on electrical and battery fires. Keep a small first-aid kit with plasters, burn gel and eye wash within reach. You hope never to use them, but you want them close if you do.</p>
+
+          <h3>No drinks near electronics</h3>
+
+          <p>Keep all drinks — water, coffee, fizzy drinks — off the electronics bench. A spilled drink can short a circuit, ruin your work, and turn a low-voltage project into a shock risk. If you need a drink, take a break away from the bench.</p>
+
+          <h2>Personal protective equipment (PPE)</h2>
+
+          <p><strong>Personal protective equipment</strong>, or <strong>PPE</strong>, is gear you wear to protect your body. Different tasks need different gear. Table 3.1 shows when each item is worth putting on.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>PPE item</th><th>Protects against</th><th>Wear it when</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Safety glasses</td><td>Flying bits, solder splashes, fumes to the eyes</td><td>Cutting, drilling, soldering, working on springs</td></tr>
+                <tr><td>Gloves</td><td>Cuts, burns, sharp edges</td><td>Cutting metal, handling hot or sharp parts (not near spinning motors)</td></tr>
+                <tr><td>Closed shoes</td><td>Dropped tools, hot solder, falling parts</td><td>Always, in any workshop</td></tr>
+                <tr><td>Tie back long hair / loose sleeves</td><td>Being grabbed by gears and belts</td><td>Any time a motor may run</td></tr>
+                <tr><td>Soldering mat</td><td>Hot solder and fire on the desk</td><td>Every soldering job</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 3.1 — Match the protection to the task. Gloves and spinning motors do not mix, because gloves can be caught and pulled in.</p>
+
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> In simple words</div>
+            <p>PPE is your armour. Glasses protect your eyes, gloves protect your hands, and closed shoes protect your feet. Wear the armour that matches the danger in front of you.</p>
+          </div>
+
+          <h2>A safe start-up routine</h2>
+
+          <p>A routine is a set of steps you do the same way every time. When a step is a habit, you cannot forget it. Here is a start-up checklist you can use for any robot test.</p>
+
+          <ol>
+            <li><strong>Clear the bench.</strong> Remove drinks, paper, tools and anything loose. Give the robot room to move.</li>
+            <li><strong>Put on your PPE.</strong> Safety glasses on. Loose sleeves rolled up, long hair tied back.</li>
+            <li><strong>Inspect the power path.</strong> Check the battery and wires. Look for damage, swelling or bare metal. Replace anything suspect.</li>
+            <li><strong>Check the E-stop.</strong> Know exactly how to cut power, and make sure it is within reach.</li>
+            <li><strong>Wheels off the ground.</strong> If the robot can move, lift it so it cannot roll away.</li>
+            <li><strong>Confirm the code.</strong> Read what the robot will do before it runs. Know the expected motion.</li>
+            <li><strong>Power on slowly.</strong> Switch on and listen. A buzzing motor or hot wire means power off at once.</li>
+            <li><strong>Watch the first motion.</strong> Keep hands clear and your eyes on the robot for the first few seconds.</li>
+            <li><strong>Say "clear".</strong> Only lower the robot to the floor when the area is clear of people and objects.</li>
+          </ol>
+
+          <h2>A safe shut-down routine</h2>
+
+          <p>Shutting down matters as much as starting up. A robot left with power and a warm battery is a robot that can hurt you later, when you have stopped paying attention.</p>
+
+          <ol>
+            <li><strong>Stop the program.</strong> Tell the robot to stop moving before anything else.</li>
+            <li><strong>Cut the motor power.</strong> Use the E-stop or switch. Confirm the robot is still.</li>
+            <li><strong>Disconnect the battery.</strong> Pull the battery plug so there is no stored power left in the circuit.</li>
+            <li><strong>Wait, then check for heat.</strong> Feel near the battery and motors with the back of your hand. Warm is normal; hot is a warning.</li>
+            <li><strong>Remove the battery from the robot.</strong> Store it cool, dry and at half charge, away from metal objects.</li>
+            <li><strong>Let tools cool.</strong> Leave the soldering iron in its stand until it is fully cool.</li>
+            <li><strong>Tidy the bench.</strong> Put tools away and coil cables. A clean bench is ready and safe for next time.</li>
+          </ol>
+
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> Tip</div>
+            <p>Print these two routines and stick them to the wall above your bench. Tick each step with a pencil. After a few weeks you will do them without thinking — that is the goal.</p>
+          </div>
+
+          <h2>Personal safety habits</h2>
+
+          <p>Good habits carry you when your attention slips. These four habits prevent more accidents than any single tool.</p>
+
+          <ul>
+            <li><strong>Stop when you are tired.</strong> Tired people rush and skip steps. If you feel sleepy or annoyed, stop for the day. The robot will still be there tomorrow.</li>
+            <li><strong>Plan before power.</strong> Say out loud what the robot should do and where your hands will be. Never power on "just to see".</li>
+            <li><strong>Label wires.</strong> Write the purpose on each wire or use coloured wires. A labelled wire is far less likely to be connected wrong.</li>
+            <li><strong>Know your power switch.</strong> Before anything runs, point to the switch and the battery plug. In an emergency you will not have time to search.</li>
+          </ul>
+
+          <h2>Worked scenario: you smell burning</h2>
+
+          <p>Let us return to that evening on the bench. You smell hot plastic and see a thin line of smoke. Here is exactly what to do, step by step. Keep these steps in order — the order matters.</p>
+
+          <ol>
+            <li><strong>Stay calm.</strong> Take one breath. Panic makes people grab hot things. You have a plan, so use it.</li>
+            <li><strong>Cut the power.</strong> Pull the battery plug or hit the E-stop. Do not touch the smoke or the wires while power is on.</li>
+            <li><strong>Move back a step.</strong> Give the smoke room. Do not put your face close to the source.</li>
+            <li><strong>Watch and wait.</strong> Does the smoke stop and fade? If yes, the fault is probably just a hot wire. If it grows, be ready to act.</li>
+            <li><strong>Do not breathe the fumes.</strong> Open a window or door if you can reach it safely. Chemical smoke is harmful.</li>
+            <li><strong>If a fire starts, leave and call for help.</strong> A battery fire grows fast. Get out, get an adult, and call the emergency number. Do not fight a lithium fire with water.</li>
+            <li><strong>Let it cool completely.</strong> Do not touch or move a hot part. Wait until it is cold to the back of your hand.</li>
+            <li><strong>Find the cause later.</strong> Once everything is cold and power is off, look for the damaged wire or the wrong connection. Fix it before you power up again.</li>
+          </ol>
+
+          <div class="callout danger">
+            <div class="callout__head"><i class="bi bi-shield-exclamation"></i> Danger</div>
+            <p>Never pour water on an electrical or battery fire. Water can spread a battery fire and can shock you. Get away, warn others, and call the emergency services. Your robot can be replaced. You cannot.</p>
+          </div>
+
+          <p>Notice what the calm builder never does. They never grab the smoking part with bare hands. They never blow on it. They never "just check" the battery while it is still hot. Every one of those actions could turn a small fault into an injury.</p>
+
+          <h2>Common beginner mistakes</h2>
+
+          <p>Almost every beginner makes these mistakes. Knowing them in advance is like seeing the potholes before you drive. Here are the ones to watch for.</p>
+
+          <ul>
+            <li><strong>Rushing a test because you are excited.</strong> Excitement skips steps. Slow down for the first power-on of any new circuit.</li>
+            <li><strong>Reaching into a running robot.</strong> Always cut power first. A motor can move when you least expect it.</li>
+            <li><strong>Leaving a lithium battery charging unattended.</strong> Charge where you can see and hear the battery, on a fire-proof surface.</li>
+            <li><strong>Working on mains alone.</strong> Never. Have another adult present who can switch off power and call for help.</li>
+            <li><strong>Leaving the soldering iron on the bench.</strong> It must live in its stand, and be unplugged when you finish.</li>
+            <li><strong>Loose hair, sleeves or cables near gears.</strong> Tie back hair, roll up sleeves, and keep cables away from moving parts.</li>
+            <li><strong>Drinks on the electronics bench.</strong> A spilled drink shorts circuits and ruins work. Keep drinks elsewhere.</li>
+            <li><strong>No E-stop within reach.</strong> Decide how to cut power before you switch on, and keep it close.</li>
+            <li><strong>Ignoring a small warning sign.</strong> A swollen battery, a warm wire or a faint smell is a message. Listen to it early.</li>
+            <li><strong>Building when tired or angry.</strong> Stop. Rested hands are careful hands.</li>
+          </ul>
+
+          <div class="callout note">
+            <div class="callout__head"><i class="bi bi-info-circle-fill"></i> Note</div>
+            <p>Mistakes are normal and useful when they are small. The goal is not to never make a mistake. The goal is to design your work so that a mistake is small, quiet and recoverable, instead of dangerous.</p>
+          </div>
+
+          <h2>How professionals do it</h2>
+
+          <p>A professional workshop looks calm and slow, even when it is busy. That calm comes from systems. When robots get bigger and stronger, the same safety ideas you learned here grow into formal rules.</p>
+
+          <h3>Risk assessment</h3>
+
+          <p>A <strong>risk assessment</strong> is a written list of what could go wrong, how likely it is, how bad it would be, and what you will do about it. Professionals do this before work starts, not after an accident. Even a short note — "big motor, might pinch, keep hands out, use E-stop" — is a real risk assessment.</p>
+
+          <h3>Lockout/tagout</h3>
+
+          <p><strong>Lockout/tagout</strong> is a rule that stops a machine being switched on while someone is working inside it. The worker puts a physical lock on the power switch and keeps the only key. A tag warns others not to touch it. This removes the surprise of a machine starting while a hand is inside.</p>
+
+          <h3>Guarding and safety standards</h3>
+
+          <p>A <strong>guard</strong> is a cover or fence that keeps people away from moving parts. Cages, light curtains and clear panels are everyday guards in factories. Safety standards are shared rules that tell engineers how strong, how fast and how guarded a machine must be. They exist so the same danger is handled the same way everywhere.</p>
+
+          <h3>Emergency stops in industry</h3>
+
+          <p>Industrial E-stops are big, red and easy to hit with a whole hand. Some machines have several, placed at every exit. The design rule is simple: a person in danger must be able to stop the machine instantly, without thinking and without searching.</p>
+
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> The professional mindset</div>
+            <p>Professionals do not rely on being careful. They assume a careful person will still make a mistake, so they build safety into the machines, the room and the process. You can copy this mindset today, even on a tiny robot.</p>
+          </div>
+
+          <h2>Try it yourself</h2>
+
+          <p>Reading about safety is not enough. Do these small exercises so the habits become real. Start with the easy ones and work up.</p>
+
+          <h3>Exercise 1 — Find the dangers</h3>
+          <p>Walk around your workspace with a notebook. List every danger you can see: hot irons, loose wires, sharp tools, drinks near electronics, cables across the floor. <em>Hint:</em> aim for ten items. You will find more than you expect.</p>
+
+          <h3>Exercise 2 — Write your own start-up checklist</h3>
+          <p>Using the start-up routine in this chapter, write your own version for your desk. Reorder the steps if your setup needs it. <em>Hint:</em> keep it to nine steps or fewer, and make the E-stop step stand out. Print it and stick it up.</p>
+
+          <h3>Exercise 3 — Set up your emergency plan</h3>
+          <p>Decide, in writing, where your fire extinguisher is, where the first-aid kit is, and who you would call. Point to your E-stop right now and say out loud how you would cut power. <em>Hint:</em> practise this once while everything is off, so you know the moves before you need them.</p>
+
+          <h3>Exercise 4 — Inspect a battery like a professional</h3>
+          <p>Take an old battery and inspect it: is it swollen, torn or dented? Does it smell strange? Check your charger matches the battery. <em>Hint:</em> if a battery fails any check, stop using it and take it to a recycling point.</p>
+
+          <h3>Exercise 5 — Run a bench test safely</h3>
+          <p>With a small robot, lift the wheels off the bench and run the motors for a few seconds. Confirm both wheels turn, check for heat, and test your E-stop. <em>Hint:</em> do the whole start-up checklist first and the shut-down checklist after. Say each step out loud.</p>
+
+          <h2>Going deeper (optional)</h2>
+
+          <p>If you want one idea to carry forward, let it be this: <strong>layers of protection</strong>. Professionals never rely on a single safety measure. A factory might use a guard, plus a sensor that stops the machine, plus a trained operator, plus a rule. If one layer fails, the others catch the problem.</p>
+
+          <p>Look at your own robot and ask: what are my layers? You might have a fuse, an E-stop, a safe zone and your own attention. Four layers that each fail only rarely multiply into a system that almost never hurts anyone. This idea is called <strong>defence in depth</strong>, and it is the quiet heart of all industrial safety.</p>
+
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> Where this leads</div>
+            <p>This chapter kept you safe in your own workshop. Real products must also be <strong>certifiably safe</strong> for strangers: graded safety functions, FMEA tables and standards. Continue with <a href="ch29-functional-safety-certification.html">Chapter 29: Functional Safety and Certification</a>, which builds directly on the habits you learned here.</p>
+          </div>
+
+          <section class="takeaways">
+            <h2><i class="bi bi-pin-angle-fill"></i> Key takeaways</h2>
+            <ul>
+              <li><i class="bi bi-check2-circle"></i> Current harms the body; voltage only pushes the current. Low voltage is far safer to learn on.</li>
+              <li><i class="bi bi-check2-circle"></i> Mains voltage can kill. Never work on it alone, and always unplug first.</li>
+              <li><i class="bi bi-check2-circle"></i> Insulation, fuses, correct plugs and an RCD are simple layers that protect you.</li>
+              <li><i class="bi bi-check2-circle"></i> Lithium batteries can catch fire. Charge them on a heat-proof surface and never leave them unattended.</li>
+              <li><i class="bi bi-check2-circle"></i> Remove power before you touch any mechanism, and always keep an E-stop within reach.</li>
+              <li><i class="bi bi-check2-circle"></i> Match your PPE to the task, and keep a start-up and shut-down routine every single time.</li>
+              <li><i class="bi bi-check2-circle"></i> Good safety is removing surprises before they happen.</li>
+            </ul>
+          </section>
+
+          <section class="quiz">
+            <div class="quiz__head"><i class="bi bi-patch-question-fill"></i> Check your understanding</div>
+            <details>
+              <summary><span class="q-num">Q1.</span><span>What actually harms the body — voltage or current?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Current harms the body. Voltage matters because a higher voltage can push more current through you, but it is the current that does the damage.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q2.</span><span>Why is it safe to learn on a 9 V battery but dangerous to open a mains plug?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> A 9 V battery cannot push enough current through dry skin to hurt you badly. Mains voltage can push a deadly current, and it stays live even when a device looks switched off.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q3.</span><span>What does an RCD or GFCI do, and why is it important?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> It cuts the power very fast if current leaks to earth — for example, through your body. That fast cut can stop a shock from becoming fatal.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q4.</span><span>A fuse keeps blowing. Why should you never replace it with a nail or foil?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> A fuse is a deliberate weak point that melts to protect the circuit. Bridging it removes the protection, so the next fault can overheat a wire or start a fire.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q5.</span><span>Why should you test a robot with its wheels off the ground first?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> It lets you check that the motors turn the right way, that nothing shakes loose, and that the E-stop works — all without the robot racing away or rolling off the bench.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q6.</span><span>You smell faint burning from your robot. What is the very first thing you do?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Stay calm and cut the power — pull the battery plug or hit the E-stop. Then step back, watch whether the smoke fades, and do not touch hot parts.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q7.</span><span>What is lockout/tagout, and what problem does it solve?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> It is a rule where the worker locks the power switch and keeps the only key, with a tag warning others. It stops a machine being switched on by surprise while someone is inside it.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q8.</span><span>Wet skin can drop to about 1,000 ohms. Using I = V &divide; R, why is a 230 V shock so much worse than a 9 V one?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> 230 &divide; 1,000 = 0.23 A = 230 mA, which can stop the heart. 9 &divide; 1,000 = 0.009 A = 9 mA, which is only a tingle. Lower voltage means much less current through the body.</div>
+            </details>
+          </section>
+
+        </article>
+
+        <nav class="pager" id="pager" aria-label="Chapter navigation"></nav>
+      </div>
+    </main>
+  </div>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/book.js"></script>
+</body>
+</html>

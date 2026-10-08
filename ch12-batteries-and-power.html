@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>try{var __t=localStorage.getItem("mr-theme");if(__t==="dark"||__t==="light")document.documentElement.setAttribute("data-theme",__t);}catch(e){}</script>
+  <title>Chapter 12: Batteries and Power Management — Master Robotics</title>
+  <meta name="description" content="A plain-English guide to robot power. Learn battery capacity, voltage, watt-hours, C-rate, chemistries, regulators, power budgets and safe charging so your robot runs longer.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/prose.css">
+</head>
+<body data-file="ch12-batteries-and-power.html">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="topbar" id="topbar"></header>
+  <div class="progress-bar" id="progressBar"></div>
+
+  <div class="layout">
+    <div class="sidebar__backdrop" id="navBackdrop"></div>
+    <nav class="sidebar" id="sidebar" aria-label="Book contents"></nav>
+
+    <main class="main" id="main">
+      <div class="container">
+
+        <header class="chapter-head">
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="index.html">Home</a>
+            <i class="bi bi-chevron-right"></i>
+            <a href="index.html#electronics">Part 3 &middot; Electronics and Power</a>
+            <i class="bi bi-chevron-right"></i>
+            <span>Chapter 12</span>
+          </nav>
+          <span class="chapter-kicker"><i class="bi bi-cpu"></i> Part 3 &middot; Electronics and Power</span>
+          <h1>Batteries and Power Management</h1>
+          <p class="lede">Power is the fuel that makes your robot move. By the end of this chapter, you will be able to read a battery label, work out how long your robot will run, and avoid the mistakes that damage batteries or start fires.</p>
+          <div class="chapter-meta">
+            <span><i class="bi bi-clock"></i> ~21 min read</span>
+            <span><i class="bi bi-bar-chart"></i> Beginner</span>
+            <span><i class="bi bi-list-check"></i> Chapter 12 of 30</span>
+          </div>
+          <div class="goals">
+            <h2>What you will learn</h2>
+            <ul>
+              <li><i class="bi bi-check-circle-fill"></i> Explain battery capacity and voltage.</li>
+              <li><i class="bi bi-check-circle-fill"></i> Estimate how long a robot will run.</li>
+              <li><i class="bi bi-check-circle-fill"></i> Avoid the most common battery mistakes.</li>
+            </ul>
+          </div>
+        </header>
+
+        <article class="article">
+
+          <p class="lead">Imagine you spend a weekend building a small robot. You wire the motors, load the code, and place it on the floor. It drives forward, turns, dodges the sofa, and stops at the wall. It works! Then, eight minutes later, it slows down, twitches, and dies. You check the code. The code is fine. The problem is power.</p>
+
+          <h2>Why power is the robot's fuel</h2>
+
+          <p>Your robot needs energy to move, to think, and to sense. That energy comes from a battery. A battery is not a fuel tank you fill with petrol. It is a store of chemical energy that turns into electricity when you connect a circuit.</p>
+
+          <p>Beginners spend a lot of time choosing motors, sensors and code. They spend almost no time on power. Then their robot runs for a few minutes, browns out, or refuses to start. Every one of those problems traces back to power.</p>
+
+          <p>Think of a robot like a car. The motors are the engine. The sensors are the eyes. The controller is the driver. The battery is the fuel tank. A brilliant driver in a car with an empty tank goes nowhere. Power is the part that quietly decides whether any of your work pays off.</p>
+
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> The key idea</div>
+            <p>A robot runs on two questions at once: does the battery give the right <strong>voltage</strong> (the push), and does it hold enough <strong>capacity</strong> (the amount of energy) to finish the job? Get both wrong and the best design still fails.</p>
+          </div>
+
+          <p>Power is also the most underestimated part of a build because its mistakes are hidden. A weak battery still lights an LED, so the board seems alive. But the moment a motor asks for a big gulp of current, the voltage sags, the controller resets, and the robot behaves in strange ways. In this chapter we make power visible and easy to plan.</p>
+
+          <p>There are three big things to understand: how batteries store energy, how much your parts need, and how to move and protect that energy safely. We will take them one at a time, in plain language.</p>
+
+          <h2>Battery basics: cells, voltage and capacity</h2>
+
+          <p>A <strong>battery</strong> is one or more <strong>cells</strong> packaged together. A single cell is the smallest unit. It stores chemical energy and gives a small, fixed voltage. Cells are the building blocks, and we arrange them to get the voltage and capacity we want.</p>
+
+          <h3>Voltage per cell</h3>
+          <p>Every cell has a <strong>nominal voltage</strong>: the typical voltage it gives while working. <strong>Voltage</strong> is the electrical push. Think of it as water pressure in a pipe. More pressure pushes more water through. More voltage pushes more current through a wire.</p>
+
+          <p>Different chemistries have different cell voltages. A rechargeable nickel-metal-hydride cell gives about 1.2 volts. A single-use alkaline cell gives 1.5 volts. A lithium-ion cell gives about 3.6 to 3.7 volts. A lithium-iron-phosphate cell gives about 3.2 volts. You will meet these names again later.</p>
+
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> In simple words</div>
+            <p>Voltage is the push. Current is the flow. One cell gives a small push. To get a bigger push, we stack cells in series. To get a longer-lasting pack, we line them up in parallel.</p>
+          </div>
+
+          <h3>Series adds voltage</h3>
+          <p>When you connect cells in <strong>series</strong>, you join the positive end of one to the negative end of the next. This is like stacking batteries end to end in a torch. The pushes add up, so the voltages add up. But the flow of current passes through each cell in turn, so the <strong>capacity stays the same as one cell</strong>.</p>
+
+          <h3>Parallel adds capacity</h3>
+          <p>When you connect cells in <strong>parallel</strong>, you join positive to positive and negative to negative. Now the push does not change, so the voltage stays the same. But the stored energy is shared across all the cells, so the <strong>capacity adds up</strong>. This is like having several water tanks feeding the same pipe.</p>
+
+          <figure class="figure">
+            <div class="figure__box">
+              <svg viewBox="0 0 640 300" width="100%" role="img" aria-label="Two diagrams. Left: three cells in series, voltages add while capacity stays the same. Right: three cells in parallel, capacity adds while voltage stays the same.">
+                <text x="150" y="26" text-anchor="middle" font-family="Inter, sans-serif" font-size="15" font-weight="700" fill="#2d5bff">Series: voltage adds</text>
+                <rect x="40" y="70" width="70" height="46" rx="6" fill="#e8eeff" stroke="#2d5bff" stroke-width="2"></rect>
+                <line x1="52" y1="70" x2="52" y2="58" stroke="#1c2230" stroke-width="2"></line>
+                <line x1="98" y1="70" x2="98" y2="58" stroke="#1c2230" stroke-width="2"></line>
+                <rect x="128" y="70" width="70" height="46" rx="6" fill="#e8eeff" stroke="#2d5bff" stroke-width="2"></rect>
+                <line x1="140" y1="70" x2="140" y2="58" stroke="#1c2230" stroke-width="2"></line>
+                <line x1="186" y1="70" x2="186" y2="58" stroke="#1c2230" stroke-width="2"></line>
+                <rect x="216" y="70" width="70" height="46" rx="6" fill="#e8eeff" stroke="#2d5bff" stroke-width="2"></rect>
+                <line x1="228" y1="70" x2="228" y2="58" stroke="#1c2230" stroke-width="2"></line>
+                <line x1="274" y1="70" x2="274" y2="58" stroke="#1c2230" stroke-width="2"></line>
+                <line x1="110" y1="93" x2="128" y2="93" stroke="#1c2230" stroke-width="2"></line>
+                <line x1="198" y1="93" x2="216" y2="93" stroke="#1c2230" stroke-width="2"></line>
+                <text x="163" y="150" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#0f9d78">1.2 V + 1.2 V + 1.2 V = 3.6 V</text>
+                <text x="163" y="172" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#4a5266">capacity stays 2000 mAh</text>
+
+                <line x1="320" y1="20" x2="320" y2="280" stroke="#7b849b" stroke-width="1" stroke-dasharray="5 5"></line>
+
+                <text x="490" y="26" text-anchor="middle" font-family="Inter, sans-serif" font-size="15" font-weight="700" fill="#7a4ddb">Parallel: capacity adds</text>
+                <rect x="360" y="60" width="70" height="42" rx="6" fill="#f0e9fd" stroke="#7a4ddb" stroke-width="2"></rect>
+                <rect x="360" y="118" width="70" height="42" rx="6" fill="#f0e9fd" stroke="#7a4ddb" stroke-width="2"></rect>
+                <rect x="360" y="176" width="70" height="42" rx="6" fill="#f0e9fd" stroke="#7a4ddb" stroke-width="2"></rect>
+                <line x1="430" y1="81" x2="470" y2="81" stroke="#1c2230" stroke-width="2"></line>
+                <line x1="430" y1="139" x2="470" y2="139" stroke="#1c2230" stroke-width="2"></line>
+                <line x1="430" y1="197" x2="470" y2="197" stroke="#1c2230" stroke-width="2"></line>
+                <line x1="470" y1="60" x2="470" y2="218" stroke="#1c2230" stroke-width="2"></line>
+                <line x1="360" y1="40" x2="360" y2="240" stroke="#1c2230" stroke-width="2"></line>
+                <line x1="360" y1="60" x2="330" y2="60" stroke="#1c2230" stroke-width="2"></line>
+                <line x1="470" y1="218" x2="470" y2="240" stroke="#1c2230" stroke-width="2"></line>
+                <line x1="360" y1="240" x2="470" y2="240" stroke="#1c2230" stroke-width="2"></line>
+                <text x="490" y="262" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#0f9d78">1.2 V stays 1.2 V</text>
+                <text x="490" y="282" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#4a5266">2000 mAh &times; 3 = 6000 mAh</text>
+              </svg>
+            </div>
+            <figcaption>Figure 12.1 — Series wiring stacks the pushes (voltage adds). Parallel wiring stacks the storage (capacity adds). A real pack uses both: some cells in series for voltage, some in parallel for capacity.</figcaption>
+          </figure>
+
+          <p>Here is the water-tank way to remember it. <strong>Series</strong> is like raising one tank higher so the water arrives with more pressure, but you still have only one tank of water. <strong>Parallel</strong> is like putting several tanks side by side at the same height, so you have the same pressure but much more water. Most robot packs combine both: a group in series to reach the voltage, then several such groups in parallel to reach the capacity.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Wiring</th><th>Voltage</th><th>Capacity</th><th>Good for</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Series</td><td>Adds up</td><td>Stays the same</td><td>Reaching the voltage a motor or board needs</td></tr>
+                <tr><td>Parallel</td><td>Stays the same</td><td>Adds up</td><td>Running longer without changing the voltage</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 12.1 — The one-line rule for series and parallel packs.</p>
+
+          <h2>Capacity: amp-hours and milliamp-hours</h2>
+
+          <p><strong>Capacity</strong> is how much energy a battery can store. We measure it in <strong>amp-hours</strong> (Ah) or, for small batteries, <strong>milliamp-hours</strong> (mAh). One amp-hour means the battery can give 1 amp of current for 1 hour, or 0.5 amps for 2 hours, or 2 amps for half an hour. A milliamp-hour is one thousandth of an amp-hour, so 1000 mAh equals 1 Ah.</p>
+
+          <p>Here is what that means in real life. A phone battery might be 3000 mAh (3 Ah). If your phone uses about 0.3 A while you scroll a page, it lasts roughly ten hours. A small robot motor might use 0.5 A while running, so a 3 Ah pack driving one such motor lasts about six hours on paper. Reality will be shorter, and later we will see why.</p>
+
+          <div class="callout note">
+            <div class="callout__head"><i class="bi bi-info-circle-fill"></i> Note</div>
+            <p>Capacity is only half the story. Amp-hours tell you how long a battery lasts at its own voltage. To compare two batteries with different voltages, you must convert to watt-hours, which we do next.</p>
+          </div>
+
+          <h3>Why the label can mislead you</h3>
+          <p>Manufacturers often quote a big mAh number because it sounds impressive. But mAh alone does not say how much energy is inside. A 3.7 V battery rated 10000 mAh stores far less energy than a 12 V battery rated 5000 mAh. To compare them honestly, turn both into watt-hours.</p>
+
+          <h2>Energy in watt-hours: the honest comparison</h2>
+
+          <p><strong>Energy</strong> is the real measure of what a battery can do. We measure it in <strong>watt-hours</strong> (Wh). One watt-hour is the energy used by a device drawing 1 watt for 1 hour. Since power equals voltage times current, we can combine both numbers into one.</p>
+
+          <div class="formula"><span class="label">Watt-hours</span> Wh = V &times; Ah</div>
+
+          <p>Read it in plain words: the energy in watt-hours equals the voltage times the amp-hours. If the capacity is in milliamp-hours, divide by 1000 first. This single number lets you compare any two batteries fairly, no matter what voltage they run at.</p>
+
+          <p><strong>Worked example.</strong> You are choosing between two packs.</p>
+
+          <ol>
+            <li>Pack A: a 3.7 V lithium-ion pack rated 10000 mAh (that is 10 Ah). Energy = 3.7 V &times; 10 Ah = <strong>37 Wh</strong>.</li>
+            <li>Pack B: a 12 V pack rated 5000 mAh (5 Ah). Energy = 12 V &times; 5 Ah = <strong>60 Wh</strong>.</li>
+            <li>Conclusion: Pack B holds far more energy, even though its mAh number looks smaller. The 12 V pack can do more work.</li>
+          </ol>
+
+          <p>So when someone claims their battery is "10000 mAh", ask one question: at what voltage? The honest answer turns into watt-hours, and watt-hours are what actually move your robot.</p>
+
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> Tip</div>
+            <p>Write watt-hours on every battery you own. It makes comparisons instant and stops you buying a pack that is bigger only on paper.</p>
+          </div>
+
+          <h2>C-rate: the safe speed of charge and discharge</h2>
+
+          <p>Not every battery can give its energy quickly. The <strong>C-rate</strong> tells you how fast a battery can safely charge or discharge compared with its own capacity. A C-rate of 1C means the battery can give or take a current equal to its full capacity in one hour.</p>
+
+          <p>If a battery is rated 2000 mAh (2 Ah), then 1C means 2 A. A 2C discharge rating means it can safely give 4 A. A 0.5C charge rating means you should charge it at no more than 1 A. Push beyond the rating and the battery gets hot, ages fast, or becomes dangerous.</p>
+
+          <div class="formula"><span class="label">Max current from C-rate</span> I<sub>max</sub> = C &times; capacity (Ah)</div>
+
+          <p><strong>Worked example: why a small battery cannot run a big motor.</strong></p>
+
+          <ol>
+            <li>Your motor stalls and pulls <strong>10 A</strong> for a moment. Stall current is the current when the motor is blocked and cannot turn; it is the largest current it ever asks for.</li>
+            <li>You plan to use a tiny 1000 mAh (1 Ah) battery rated only 2C.</li>
+            <li>Maximum safe current = 2C &times; 1 Ah = <strong>2 A</strong>.</li>
+            <li>The motor wants 10 A. That is five times more than the battery allows. The battery voltage collapses, the motor barely moves, and the battery heats up.</li>
+            <li>Fix: choose a battery whose C-rating and capacity give at least 10 A, such as a 5000 mAh (5 Ah) pack rated 3C (3 &times; 5 = 15 A).</li>
+          </ol>
+
+          <div class="callout warn">
+            <div class="callout__head"><i class="bi bi-exclamation-triangle-fill"></i> Watch out</div>
+            <p>Motors pull their largest current at the moment they start, or when they are stalled. A battery that runs the motor fine while spinning may still be overwhelmed the instant the wheel jams. Always check the stall current, not just the running current.</p>
+          </div>
+
+          <h2>Battery chemistries compared</h2>
+
+          <p>A <strong>chemistry</strong> is the mix of materials inside a cell. Each chemistry trades off energy, weight, cost and safety in a different way. There is no perfect battery, only the right one for your job. Table 12.2 compares the main types you will meet.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Chemistry</th><th>Energy density</th><th>Weight</th><th>Cost</th><th>Safety</th><th>Best use</th><th>Typical cycles</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Alkaline</td><td>Low</td><td>Heavy for the energy</td><td>Cheap</td><td>Very safe</td><td>Toys, clocks, one-off tests</td><td>Not rechargeable</td></tr>
+                <tr><td>NiMH</td><td>Medium</td><td>Moderate</td><td>Low</td><td>Very safe</td><td>AA/AAA rechargeable packs</td><td>500-1000</td></tr>
+                <tr><td>Lead-acid</td><td>Low</td><td>Very heavy</td><td>Cheap per Wh</td><td>Safe but can vent</td><td>Large ground robots, backups</td><td>300-500</td></tr>
+                <tr><td>Li-ion (18650)</td><td>High</td><td>Light</td><td>Medium</td><td>Needs care</td><td>Robots, laptops, power banks</td><td>500-1000</td></tr>
+                <tr><td>LiPo</td><td>Very high</td><td>Very light</td><td>Medium-high</td><td>Needs care</td><td>Drones, high-current robots</td><td>300-500</td></tr>
+                <tr><td>LiFePO4</td><td>High</td><td>Moderate</td><td>Higher</td><td>Very safe</td><td>Durable robots, solar storage</td><td>2000-5000</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 12.2 — Battery chemistries at a glance. Cycles means how many full charge-and-empty rounds the battery survives before it weakens.</p>
+
+          <h3>How to choose</h3>
+          <p>For a first small robot, a nickel-metal-hydride pack is a gentle choice: cheap, safe and easy to recharge. For a drone or a fast robot where weight and current matter, lithium-polymer is the usual pick. For a heavy ground robot or a long-lived project, lithium-iron-phosphate gives safety and thousands of cycles. Alkaline cells are fine for a quick bench test, but they are wasteful for a robot you run often.</p>
+
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> In simple words</div>
+            <p>Alkaline: cheap, not refillable. NiMH: safe and reusable. Lead-acid: heavy and tough. Li-ion: light and strong, needs care. LiPo: lightest and fastest, needs care. LiFePO4: safe and long-lasting, costs more.</p>
+          </div>
+
+          <h2>Voltage regulators and converters</h2>
+
+          <p>Batteries do not hold a perfectly steady voltage. A "12 V" pack might read 13.5 V when full and 10 V when nearly empty. Motors cope with this fine, but the controller and sensors usually need a clean, steady voltage. That is the job of a <strong>voltage regulator</strong> or <strong>converter</strong>: a small circuit that takes the battery voltage in and gives a fixed voltage out.</p>
+
+          <h3>Linear regulator: simple but wasteful</h3>
+          <p>A <strong>linear regulator</strong> drops the extra voltage as heat. If you feed 12 V in and take 5 V out, the missing 7 V turns into warmth. It is simple and quiet, but wastes energy. The wasted heat is proportional to the current, so a linear regulator that was fine for a small sensor becomes a mini heater when it feeds a motor. Use it only for small, low-current loads.</p>
+
+          <h3>Buck converter: step down, efficiently</h3>
+          <p>A <strong>buck converter</strong> steps voltage down while wasting very little. It switches on and off thousands of times per second to move energy into an inductor, then releases it at the lower voltage. A good buck converter is 85 to 95 percent efficient, so almost all the stored energy reaches your parts. This is the usual way to make a steady 5 V or 3.3 V rail for a robot's brain from a higher battery.</p>
+
+          <h3>Boost converter: step up</h3>
+          <p>A <strong>boost converter</strong> steps voltage up. It lets a single 3.7 V lithium cell power parts that need 5 V. Boost converters are useful for a steady logic rail from a low-voltage cell, but they cannot create energy: if the battery is small, the current drawn from it grows larger as you use it.</p>
+
+          <figure class="figure">
+            <div class="figure__box">
+              <svg viewBox="0 0 640 320" width="100%" role="img" aria-label="A power distribution diagram showing a battery pack feeding motors directly through a switch and fuse, and feeding a buck converter that powers the controller and sensors, with a voltage divider sensing the battery.">
+                <rect x="240" y="20" width="160" height="56" rx="10" fill="#e8eeff" stroke="#2d5bff" stroke-width="2"></rect>
+                <text x="320" y="44" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#2d5bff">Battery pack</text>
+                <text x="320" y="64" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#4a5266">12 V, 5 Ah, 60 Wh</text>
+
+                <line x1="320" y1="76" x2="320" y2="108" stroke="#1c2230" stroke-width="2"></line>
+                <rect x="272" y="108" width="96" height="40" rx="8" fill="#fff6e6" stroke="#d98b00" stroke-width="2"></rect>
+                <text x="320" y="133" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#d98b00">Switch + fuse</text>
+
+                <line x1="320" y1="148" x2="320" y2="176" stroke="#1c2230" stroke-width="2"></line>
+                <line x1="120" y1="176" x2="520" y2="176" stroke="#1c2230" stroke-width="2"></line>
+
+                <line x1="180" y1="176" x2="180" y2="212" stroke="#1c2230" stroke-width="2"></line>
+                <rect x="110" y="212" width="140" height="48" rx="10" fill="#f0e9fd" stroke="#7a4ddb" stroke-width="2"></rect>
+                <text x="180" y="234" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#7a4ddb">Motors (raw 12 V)</text>
+                <text x="180" y="252" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#4a5266">2 &times; 1.5 A, stall 5 A</text>
+
+                <line x1="460" y1="176" x2="460" y2="212" stroke="#1c2230" stroke-width="2"></line>
+                <rect x="390" y="212" width="140" height="48" rx="10" fill="#e2f6ef" stroke="#0f9d78" stroke-width="2"></rect>
+                <text x="460" y="234" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#0f9d78">Buck converter</text>
+                <text x="460" y="252" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#4a5266">12 V &#8594; 5 V</text>
+
+                <line x1="460" y1="260" x2="460" y2="288" stroke="#1c2230" stroke-width="2"></line>
+                <rect x="380" y="288" width="160" height="0" rx="0" fill="none" stroke="none"></rect>
+
+                <line x1="320" y1="176" x2="320" y2="212" stroke="#1c2230" stroke-width="2"></line>
+                <rect x="255" y="212" width="130" height="48" rx="10" fill="#fff6e6" stroke="#d98b00" stroke-width="2"></rect>
+                <text x="320" y="234" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#d98b00">Voltage sense</text>
+                <text x="320" y="252" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#4a5266">to controller ADC</text>
+
+                <rect x="430" y="288" width="180" height="26" rx="6" fill="#e2f6ef" stroke="#0f9d78" stroke-width="2"></rect>
+                <text x="520" y="306" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#0f9d78">5 V logic: controller, sensors, LED</text>
+              </svg>
+            </div>
+            <figcaption>Figure 12.2 — A clean power distribution idea. The battery feeds the motors directly through a switch and fuse. A buck converter makes a steady 5 V rail for the brain. A voltage divider lets the controller watch the battery level.</figcaption>
+          </figure>
+
+          <p>The key rule: motors can use the raw battery voltage, because they only care about speed and force. The brain needs a clean, regulated rail, because computers reset or misbehave when their voltage wobbles. Keep those two worlds separate, and your robot becomes far more reliable.</p>
+
+          <div class="callout note">
+            <div class="callout__head"><i class="bi bi-info-circle-fill"></i> Note</div>
+            <p>Converters have a maximum output current. If the brain and sensors together need 1.5 A, choose a converter rated at least 2 A, and leave a little headroom. A converter pushed past its limit will drop its voltage or get hot.</p>
+          </div>
+
+          <h2>The real power budget</h2>
+
+          <p>A <strong>power budget</strong> is a table of every part in your robot, with its voltage and current, added up. This is the single most useful calculation in this chapter. It turns a pile of parts into a number you can size a battery against.</p>
+
+          <p>You do not need perfect numbers. Look up each part's typical current in its datasheet, or measure it. Estimate first, then refine by testing. Table 12.3 shows the parts of a small robot and their currents.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Part</th><th>Voltage rail</th><th>Typical current</th><th>Notes</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Microcontroller board</td><td>5 V</td><td>0.05 A (50 mA)</td><td>Mainly the chip and its LED</td></tr>
+                <tr><td>Distance sensor</td><td>5 V</td><td>0.015 A (15 mA)</td><td>Small, always on</td></tr>
+                <tr><td>Status LED</td><td>5 V</td><td>0.02 A (20 mA)</td><td>A single indicator light</td></tr>
+                <tr><td>Left motor (running)</td><td>12 V</td><td>0.5 A</td><td>Wheel spinning freely</td></tr>
+                <tr><td>Right motor (running)</td><td>12 V</td><td>0.5 A</td><td>Wheel spinning freely</td></tr>
+                <tr><td>Each motor (stall)</td><td>12 V</td><td>2.0 A</td><td>Wheel blocked; worst case</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 12.3 — The parts list for our small robot. Motor stall current is included because it is the worst case.</p>
+
+          <p>Now add them up. First the logic rail on 5 V: 0.05 + 0.015 + 0.02 = <strong>0.085 A</strong>. Then the motors on 12 V while running: 0.5 + 0.5 = <strong>1.0 A</strong>. But the two rails use different voltages, so we cannot simply add the amps. The honest way is to convert each rail to watts, then add watts.</p>
+
+          <div class="formula"><span class="label">Power on each rail</span> P = V &times; I</div>
+
+          <ol>
+            <li>Logic rail: P = 5 V &times; 0.085 A = <strong>0.425 W</strong>.</li>
+            <li>Motor rail while running: P = 12 V &times; 1.0 A = <strong>12 W</strong>.</li>
+            <li>Total while driving: 0.425 + 12 = <strong>12.4 W</strong>.</li>
+            <li>Worst case with one motor stalled: motor rail = 12 V &times; (0.5 + 2.0) A = 30 W, total about <strong>30.4 W</strong>.</li>
+          </ol>
+
+          <p>That last line matters. Most of the time the robot draws about 12 W. But if a wheel jams, the draw jumps toward 30 W. Your battery, fuse and wiring must survive that moment, even if it lasts only a fraction of a second.</p>
+
+          <h2>Worked example: choosing a battery for 30 minutes</h2>
+
+          <p>Let us solve one full problem, from the parts list to the final battery choice. This is exactly the sort of thinking a professional does before buying a pack.</p>
+
+          <p><strong>The goal.</strong> Our small robot must drive around for 30 minutes on one charge, with a safety margin so it is not empty at the end.</p>
+
+          <p><strong>Step 1 — Estimate the average power.</strong> The robot does not drive the whole time. Suppose it drives about 70 percent of the run and rests or turns slowly the rest. Its average power is roughly 0.7 &times; 12 W plus the small logic draw, so about <strong>9 W</strong>. We keep this as our working average.</p>
+
+          <p><strong>Step 2 — Convert the time to hours.</strong> 30 minutes is <strong>0.5 hours</strong>. Always use hours, because capacity is in amp-hours.</p>
+
+          <p><strong>Step 3 — Compute the energy needed.</strong></p>
+
+          <div class="formula"><span class="label">Energy needed</span> Wh = P &times; time = 9 W &times; 0.5 h = 4.5 Wh</div>
+
+          <p><strong>Step 4 — Add a safety margin.</strong> Real batteries never deliver every watt-hour. Age, cold, wiring losses and the way we measure capacity all steal some. Add at least 30 percent. So we need 4.5 Wh &times; 1.3 = <strong>5.85 Wh</strong>. Round up to <strong>7 Wh</strong> to be comfortable.</p>
+
+          <p><strong>Step 5 — Turn watt-hours into a battery choice.</strong> Our robot motor rail wants about 12 V. Using Wh = V &times; Ah, we solve for Ah:</p>
+
+          <div class="formula"><span class="label">Capacity needed</span> Ah = Wh &divide; V = 7 Wh &divide; 12 V &asymp; 0.58 Ah</div>
+
+          <p>So we need a 12 V pack of at least 0.58 Ah (580 mAh). A 1000 mAh (1 Ah), 12 V pack gives 12 Wh, well above our need, and leaves margin for a longer run or an older battery.</p>
+
+          <p><strong>Step 6 — Check the current limits.</strong> The worst-case stall draw at 12 V was about 2.5 A (the stalled motor plus the running one). The pack must supply that without sagging. A 1000 mAh pack rated 3C can give 3 &times; 1 = 3 A, which just covers it. A larger 2000 mAh pack rated 3C gives 6 A and is safer. This is why capacity and C-rate must both be checked.</p>
+
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> The rule of thumb</div>
+            <p>Size the battery for the worst-case current (stall), then size the capacity for the energy you need (watt-hours), then add a margin. Meet both, or the robot will fail in one of the two ways.</p>
+          </div>
+
+          <h2>Estimating runtime</h2>
+
+          <p>The simple formula for how long a robot runs is:</p>
+
+          <div class="formula"><span class="label">Runtime</span> time (hours) = capacity (Ah) &divide; average current (A)</div>
+
+          <p>If a 2 Ah pack feeds an average current of 0.5 A, the idea says 2 &divide; 0.5 = 4 hours. That is the ceiling, the best case. Real robots never reach it, for several plain reasons.</p>
+
+          <h3>Why real runtime is shorter</h3>
+          <ul>
+            <li><strong>Efficiency losses.</strong> Converters, wiring and heat eat some energy before it reaches the parts.</li>
+            <li><strong>Ageing.</strong> A battery that has been charged many times holds less than when new.</li>
+            <li><strong>Cold.</strong> Low temperature slows the chemical reaction, so a cold battery gives less usable energy.</li>
+            <li><strong>Peukert effect (in plain words).</strong> The harder you drain a battery, the less total energy you can get out. Drawing a big current wastes more of the stored energy than drawing a small one. So a robot that drives fast has a shorter run than the simple formula predicts.</li>
+            <li><strong>Cut-off.</strong> We stop before the battery is truly empty, because an empty lithium pack can be damaged. That missing tail is energy we never use.</li>
+          </ul>
+
+          <p>To handle all of this at once, engineers use a <strong>derating factor</strong>: a number below 1 that shrinks the estimate. For a well-built robot, 0.8 is fair. For a fast, cold, well-worn robot, 0.5 is safer.</p>
+
+          <div class="formula"><span class="label">Realistic runtime</span> time = (capacity &divide; average current) &times; derating factor</div>
+
+          <p><strong>Worked example.</strong> A 2 Ah pack, average current 0.5 A, derating 0.8.</p>
+
+          <ol>
+            <li>Ideal time = 2 Ah &divide; 0.5 A = 4.0 hours.</li>
+            <li>Realistic time = 4.0 h &times; 0.8 = <strong>3.2 hours</strong>.</li>
+            <li>So promise your robot about 3 hours, not 4. If you need 4 real hours, buy a bigger pack.</li>
+          </ol>
+
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> Tip</div>
+            <p>Before a long run, measure the real thing. Note the start voltage, run the robot, and note the voltage when it stops. Compare with your estimate. Your derating factor will improve each time you do this.</p>
+          </div>
+
+          <h2>Safe charging and care</h2>
+
+          <p>A battery that is handled carelessly can be ruined, or worse, can catch fire. Lithium batteries deserve real respect. None of this is hard, but you must build the habits. Here are the rules that keep you and your robot safe.</p>
+
+          <ol>
+            <li><strong>Use the correct charger.</strong> Match the chemistry and the voltage. Never charge a lithium pack on a nickel charger.</li>
+            <li><strong>Never overcharge.</strong> Stop at the full voltage the maker states. A good charger does this for you.</li>
+            <li><strong>Store at storage voltage.</strong> Lithium packs last longest stored around 3.8 V per cell, not full or empty.</li>
+            <li><strong>Watch the temperature.</strong> Charge and store at room temperature. A hot or freezing pack is unhappy.</li>
+            <li><strong>Never short a battery.</strong> A short is a direct path with almost no resistance. It can push enormous current and start a fire.</li>
+            <li><strong>Never puncture or crush.</strong> A damaged cell can leak or burn. Treat a dropped lithium pack with suspicion.</li>
+            <li><strong>Dispose of a swollen battery safely.</strong> If a pack looks puffed or puffy, stop using it. Take it to a proper battery recycling point. Do not poke it.</li>
+            <li><strong>Use a fuse and a switch.</strong> The fuse protects the wiring. The switch lets you cut power in a hurry.</li>
+          </ol>
+
+          <div class="callout danger">
+            <div class="callout__head"><i class="bi bi-shield-exclamation"></i> Danger</div>
+            <p>Shorting or puncturing a lithium battery can cause a fire that is very hard to put out. Never leave a charging lithium pack unattended. Never store a fully charged lithium-polymer pack for a long time. If any pack is swollen, stop and dispose of it safely at a recycling point.</p>
+          </div>
+
+          <h3>Storage voltage in plain words</h3>
+          <p>A lithium cell is happiest when it is neither full nor empty. Full storage slowly damages it. Empty storage can let it fall too low and never recover. So before you put a pack away for weeks, bring each cell to about 3.8 V. Many chargers have a "storage" mode that does this automatically.</p>
+
+          <h2>Monitoring: how a robot knows its own charge</h2>
+
+          <p>A robot that cannot tell how much charge it has is like a phone with no battery icon. You only learn the truth when it dies. Good robots watch their own voltage.</p>
+
+          <p>The controller can read the battery voltage through a <strong>voltage divider</strong>: two resistors that scale the battery voltage down to a level the controller's input can safely measure. Because many boards measure only up to about 5 V, a 12 V pack must be divided down before it touches the input.</p>
+
+          <div class="formula"><span class="label">Voltage divider</span> V<sub>out</sub> = V<sub>in</sub> &times; R2 &divide; (R1 + R2)</div>
+
+          <p>With a 12 V input and two equal 10 k&Omega; resistors, the output is 12 V &times; 10000 &divide; 20000 = <strong>6 V</strong>. That is still too high for a 5 V input, so use a larger bottom resistor, such as 10 k&Omega; on top and 6.8 k&Omega; on the bottom, to land safely below 5 V. Always check the numbers before connecting.</p>
+
+          <p>Once the controller can see its own voltage, it can add a simple low-battery warning. Here is the idea in plain pseudo-code.</p>
+
+          <div class="code">
+            <div class="code__bar">
+              <span class="code__dots"><span></span><span></span><span></span></span>
+              <span class="code__lang">Pseudo-code</span>
+              <button class="code__copy" type="button"><i class="bi bi-clipboard"></i> Copy</button>
+            </div>
+            <pre><code>raw = read_analog(battery_pin)
+volts = raw_to_volts(raw) * divider_ratio
+
+if volts &lt; 10.5:            # nearly empty for a 3-cell pack
+    blink_warning_led()
+    stop_motors_slowly()     # protect the battery
+elif volts &lt; 11.0:          # getting low
+    slow_down()
+
+repeat every 0.1 seconds</code></pre>
+          </div>
+
+          <p>Read it in plain English: "Check the battery often. If it is nearly empty, warn me and stop gently. If it is getting low, slow down. Do this ten times a second." That small habit protects both the battery and your work.</p>
+
+          <div class="callout note">
+            <div class="callout__head"><i class="bi bi-info-circle-fill"></i> Note</div>
+            <p>Measure voltage while the motors are off for the most honest reading. Motors pull the voltage down while they run, so a reading taken mid-drive can look falsely low.</p>
+          </div>
+
+          <h2>Common mistakes beginners make</h2>
+
+          <p>These are the power mistakes that show up again and again. Learn them now and save yourself a ruined battery and a confusing afternoon.</p>
+
+          <ul>
+            <li><strong>Mixing chemistries.</strong> Putting an alkaline cell next to a rechargeable one, or mixing old and new cells, causes uneven draining and overheating. Use cells of the same type, age and charge.</li>
+            <li><strong>No fuse.</strong> Without a fuse, a wiring mistake turns the battery into a welder. A fuse is cheap insurance.</li>
+            <li><strong>Connecting polarity backwards.</strong> Reversing plus and minus destroys boards and sensors. Check the markings twice before powering up.</li>
+            <li><strong>Running motors from the logic rail.</strong> Motors pull huge currents and create voltage spikes. They will reset or kill the controller. Give motors their own rail and their own wires.</li>
+            <li><strong>Ignoring stall current.</strong> Sizing a battery or fuse for the running current alone means the robot dies or blows a fuse the first time a wheel jams.</li>
+            <li><strong>Storing a LiPo charged.</strong> A full lithium-polymer pack kept for weeks loses capacity and becomes less safe. Store it at storage voltage instead.</li>
+            <li><strong>Using thin wires.</strong> Thin wire adds resistance, drops voltage and gets warm. Choose a wire gauge that suits the worst-case current.</li>
+            <li><strong>Trusting the mAh number.</strong> Comparing packs by mAh alone ignores voltage. Convert to watt-hours before you judge.</li>
+          </ul>
+
+          <div class="callout warn">
+            <div class="callout__head"><i class="bi bi-exclamation-triangle-fill"></i> Watch out</div>
+            <p>If your robot reboots the moment the motors start, you almost certainly have a power problem, not a code problem. The motors are pulling the whole supply down. Give the logic its own regulated rail and a bigger battery.</p>
+          </div>
+
+          <h2>How professionals do it</h2>
+
+          <p>At hobby scale, power is one battery and a switch. At industrial scale, power becomes a serious engineering subject. The ideas are the same, just bigger and safer.</p>
+
+          <h3>A battery management system, or BMS</h3>
+          <p>A <strong>BMS</strong> is a small circuit built into or attached to a battery pack. It watches each cell's voltage and temperature, balances the cells so none drifts too high or low, and cuts off the pack if something goes wrong. Most lithium robot packs should have one.</p>
+
+          <h3>Fuses, e-stops and contactors</h3>
+          <p>Professionals never rely on software alone to stop a machine. They add a <strong>fuse</strong> to protect wiring, an <strong>emergency stop</strong> (e-stop) button a person can press, and a <strong>contactor</strong>: a heavy-duty relay that physically disconnects the battery. The e-stop opens the contactor, so power is cut even if the computer has frozen.</p>
+
+          <h3>Redundancy and power integrity</h3>
+          <p>Important systems have backup paths. Two batteries, two regulators, or a small backup cell for the controller. <strong>Power integrity</strong> means keeping the voltage clean: wide traces, good grounding, and capacitors near chips to absorb sudden demands.</p>
+
+          <h3>Thermal design and inrush</h3>
+          <p>Every watt lost becomes heat, and heat ages parts. Professionals plan where heat goes and how to remove it. They also handle <strong>inrush</strong>: the big current spike when a device first powers on, which can trip fuses or weld contacts. Soft-start circuits tame that first surge.</p>
+
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> In simple words</div>
+            <p>Professionals add a battery guard (BMS), a physical power cut (contactor and e-stop), a backup path (redundancy), a plan for heat (thermal design), and a way to soften the first power surge (inrush control). Same ideas you use, taken seriously.</p>
+          </div>
+
+          <h2>Try it yourself</h2>
+
+          <p>These exercises turn the ideas in this chapter into muscle memory. Start easy and work up.</p>
+
+          <ol>
+            <li><strong>Read five battery labels.</strong> For each, write down the voltage, the capacity, and the watt-hours (V &times; Ah). Which holds the most energy? Hint: watt-hours, not mAh, is the fair comparison.</li>
+            <li><strong>Work out your phone's runtime.</strong> Find your phone battery's Ah. Look up a rough average current for your use. Estimate the hours with the runtime formula, then derate by 0.8. Hint: real time is always shorter.</li>
+            <li><strong>Build a power budget for your own robot.</strong> List every part with its voltage and current. Convert each rail to watts, add them up, and include the motor stall current. Hint: separate the logic rail from the motor rail.</li>
+            <li><strong>Choose a battery.</strong> Using your budget, decide how long you want the robot to run. Compute the watt-hours needed, add 30 percent, then find a pack that also meets the stall current. Hint: check C-rate times capacity.</li>
+            <li><strong>Plan a low-battery warning on paper.</strong> Decide at what voltage your robot should warn you and at what voltage it should stop. Write the two rules in plain English. Hint: stopping before empty protects the pack.</li>
+          </ol>
+
+          <h2>Going deeper (optional)</h2>
+
+          <p>If you enjoy power, one advanced idea is worth a look: the <strong>battery model</strong>. Engineers describe a real battery as an ideal voltage source plus an internal resistance. That resistance explains why the voltage sags when big current flows, and why a battery that reads 12 V at rest drops to 10 V under load. Adding this one idea to your thinking makes every voltage reading make sense.</p>
+
+          <p>You can even estimate internal resistance yourself. Measure the voltage with no load, then with a known load. The drop divided by the current gives the resistance. It rises as a battery ages, which is why old packs sag more. Chapter 13 continues this story with wiring, connectors and using a multimeter to find problems.</p>
+
+          <section class="takeaways">
+            <h2><i class="bi bi-pin-angle-fill"></i> Key takeaways</h2>
+            <ul>
+              <li><i class="bi bi-check2-circle"></i> Power is the robot's fuel, and it is the most underestimated part of a build.</li>
+              <li><i class="bi bi-check2-circle"></i> Voltage is the push; capacity is the amount of energy stored.</li>
+              <li><i class="bi bi-check2-circle"></i> Cells in series add voltage; cells in parallel add capacity.</li>
+              <li><i class="bi bi-check2-circle"></i> Watt-hours compare batteries honestly; amp-hours do not.</li>
+              <li><i class="bi bi-check2-circle"></i> Always size a battery for the motor stall current, not just the running current.</li>
+              <li><i class="bi bi-check2-circle"></i> Use the right charger, a fuse and a switch, and never short a battery.</li>
+              <li><i class="bi bi-check2-circle"></i> A robot should monitor its own voltage so it can warn you before it dies.</li>
+            </ul>
+          </section>
+
+          <section class="quiz">
+            <div class="quiz__head"><i class="bi bi-patch-question-fill"></i> Check your understanding</div>
+            <details>
+              <summary><span class="q-num">Q1.</span><span>What is the difference between voltage and capacity?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Voltage is the electrical push, like water pressure. Capacity is the amount of energy stored, like the size of the tank. You need the right push and enough stored energy.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q2.</span><span>You connect three 1.2 V, 2000 mAh cells in series. What is the pack's voltage and capacity?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> 3.6 V and 2000 mAh. In series the voltages add (1.2 + 1.2 + 1.2) but the capacity stays the same as one cell.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q3.</span><span>Which compares two batteries more honestly: amp-hours or watt-hours? Why?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Watt-hours. Amp-hours ignore voltage, so a 12 V and a 3.7 V battery with the same Ah do not hold the same energy. Watt-hours = volts &times; amp-hours, so it includes both.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q4.</span><span>Why can a small battery fail to run a large motor even if it is fully charged?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> The large motor may pull more current than the battery can safely deliver. Its C-rate is too low, so the voltage sags or the battery overheats.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q5.</span><span>Your robot's brain needs a steady 5 V but the motor pack is 12 V. What do you add?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> A voltage regulator. A buck converter steps 12 V down to a steady 5 V efficiently for the electronics, while the motors can use the raw 12 V.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q6.</span><span>Why should motors and the controller usually use separate power rails?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Motors pull large, spiky currents that drag the voltage down. If the controller shares that rail, it may reset or misbehave. Motors can use raw voltage, but the brain needs a clean regulated rail.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q7.</span><span>A robot is estimated at 4 hours of runtime, but runs for 2.5 hours. Name two likely reasons.</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Any two of: efficiency losses, battery ageing, cold temperature, the Peukert effect from drawing big currents, or stopping before the battery is truly empty. That is why we derate the estimate.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q8.</span><span>What does a battery management system (BMS) do, and why does it matter for lithium packs?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> A BMS watches each cell's voltage and temperature, balances the cells, and cuts off the pack if something goes wrong. Lithium packs are damaged or become dangerous if a cell drifts too high or too low, so the guard matters.</div>
+            </details>
+          </section>
+        </article>
+
+        <nav class="pager" id="pager" aria-label="Chapter navigation"></nav>
+      </div>
+    </main>
+  </div>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/book.js"></script>
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>try{var __t=localStorage.getItem("mr-theme");if(__t==="dark"||__t==="light")document.documentElement.setAttribute("data-theme",__t);}catch(e){}</script>
+  <title>Appendix D: Debugging Cookbook — Master Robotics</title>
+  <meta name="description" content="Symptom to cause to test: the fastest fixes for dead robots, bad solder joints, brownouts, motor faults and ROS 2 bugs.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/prose.css">
+</head>
+<body data-file="appendix-d-debugging-cookbook.html">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="topbar" id="topbar"></header>
+  <div class="progress-bar" id="progressBar"></div>
+
+  <div class="layout">
+    <div class="sidebar__backdrop" id="navBackdrop"></div>
+    <nav class="sidebar" id="sidebar" aria-label="Book contents"></nav>
+
+    <main class="main" id="main">
+      <div class="container">
+
+        <header class="chapter-head">
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="index.html">Home</a>
+            <i class="bi bi-chevron-right"></i>
+            <a href="index.html#contents">Appendices</a>
+            <i class="bi bi-chevron-right"></i>
+            <span>Appendix D</span>
+          </nav>
+          <span class="chapter-kicker"><i class="bi bi-collection"></i> Appendix D &middot; Reference</span>
+          <h1>Debugging Cookbook</h1>
+          <p class="lede">Your robot is dead and the clock is ticking. Find your symptom below, check the likely causes in order, and run the test that proves each one.</p>
+          <div class="chapter-meta">
+            <span><i class="bi bi-clock"></i> Reference</span>
+            <span><i class="bi bi-bar-chart"></i> All levels</span>
+            <span><i class="bi bi-list-check"></i> Appendix D of D</span>
+          </div>
+        </header>
+
+        <article class="article">
+
+          <div class="callout danger">
+            <div class="callout__head"><i class="bi bi-shield-exclamation"></i> Safety first</div>
+            <p>Smell burning or see swelling batteries? Stop. Cut power, move the battery to a safe spot, and follow <a href="ch03-safety-first.html">Chapter 3</a>. No debug is worth a fire.</p>
+          </div>
+
+          <h2>The golden rule: halves, not guesses</h2>
+          <p>Do not change three things at once. Split the system in <strong>half</strong>: is power fine? Then power is innocent. Is the brain alive? Then the brain is innocent. Each test should clear <strong>half</strong> the suspects. Five good tests beat fifty random tweaks.</p>
+          <div class="formula"><span class="label">Debug order</span> Power &rarr; brain &rarr; signals &rarr; software &rarr; mechanics</div>
+          <p>Follow this order because each layer feeds the next. A dead battery looks exactly like broken code.</p>
+
+          <h2>Dead on arrival: nothing lights up</h2>
+          <ol>
+            <li>Measure the battery with a multimeter. Compare with the label in <a href="ch12-batteries-and-power.html">Chapter 12</a>.</li>
+            <li>Check polarity: plus to plus, minus to minus. Reverse polarity kills boards fast.</li>
+            <li>Check the switch, fuse and e-stop chain. Wiggle each while watching the meter.</li>
+            <li>Measure voltage at the board input while the switch is on. A big drop means a bad wire or connector.</li>
+          </ol>
+
+          <h2>Brownout: brain resets when motors move</h2>
+          <p>The classic symptom: the robot boots, the wheels spin, the brain reboots. The motors steal current and the voltage sags below the brain's minimum.</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Symptom</th><th>Likely cause</th><th>Test</th></tr></thead>
+              <tbody>
+                <tr><td>Reset exactly when motors start</td><td>Weak battery or thin wires</td><td>Meter on brain supply; watch the dip during a stall</td></tr>
+                <tr><td>Reset only at full speed</td><td>Stall current above supply limit</td><td>Limit PWM to 50%; if resets stop, size power per Ch. 6</td></tr>
+                <tr><td>Random resets near radios</td><td>Shared-impedance noise (EMI)</td><td>Separate motor and logic grounds at one star point</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>Fixes that work: a battery with higher discharge rating, thicker motor wires, a separate regulator for logic, and bulk capacitors at the driver input.</p>
+
+          <h2>Motors hum but do not move</h2>
+          <ol>
+            <li>Check the driver enable pin and mode jumpers (see <a href="ch06-electric-motors.html">Chapter 6</a>).</li>
+            <li>Confirm the PWM signal reaches the driver: meter or scope on the input pin.</li>
+            <li>Check stall: can you turn the shaft by hand with power off? A jammed gearbox hums exactly like this.</li>
+            <li>For steppers: verify coil pairs with a meter. Swapped coils vibrate instead of turning.</li>
+          </ol>
+
+          <h2>Motor driver faults (CiA 402 / EtherCAT)</h2>
+          <p>Industrial drives report <strong>fault codes</strong>, not silence. Read them first. Common ones: over-current (too much load or too fast a ramp), over-voltage (braking energy with nowhere to go), following error (encoder says the motor lags the command).</p>
+          <div class="callout note">
+            <div class="callout__head"><i class="bi bi-info-circle-fill"></i> Note</div>
+            <p>Vendor quirks are real: some drives need a homing run (mode 6) before cyclic modes 8/9/10 work, and some ignore commands until the state machine reaches Operation Enabled. See <a href="ch27-production-software-robotics.html">Chapter 27</a>.</p>
+          </div>
+
+          <h2>Bad joints and cold solder</h2>
+          <p>A <strong>cold joint</strong> looks dull, blobby or cracked. It works when you press it and fails when you let go. Reheat with flux until it flows shiny, as in <a href="ch13-wiring-and-soldering.html">Chapter 13</a>. For connectors: tug-test every crimp. A wire that slides out with a gentle pull was never connected.</p>
+
+          <h2>Sensor lies: noisy or frozen readings</h2>
+          <ol>
+            <li>Print raw values with nothing moving. Frozen numbers mean wiring or address trouble (wrong I2C address is the top suspect).</li>
+            <li>Wave your hand: do numbers move at all? Movement with wrong scale means a calibration error (<a href="ch10-sensors.html">Chapter 10</a>).</li>
+            <li>Noise that grows when motors run means EMI: twist motor wires, route signal wires away, add the scope check below.</li>
+          </ol>
+
+          <h2>Scope in five minutes</h2>
+          <p>You do not need to master the oscilloscope. Three checks solve most cases: supply rail during a motor start (dip or spike?), PWM pin (clean square wave at the right rate?), encoder lines (both channels toggling while you turn the shaft by hand?). If the rail dips, fix power. If PWM is wrong, fix code. If encoders are dead, fix wiring.</p>
+
+          <figure class="figure">
+            <div class="figure__box">
+              <svg viewBox="0 0 420 150" width="100%" role="img" aria-label="Debug order diagram">
+                <rect x="10" y="50" width="88" height="50" rx="10" fill="#e8eeff" stroke="#2d5bff"/>
+                <text x="54" y="79" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#1c2230">Power</text>
+                <rect x="112" y="50" width="88" height="50" rx="10" fill="#e6f7f0" stroke="#0f9d78"/>
+                <text x="156" y="79" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#1c2230">Brain</text>
+                <rect x="214" y="50" width="88" height="50" rx="10" fill="#eef0f4" stroke="#7b849b"/>
+                <text x="258" y="79" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#1c2230">Signals</text>
+                <rect x="316" y="50" width="88" height="50" rx="10" fill="#eef0f4" stroke="#7b849b"/>
+                <text x="360" y="79" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#1c2230">Code</text>
+              </svg>
+            </div>
+            <figcaption>Figure 1. Always debug in order: power, brain, signals, then code. Each layer feeds the next.</figcaption>
+          </figure>
+
+          <h2>ROS 2: no data on the topic</h2>
+          <ol>
+            <li>Run <code>ros2 node list</code> and <code>ros2 topic list</code>. Is your node and topic even there?</li>
+            <li>Run <code>ros2 topic echo /your_topic</code>. Data here but not in your code means a message-type or QoS mismatch.</li>
+            <li>Check DDS connectivity across machines: same domain ID, working multicast. Logs in <a href="ch27-production-software-robotics.html">Chapter 27</a> show the exact knobs.</li>
+          </ol>
+
+          <h2>Reading datasheets and errata</h2>
+          <p>When nothing makes sense, the vendor already warned you. Search the datasheet for "errata", "absolute maximum" and "typical application". Check: supply limits, pin modes after reset, and timing diagrams. One errata line ("ADC reads high when motor PWM exceeds 20 kHz") can save a week.</p>
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> Tip</div>
+            <p>Write down the exact part number and revision before searching. Errata attaches to revisions, not part families. Keep a project log of every quirk you find; it becomes your team's private database.</p>
+          </div>
+
+          <section class="takeaways">
+            <h2><i class="bi bi-pin-angle-fill"></i> Key takeaways</h2>
+            <ul>
+              <li><i class="bi bi-check2-circle"></i> Debug in halves: power, brain, signals, code.</li>
+              <li><i class="bi bi-check2-circle"></i> Brownouts look like software bugs; measure the rail first.</li>
+              <li><i class="bi bi-check2-circle"></i> Drive fault codes and datasheet errata tell you the answer.</li>
+              <li><i class="bi bi-check2-circle"></i> Log every quirk; it becomes your errata database.</li>
+            </ul>
+          </section>
+
+        </article>
+
+        <nav class="pager" id="pager" aria-label="Chapter navigation"></nav>
+      </div>
+    </main>
+  </div>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/book.js"></script>
+</body>
+</html>

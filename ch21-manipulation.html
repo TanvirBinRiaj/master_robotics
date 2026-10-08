@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>try{var __t=localStorage.getItem("mr-theme");if(__t==="dark"||__t==="light")document.documentElement.setAttribute("data-theme",__t);}catch(e){}</script>
+  <title>Chapter 21: Robot Manipulation and Grasping — Master Robotics</title>
+  <meta name="description" content="Learn how robot arms pick up and place real objects. Covers grasp planning, gripper types, pick-and-place state machines, force control, and a worked design from apple to cutting board.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/prose.css">
+</head>
+<body data-file="ch21-manipulation.html">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="topbar" id="topbar"></header>
+  <div class="progress-bar" id="progressBar"></div>
+
+  <div class="layout">
+    <div class="sidebar__backdrop" id="navBackdrop"></div>
+    <nav class="sidebar" id="sidebar" aria-label="Book contents"></nav>
+
+    <main class="main" id="main">
+      <div class="container">
+
+        <header class="chapter-head">
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="index.html">Home</a>
+            <i class="bi bi-chevron-right"></i>
+            <a href="index.html#intelligence">Part 5 &middot; Robot Intelligence</a>
+            <i class="bi bi-chevron-right"></i>
+            <span>Chapter 21</span>
+          </nav>
+          <span class="chapter-kicker"><i class="bi bi-diagram-3"></i> Part 5 &middot; Robot Intelligence</span>
+          <h1>Robot Manipulation and Grasping</h1>
+          <p class="lede">After this chapter, you will understand what makes a good grasp, how to choose the right gripper, and how to plan a complete pick-and-place task from start to finish.</p>
+          <div class="chapter-meta">
+            <span><i class="bi bi-clock"></i> ~24 min read</span>
+            <span><i class="bi bi-bar-chart"></i> Intermediate</span>
+            <span><i class="bi bi-list-check"></i> Chapter 21 of 30</span>
+          </div>
+          <div class="goals">
+            <h2>What you will learn</h2>
+            <ul>
+              <li><i class="bi bi-check-circle-fill"></i> Explain what makes a good grasp on a real object.</li>
+              <li><i class="bi bi-check-circle-fill"></i> Describe the main gripper types and pick the right one for a given object.</li>
+              <li><i class="bi bi-check-circle-fill"></i> Plan a simple pick-and-place task step by step, from perception to release.</li>
+            </ul>
+          </div>
+        </header>
+
+        <article class="article">
+
+          <p class="lead">Your robot arm can reach any point in the room. It moves smoothly. It can hold a position for hours. So why does it fail the moment you ask it to pick up a water bottle? Because reaching is only half the job. The missing half is <strong>manipulation</strong> — the art and science of touching the world with just enough force, at just the right place, without dropping, crushing or sliding.</p>
+
+          <h2>What manipulation really means</h2>
+
+          <p>Reaching and manipulating are different skills. When you tell a robot where its tip should go, that is a <strong>reach</strong> task. The robot only needs position and speed. When you ask it to pick up a raw egg, carry it across the room, and set it down without cracking it, that is a <strong>manipulation</strong> task. The robot must now control forces, estimate contact points, and adapt to objects that move, slip and tilt.</p>
+
+          <p>Manipulation is everywhere in factories, but it is now moving into warehouses, kitchens, farms and even homes. The same problems show up every time: friction, object weight, shape, compliance (whether the object squashes or squishes under pressure), and uncertainty (the robot is never quite sure where the object is). A solid brick is easy to grasp. A USB cable, a grape, a cardboard box with loose packing — these are hard, and for the same reasons beginners find surprising.</p>
+
+          <div class="callout note">
+            <div class="callout__head"><i class="bi bi-info-circle-fill"></i> Note</div>
+            <p>Manipulation is sometimes called the "last 20 seconds" of a robot task. A mobile robot can drive to the shelf in 30 seconds. Picking the right item from that shelf, without knocking everything else over, is the hard part.</p>
+          </div>
+
+          <h2>Why manipulation is harder than it looks</h2>
+
+          <p>When you watch a human pick up a coffee mug, you do not see how much your brain is doing in the background. Your eyes estimate the mug's handle. Your hand adjusts grip pressure before you even close your fingers. Your wrist tilts to balance the sloshing liquid. A robot must do all of that — with simpler senses and slower decisions.</p>
+
+          <p>There are five physical reasons manipulation is hard. You will meet every one of them when you build your first pick-and-place system.</p>
+
+          <ol>
+            <li><strong>Friction.</strong> Two surfaces sliding past each other resist motion. But the amount of friction depends on the material, the surface finish, and the normal force (the squeezing force). A little less friction and the object slips.</li>
+            <li><strong>Object weight and centre of mass.</strong> A 200-gram water bottle is easy. A 5-kilogram box with the weight at the top will tip if you lift too fast. The robot must know where the weight sits, not just how heavy the object is.</li>
+            <li><strong>Shape and geometry.</strong> A sphere has no natural handle. A long thin rod has many possible grasp directions. Shape determines which contact points are stable and which will slip.</li>
+            <li><strong>Compliance.</strong> A steel bearing is rigid. A loaf of bread is compliant — it squashes if you squeeze too hard. Most everyday objects sit between these extremes and change shape under load.</li>
+            <li><strong>Uncertainty.</strong> The robot never knows the exact position, orientation and weight of the object. Cameras have noise. Depth sensors have holes. Conveyor belts shake. Good designs are built to tolerate small errors.</li>
+          </ol>
+
+          <p>A good manipulation system hides all five problems from the operator. The operator says "pick the bottle". The robot sorts out friction, weight, shape, compliance and uncertainty by itself. That is the goal of this chapter.</p>
+
+          <h2>The three layers of a pick-and-place system</h2>
+
+          <p>Every pick-and-place system, from the simplest teach-and-play arm to a modern AI-driven warehouse robot, has the same three layers. Understanding these three layers gives you a mental map you can use on any project.</p>
+
+          <h3>Layer 1: Perception — find the object</h3>
+
+          <p><strong>Perception</strong> is the "where is it?" question. The robot looks at the scene, finds the object, and estimates its position and orientation. This step sounds easy to a human, because our eyes and brain do it automatically. For a robot, it is the first major design challenge.</p>
+
+          <p>Perception must answer three small questions:</p>
+
+          <ol>
+            <li>Where is the object? (position)</li>
+            <li>How is it rotated? (orientation)</li>
+            <li>What kind of object is it? (class, so the planner can choose a good grasp)</li>
+          </ol>
+
+          <p>Each answer has error bars. The position might be off by a few millimetres. The orientation might be wrong by a few degrees. The planner must be able to handle that uncertainty.</p>
+
+          <h3>Layer 2: Planning — decide where to go and how to grasp</h3>
+
+          <p><strong>Planning</strong> is the "how do I get it?" question. Given the object's estimated pose, the planner chooses a <strong>grasp pose</strong> — a point and a direction where the gripper should close. It also chooses an <strong>approach path</strong> — how the arm moves from its current position to the grasp point without hitting the table, the bin walls or itself.</p>
+
+          <p>In a simple system, the grasp pose is hand-coded for each object. In a more advanced system, the planner runs a search over many possible grasps and scores them by stability, reachability and collision safety. You will see both approaches in this chapter.</p>
+
+          <h3>Layer 3: Control — close the gripper, lift, move, place, release</h3>
+
+          <p><strong>Control</strong> is the "do it safely" question. Even with a perfect plan, small errors appear when the robot moves. The controller must:</p>
+
+          <ol>
+            <li>Close the gripper with the right amount of force. Too little force and the object slips. Too much and the object breaks or deforms.</li>
+            <li>Lift the object straight up, without letting it tilt or swing.</li>
+            <li>Move the arm to the place location without colliding with the table or bin edges.</li>
+            <li>Release the object gently and retract the arm.</li>
+          </ol>
+
+          <p>Control is where <strong>force feedback</strong> matters. A <strong>force/torque sensor</strong> at the robot wrist measures the forces the arm feels. If the gripper is squeezing too hard, the sensor sees it. If the object is pushing back unexpectedly, the sensor sees that too.</p>
+
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> The key idea</div>
+            <p>Perception says "where is it". Planning says "how do I grab it". Control says "do it gently but firmly". These three layers are the skeleton of every manipulation system, and you will see them again in every worked example in this chapter.</p>
+          </div>
+
+          <h2>Grasp planning for beginners</h2>
+
+          <p><strong>Grasp planning</strong> sounds technical, but the core idea is something you already do every day. When you pick up a pen, you do not think "my thumb will be at coordinate x and my index finger at coordinate y". You simply know roughly where to hold it so it does not fall.</p>
+
+          <p>A robot grasp planner does the same calculation, with one big difference: the robot must write the plan as numbers that an arm can follow.</p>
+
+          <h3>The four elements of a simple grasp</h3>
+
+          <p>Every basic grasp plan has four parts. You can draw all of them on a single side-view sketch.</p>
+
+          <ol>
+            <li><strong>Approach vector.</strong> The direction the gripper travels just before closing. Think of it as the direction you move your hand before your fingers close.</li>
+            <li><strong>Pre-grasp pose.</strong> The arm position just before closing. The gripper is open, the fingers are roughly in line with the grasp point, and the arm is a safe distance away.</li>
+            <li><strong>Contact points.</strong> The exact spots where the gripper fingers touch the object. Usually two points for a parallel gripper, one point for suction.</li>
+            <li><strong>Lift direction.</strong> The direction the arm moves after closing. For most tabletop tasks, this is straight up.</li>
+          </ol>
+
+          <figure class="figure">
+            <div class="figure__box">
+              <svg viewBox="0 0 520 220" width="100%" role="img" aria-label="Side view of a robot arm grasping a water bottle. Labels show approach vector, pre-grasp pose, contact points and lift direction">
+                <rect x="20" y="10" width="12" height="160" fill="#7b849b" rx="3"></rect>
+                <rect x="50" y="10" width="12" height="160" fill="#7b849b" rx="3"></rect>
+                <rect x="200" y="55" width="44" height="115" rx="8" fill="#e8eeff" stroke="#2d5bff" stroke-width="2"></rect>
+                <rect x="210" y="30" width="24" height="28" rx="6" fill="#c8d6ff" stroke="#2d5bff" stroke-width="2"></rect>
+                <text x="222" y="48" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#1c2230">cap</text>
+                <text x="222" y="112" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#1c2230">bottle</text>
+                <polygon points="196,170 248,170 240,178 204,178" fill="#7b849b"></polygon>
+                <polygon points="202,178 242,178 238,184 206,184" fill="#7b849b"></polygon>
+                <line x1="26" y1="170" x2="236" y2="170" stroke="#1c2230" stroke-width="2"></line>
+                <line x1="58" y1="4" x2="124" y2="4" stroke="#2d5bff" stroke-width="2" marker-end="url(#arr)"></line>
+                <text x="91" y="18" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#2d5bff">approach</text>
+                <line x1="72" y1="90" x2="196" y2="90" stroke="#0f9d78" stroke-width="2" stroke-dasharray="6 4"></line>
+                <polygon points="190,86 200,90 190,94" fill="#0f9d78"></polygon>
+                <text x="134" y="84" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#0f9d78">pre-grasp</text>
+                <circle cx="196" cy="90" r="4" fill="#0f9d78"></circle>
+                <circle cx="248" cy="90" r="4" fill="#0f9d78"></circle>
+                <text x="222" y="100" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#0f9d78">contact points</text>
+                <line x1="222" y1="178" x2="222" y2="210" stroke="#e07b00" stroke-width="2" marker-end="url(#arr2)"></line>
+                <text x="236" y="198" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#e07b00">lift</text>
+                <defs>
+                  <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#2d5bff"></path></marker>
+                  <marker id="arr2" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#e07b00"></path></marker>
+                </defs>
+              </svg>
+            </div>
+            <figcaption>Figure 21.1 — Side view of grasping a water bottle. The approach vector brings the gripper down from the top. Contact points are placed symmetrically so the bottle stays upright.</figcaption>
+          </figure>
+
+          <p>Figure 21.1 shows a worked example: a 200-gram plastic water bottle standing on a table. The planner chooses a top-down approach because the bottle cap is flat and offers a large, reliable target. It places the two contact points on opposite sides of the bottle body so the grasp is stable. The lift direction is straight up so the centre of mass stays directly below the gripper.</p>
+
+          <h3>Antipodal and surface-normal grasps</h3>
+
+          <p>Two simple grasp rules work in almost every teaching lab. You can use them as starting points for almost any everyday object.</p>
+
+          <p>An <strong>antipodal grasp</strong> places the thumb and one finger on opposite sides of an object, roughly along a single line. Think of holding a soup can between your thumb and your index finger. The two contact points are roughly opposite each other. This works for cylinders, boxes and bottles.</p>
+
+          <p>A <strong>surface-normal grasp</strong> presses the gripper against a flat face of the object, so the closing force is perpendicular to the surface. Think of picking up a book by the spine. The gripper closes against the flat cover, and the surface normal is the direction the force pushes into the book. This works for boxes, tablets and any object with a large flat face.</p>
+
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> In simple words</div>
+            <p>Antipodal = pinch from opposite sides. Surface-normal = press against a flat face. Both keep the object from slipping sideways.</p>
+          </div>
+
+          <h3>Wall grasps and grasp wrapping</h3>
+
+          <p>When an object rests against a wall or the side of a bin, a <strong>wall grasp</strong> uses that wall as the third contact point. The wall supports the object on one side while the gripper squeezes from the other. This is a common teaching-lab trick because it reduces the number of forces the gripper must resist.</p>
+
+          <p>More generally, grasp quality is about <strong>enclosure</strong>. A <strong>power grasp</strong> wraps the whole hand around the object, spreading the load across many contact points. A <strong>precision grasp</strong> uses only the fingertips, giving fine control but less strength. Human hands switch between both styles all day: power grasp for a hammer, precision grasp for a needle.</p>
+
+          <p>Robot grippers do the same. A parallel-jaw gripper is closer to a precision grasp (two contact points). A soft or multi-finger gripper can do a power grasp. Table 21.1 shows how the grasp type maps to everyday situations.</p>
+
+          <h2>Gripper taxonomy — choosing the right hand</h2>
+
+          <p>A robot arm is only as useful as the hand at its end. Choosing the wrong gripper is the most common beginner mistake, and it costs far more time than buying the gripper itself.</p>
+
+          <p>There are four main gripper types in use today. Each has a clear set of objects it handles well and a set where it struggles.</p>
+
+          <h3>Parallel-jaw gripper</h3>
+
+          <p>The <strong>parallel-jaw gripper</strong> is two flat fingers that slide toward each other. It is the default choice for teaching labs, industrial arms and almost every beginner project. It is cheap, simple to control, and easy to reason about. It works best on rigid or semi-rigid objects with a clear width: boxes, bottles, tools, packaged goods.</p>
+
+          <p>Limitations: two contact points means less grasp strength. Slippery or very thin objects (flat washers, sheets of paper) are hard. Deformable objects (fruit, bread) squash under the fingers.</p>
+
+          <h3>Suction cup gripper</h3>
+
+          <p>A <strong>suction gripper</strong> uses a soft rubber cup and a small vacuum pump. It creates negative pressure so the cup sticks to the object. It excels on flat, smooth, non-porous surfaces: cardboard boxes, plastic totes, glass panels, metal sheets.</p>
+
+          <p>Limitations: it needs a flat, smooth contact area. Rough, curved or porous surfaces fail. The vacuum pump needs a small compressor, which adds weight and tubing to the wrist.</p>
+
+          <h3>Soft gripper</h3>
+
+          <p>A <strong>soft gripper</strong> uses flexible fingers made of silicone or elastomer. The fingers deform around the object, increasing the contact area and conforming to shape. This naturally reduces stress on delicate items and handles irregular shapes well.</p>
+
+          <p>Limitations: lower payload, more complex to control, harder to predict exactly where contact happens. Works best for food, fruit, fragile goods, and objects with unpredictable shapes.</p>
+
+          <h3>Magnetic gripper</h3>
+
+          <p>A <strong>magnetic gripper</strong> uses an electromagnet or permanent magnet. It sticks to any ferrous (iron or steel) surface. It is fast, reliable, and needs no precise alignment.</p>
+
+          <p>Limitations: only works on ferrous metal. Objects must be magnetic. The electromagnet needs current to hold the part, so power loss means the part drops.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Gripper type</th><th>Best for</th><th>Avoid when</th><th>Typical payload</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Parallel-jaw</td><td>Boxes, bottles, tools, packaged goods</td><td>Slippery, very thin, squishy objects</td><td>2 kg — 20 kg</td></tr>
+                <tr><td>Suction cup</td><td>Flat boxes, panels, plastic totes, glass</td><td>Rough, curved, porous surfaces</td><td>0.5 kg — 10 kg</td></tr>
+                <tr><td>Soft gripper</td><td>Fruit, food, fragile, irregular shapes</td><td>Heavy, rigid, high-precision place tasks</td><td>0.1 kg — 3 kg</td></tr>
+                <tr><td>Magnetic</td><td>Sheet metal, steel parts, ferrous fasteners</td><td>Non-magnetic materials, safety-critical holds</td><td>1 kg — 50 kg</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 21.1 — Gripper selection at a glance. Start with parallel-jaw unless the object clearly calls for something else.</p>
+
+          <h2>Force and contact — why "squeeze harder" is the wrong fix</h2>
+
+          <p>When a beginner sees an object slip from the gripper, the instinct is to close harder. Sometimes that works. Often it makes things worse. A heavy, smooth object pushed sideways by a stronger grip force can slide further before friction catches it. A fragile object breaks. A deformable object squashes and changes shape, making the grasp even less stable.</p>
+
+          <p>The right way to think about force is with a simple rule. The <strong>grip force</strong> must be strong enough to stop the object slipping, and gentle enough to avoid damage. The maximum force before slipping is set by friction. The minimum force before damage is set by the object's strength. The safe window is between these two numbers.</p>
+
+          <div class="formula"><span class="label">Minimum grip force to avoid slip</span> F<sub>grip</sub> &gt; m &times; g &divide; &mu;</div>
+
+          <p>Here, <strong>m</strong> is the object mass in kilograms, <strong>g</strong> is gravity (9.81 metres per second squared), and <strong>&mu;</strong> (the Greek letter mu) is the <strong>coefficient of friction</strong> between the gripper finger and the object surface. Rough rubber on cardboard might have a mu around 0.6. Smooth metal on smooth plastic might have a mu around 0.2. A lower mu means you need more grip force for the same object.</p>
+
+          <p>Worked example: pick up a 200-gram plastic water bottle with a rubber parallel gripper. The rubber-on-plastic friction coefficient is approximately 0.5.</p>
+
+          <p>Mass m = 0.2 kg. Gravity g = 9.81 m/s&sup2;. Friction coefficient &mu; = 0.5.</p>
+
+          <p>The minimum grip force is (0.2 &times; 9.81) &divide; 0.5 = 1.96 &divide; 0.5 = 3.92 newtons.</p>
+
+          <p>A standard parallel-jaw gripper can easily produce 10 newtons or more. So 3.92 newtons is well within reach. The designer can close the gripper to 5 or 6 newtons — enough to avoid slip, but not enough to crush the bottle. If the bottle were made of thinner plastic, the designer might lower the target to 4 newtons and add a smoother finger pad.</p>
+
+          <p>This is a real calculation engineers actually do. When you design your own grasp, estimate the weight, look up a friction coefficient for your materials, and compute the minimum grip force. Then set your gripper command to a value safely above that number.</p>
+
+          <div class="code">
+            <div class="code__bar">
+              <span class="code__dots"><span></span><span></span><span></span></span>
+              <span class="code__lang">Pseudo-code</span>
+              <button class="code__copy" type="button"><i class="bi bi-clipboard"></i> Copy</button>
+            </div>
+            <pre><code># Pick-and-place state machine for a water bottle
+state = APPROACH
+
+loop forever:
+    if state == APPROACH:
+        move_arm(pre_grasp_pose)       # 30 mm above the grasp point
+        if position_error &lt; 2 mm:
+            state = GRASP
+
+    elif state == GRASP:
+        close_gripper(target_force=5N)
+        if force_sensor.read() &gt;= target_force:
+            state = LIFT
+
+    elif state == LIFT:
+        move_arm(pose + (0, 0, 80))     # raise 80 mm
+        wait(100 ms)
+        state = MOVE
+
+    elif state == MOVE:
+        move_arm(place_pose_above)
+        if position_error &lt; 2 mm:
+            state = PLACE
+
+    elif state == PLACE:
+        lower_at_speed(30 mm/s)
+        if contact_force &gt; object_weight:
+            state = RELEASE
+
+    elif state == RELEASE:
+        open_gripper()
+        wait(300 ms)
+        state = RETREAT
+
+    elif state == RETREAT:
+        move_arm(home_pose)
+        state = APPROACH                # ready for next cycle</code></pre>
+          </div>
+
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> Tip</div>
+            <p>Use a soft finger pad (a thin rubber sheet on the gripper jaws) to increase friction. A small pad can double the effective mu and halve the required grip force — with no other changes to the system.</p>
+          </div>
+
+          <h2>Pick-and-place as a state machine</h2>
+
+          <p>A <strong>state machine</strong> is a clean way to write a robot task. You draw every stage the robot passes through. Between stages there is a clear rule for when to move forward. Pick-and-place is one of the simplest state machines in robotics, and it is the backbone of almost every manipulation lab exercise.</p>
+
+          <p>The seven states are:</p>
+
+          <ol>
+            <li><strong>APPROACH</strong> — Move the arm from its current position to a point a few centimetres above the grasp point. Keep the gripper open. Rule: do not close until the arm has stopped and the position error is less than 2 millimetres.</li>
+            <li><strong>GRASP</strong> — Close the gripper until the grip force reaches the target. Rule: do not lift until the force sensor confirms the target is reached, and the object weight is detected (typically a small downward force spike).</li>
+            <li><strong>LIFT</strong> — Move the arm straight up by 5 to 10 centimetres. Rule: if the arm feels a sideways push larger than a small threshold, stop and raise an alarm — the object may be tilting.</li>
+            <li><strong>MOVE</strong> — Move the arm from the lift position to a point above the place target. Rule: keep the gripper closed. Check for collisions with bin walls before moving.</li>
+            <li><strong>PLACE</strong> — Lower the arm until the object touches the target surface. Rule: lower slowly (less than 50 millimetres per second). If the surface force sensor reads more than the object weight, stop lowering.</li>
+            <li><strong>RELEASE</strong> — Open the gripper. Rule: open fully, then wait 200 milliseconds before moving the arm, so the object settles.</li>
+            <li><strong>RETREAT</strong> — Move the arm back to a safe home position. Rule: move straight up first, then to the home position. Never retract while the gripper is still over the object.</li>
+          </ol>
+
+          <figure class="figure">
+            <div class="figure__box">
+              <svg viewBox="0 0 620 110" width="100%" role="img" aria-label="State machine diagram for a pick-and-place task with seven states: APPROACH, GRASP, LIFT, MOVE, PLACE, RELEASE, RETREAT">
+                <rect x="6" y="22" width="78" height="36" rx="8" fill="#e8eeff" stroke="#2d5bff" stroke-width="2"></rect>
+                <text x="45" y="44" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#1c2230">APPROACH</text>
+
+                <rect x="106" y="22" width="78" height="36" rx="8" fill="#e2f6ef" stroke="#0f9d78" stroke-width="2"></rect>
+                <text x="145" y="44" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#1c2230">GRASP</text>
+
+                <rect x="206" y="22" width="78" height="36" rx="8" fill="#e8eeff" stroke="#2d5bff" stroke-width="2"></rect>
+                <text x="245" y="44" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#1c2230">LIFT</text>
+
+                <rect x="306" y="22" width="78" height="36" rx="8" fill="#e2f6ef" stroke="#0f9d78" stroke-width="2"></rect>
+                <text x="345" y="44" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#1c2230">MOVE</text>
+
+                <rect x="406" y="22" width="78" height="36" rx="8" fill="#e8eeff" stroke="#2d5bff" stroke-width="2"></rect>
+                <text x="445" y="44" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#1c2230">PLACE</text>
+
+                <rect x="506" y="22" width="78" height="36" rx="8" fill="#e2f6ef" stroke="#0f9d78" stroke-width="2"></rect>
+                <text x="545" y="44" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#1c2230">RELEASE</text>
+
+                <line x1="84" y1="40" x2="106" y2="40" stroke="#7b849b" stroke-width="2" marker-end="url(#ar)"></line>
+                <line x1="184" y1="40" x2="206" y2="40" stroke="#7b849b" stroke-width="2" marker-end="url(#ar)"></line>
+                <line x1="284" y1="40" x2="306" y2="40" stroke="#7b849b" stroke-width="2" marker-end="url(#ar)"></line>
+                <line x1="384" y1="40" x2="406" y2="40" stroke="#7b849b" stroke-width="2" marker-end="url(#ar)"></line>
+                <line x1="484" y1="40" x2="506" y2="40" stroke="#7b849b" stroke-width="2" marker-end="url(#ar)"></line>
+
+                <path d="M545 58 L545 84 L45 84 L45 58" fill="none" stroke="#7b849b" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#ar)"></path>
+                <text x="300" y="96" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#7b849b">RETREAT loop (dashed) returns to APPROACH for next cycle</text>
+                <defs>
+                  <marker id="ar" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#7b849b"></path></marker>
+                </defs>
+              </svg>
+            </div>
+            <figcaption>Figure 21.2 — The seven-state pick-and-place state machine. Each arrow has one clear rule. The dashed RETREAT loop closes the cycle.</figcaption>
+          </figure>
+
+          <div class="callout warn">
+            <div class="callout__head"><i class="bi bi-exclamation-triangle-fill"></i> Watch out</div>
+            <p>Beginners often skip the RETREAT state and move the arm straight from RELEASE back to APPROACH. If the object bounces or sticks to the gripper, it can land on the wrong side of the bin. Always add a clear upward retreat before the next cycle.</p>
+          </div>
+
+          <h2>Vision for manipulation — teaching the robot to see</h2>
+
+          <p>Humans do not need a camera to pick up a mug. We use our eyes, our memory of what a mug looks like, and our sense of depth from two eyes. A robot needs all three as well, but each one is a separate design decision.</p>
+
+          <p>A <strong>2D camera</strong> sees colour and brightness, like a phone photo. It can draw a <strong>bounding box</strong> — a rectangle around the object — and tell you roughly where it is. But it cannot measure depth. It cannot tell you if the object is leaning forward or backward.</p>
+
+          <p>A <strong>depth sensor</strong> adds the third dimension. It measures how far each point in the image is from the camera. Depth is critical for manipulation because the grasp planner needs to know the object's height and the table's height to choose a good contact point. A <strong>RGBD camera</strong> combines both: colour images and depth maps in one sensor. This is the most common choice for manipulation labs today.</p>
+
+          <p>The perception pipeline for a simple pick-and-place task looks like this:</p>
+
+          <ol>
+            <li>Capture one RGBD frame.</li>
+            <li>Detect the object (draw a bounding box or segment it from the background).</li>
+            <li>Estimate the object's centre position (x, y) and height (z).</li>
+            <li>Estimate the grasp point, usually the top-centre of the bounding box for a top-down grasp.</li>
+            <li>Pass the grasp point to the arm controller as a target pose.</li>
+          </ol>
+
+          <p>Modern systems use <strong>pose estimation</strong> — a neural network that outputs not just a bounding box but a full 3D model of the object, including its rotation. This is overkill for a teaching lab. For learning, start with a colour threshold or a simple object detector, then add depth.</p>
+
+          <p><strong>Vision-based servoing</strong> is a related idea. Instead of pre-computing a grasp plan and then moving, the robot uses the camera image as a feedback signal while it moves. If the object shifts on the table, the camera sees it and the robot adjusts. This makes the system more robust to small errors, at the cost of a slightly faster camera and a more complex control loop.</p>
+
+          <h2>Common failure modes — symptom, cause, fix</h2>
+
+          <p>Every manipulation system breaks in the same handful of ways. Learning to read the symptoms is half the job of a robotics engineer. Table 21.2 gives the five most common failures in beginner systems, plus a fix you can try today.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Symptom</th><th>Likely cause</th><th>Quick fix</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Object drops during lift</td><td>Grip force too low; friction insufficient; object is slippery</td><td>Increase grip force by 20%. Add a rubber finger pad. Check the gripper is not oily.</td></tr>
+                <tr><td>Object tilts and hits the table</td><td>Grasp is off-centre; lift speed too fast; contact points uneven</td><td>Re-plan contacts symmetrically about the centre. Reduce lift speed. Add a brief pause after GRASP.</td></tr>
+                <tr><td>Grasp misses the object</td><td>Pose estimate wrong; camera calibration off; object moved</td><td>Verify the depth offset. Re-calibrate the camera. Add a wider pre-grasp tolerance.</td></tr>
+                <tr><td>Arm hits the bin wall</td><td>Path not checked for collisions; place target near wall</td><td>Add a collision check before MOVE. Choose a place target further from the wall. Use a wrist that can fold back.</td></tr>
+                <tr><td>Cycle is very slow</td><td>Wait times too long; approach speed too low; control loop slow</td><td>Reduce GRASP wait from 1 second to 200 ms. Increase approach speed. Check the controller loop rate.</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 21.2 — The five failure modes that show up in almost every beginner pick-and-place project, and the first fix to try for each.</p>
+
+          <div class="callout danger">
+            <div class="callout__head"><i class="bi bi-shield-exclamation"></i> Safety</div>
+            <p>Always test grasps with low-value objects first. A failed grasp with a heavy object can damage the gripper, the arm, or nearby equipment. Use a foam block or plastic bottle until the cycle is reliable.</p>
+          </div>
+
+          <h2>Teaching robots vs self-teaching</h2>
+
+          <p>There are three main ways to give a robot the knowledge it needs to manipulate. As a beginner, you should know all three, because each one suits a different project and a different budget.</p>
+
+          <h3>Teach-and-play (teach mode)</h3>
+
+          <p><strong>Teach-and-play</strong> is the oldest and simplest approach. You physically move the robot arm to each important position — the pre-grasp, the grasp point, the lift height, the place point and the retreat position. The robot records each position and later repeats the sequence. This is exactly how the first industrial manipulators worked in the 1960s.</p>
+
+          <p>Teach-and-play needs no camera, no object detection and no grasp planner. It only needs the arm to be in the same position every time. If the object moves by even a few centimetres, the grasp fails. For this reason, teach-and-play is only used today for tasks where the environment is tightly controlled: a welding station, a fixed assembly fixture, or a paint booth.</p>
+
+          <div class="code">
+            <div class="code__bar">
+              <span class="code__dots"><span></span><span></span><span></span></span>
+              <span class="code__lang">Pseudo-code</span>
+              <button class="code__copy" type="button"><i class="bi bi-clipboard"></i> Copy</button>
+            </div>
+            <pre><code># Teach-and-play: record positions, then replay
+positions = []
+
+record_mode:
+    while recording:
+        save current_joint_angles() to positions
+        wait for teacher to move arm to next waypoint
+
+play_mode:
+    repeat forever:
+        for each waypoint in positions:
+            move arm to waypoint
+            at grasp_waypoint: close gripper
+            at place_waypoint: open gripper</code></pre>
+          </div>
+
+          <h3>Offline programming</h3>
+
+          <p><strong>Offline programming</strong> means programming the robot in simulation on a computer, not on the physical arm. You build a 3D model of the robot, the bin, the objects and the camera. You write the grasp plan and the motion plan inside the simulator. Once the simulation runs cleanly, you transfer the same program to the real robot.</p>
+
+          <p>The big advantage is safety and speed. You can make a hundred wrong grasps in simulation at zero cost. You can also debug the perception pipeline without a physical camera. Tools like ROS/Gazebo, MoveIt, NVIDIA Isaac and PyBullet are used for this today.</p>
+
+          <p>The risk is the <strong>sim-to-real gap</strong>. A grasp that works perfectly in simulation may fail on the real robot because of small differences in friction, object weight, or sensor noise. Always expect to spend time tuning the real system after simulation.</p>
+
+          <h3>Learning-based manipulation</h3>
+
+          <p><strong>Learning-based</strong> systems use data instead of rules. You collect thousands of examples of successful and failed grasps. A machine learning model learns which grasp shape works for which object. Modern systems can generalise to new objects they have never seen before.</p>
+
+          <p>This is the state of the art in research and in advanced warehouse robots such as the Amazon Robotics Sparrow. It is not yet the right starting point for a beginner. Learning systems need large datasets, GPU hardware, and expertise in machine learning that takes months to build.</p>
+
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> Tip</div>
+            <p>As a beginner, start with teach-and-play to learn how the arm moves. Then add a camera and a simple grasp planner. Only reach for learning-based methods once you can reliably run a hand-coded grasp 20 times in a row.</p>
+          </div>
+
+          <h2>A worked design — pick an apple from a bowl and place it on a cutting board</h2>
+
+          <p>Let us walk through a real project from paper to plan. This is the kind of design a student or hobbyist might build in a weekend with a desktop robot arm, a camera and a parallel gripper.</p>
+
+          <h3>The parts list</h3>
+
+          <ol>
+            <li><strong>Camera plus depth sensor.</strong> An Intel RealSense D435 or similar RGBD camera, mounted above the table looking down at about 45 degrees.</li>
+            <li><strong>Robot arm.</strong> A 6-DOF desktop arm such as a Universal Robots UR3e, a Franka Emika Panda, or a equivalent teaching-arm clone with ROS support.</li>
+            <li><strong>Gripper.</strong> A parallel-jaw gripper with soft rubber finger pads, mounted on the wrist flange. Payload rating above 1 kg is fine for an apple.</li>
+            <li><strong>Force/torque sensor (optional).</strong> A small wrist-mounted sensor such as the OnRobot HEX. It lets the arm feel the apple's weight and confirm the grasp without a separate force sensor in the gripper.</li>
+            <li><strong>Table, bowl, cutting board, apple.</strong> A shallow bowl of mixed fruit. A wooden cutting board as the place target.</li>
+            <li><strong>Computer.</strong> A laptop running Linux with ROS 2, MoveIt and a simple perception node.</li>
+          </ol>
+
+          <h3>The five-step plan</h3>
+
+          <p>Step 1 — <strong>Define the goal in words.</strong> "Pick one apple from the bowl without disturbing the other fruit, and place it gently on the cutting board." Note the constraints: do not tip the bowl, do not bruise the apple, do not drop it from height.</p>
+
+          <p>Step 2 — <strong>Add measurable numbers.</strong> Apple diameter 70-80 mm. Bowl depth 50 mm. Table height 800 mm. Camera mounted 600 mm above table. Place target is a 200 mm &times; 200 mm zone on the cutting board. Maximum allowed drop height 20 mm. Maximum allowed grip force 8 newtons (apple skin is delicate).</p>
+
+          <p>Step 3 — <strong>Design the perception pipeline.</strong> Mount the RGBD camera above the table. Use a simple colour threshold (red in HSV space) to find the apple in the bowl. Get the (x, y) position from the depth map. Estimate grasp point at the top-centre of the bounding box plus a 5 mm safety offset.</p>
+
+          <p>Step 4 — <strong>Write the pick-and-place state machine.</strong> Use the seven states from Figure 21.2. In the APPROACH state, move to a point 30 mm above the estimated grasp point. In GRASP, close the gripper to 6 newtons. In LIFT, raise 80 mm and pause 100 ms. In MOVE, travel to a point 50 mm above the cutting board. In PLACE, lower at 30 mm/s until contact. In RELEASE, open the gripper and wait 300 ms. In RETREAT, lift 100 mm and return to home.</p>
+
+          <p>Step 5 — <strong>Test with the lowest-risk object first.</strong> Run the cycle twenty times with a foam ball the same size as the apple. Check that the arm reaches, closes, lifts and places without hitting anything. Then run with a real apple. Log every cycle. Count successes and failures. Adjust grip force, approach speed and lift height based on what you see.</p>
+
+          <h3>Expected problems and first fixes</h3>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Problem</th><th>What you will see</th><th>First fix</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Apple rolls in bowl</td><td>Grasp misses or slides off</td><td>Add a 200 ms pause after APPROACH so the apple settles.</td></tr>
+                <tr><td>Camera sees other fruit</td><td>Grasp point lands on a banana</td><td>Tighten the colour filter or use a depth threshold to isolate the red apple.</td></tr>
+                <tr><td>Apple skin marks</td><td>Grip force too high; bruising</td><td>Lower grip force to 5 newtons. Add a thinner rubber pad.</td></tr>
+                <tr><td>Apple drops during lift</td><td>Object slips from fingers</td><td>Increase grip force by 1 newton. Check fingers are clean and dry.</td></tr>
+                <tr><td>Arm hits the bowl edge</td><td>Path goes through the bowl wall</td><td>Raise the LIFT height from 80 mm to 120 mm. Add a collision check in the MOVE state.</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 21.3 — Five problems you are likely to meet in the apple-from-bowl project, with the first change to try.</p>
+
+          <h2>Teaching robots vs self-teaching</h2>
+
+          <p>There are three main ways to give a robot the knowledge it needs to manipulate. As a beginner, you should know all three, because each one suits a different project and budget.</p>
+
+          <h3>Teach-and-play (teach mode)</h3>
+
+          <p><strong>Teach-and-play</strong> is the oldest and simplest approach. You physically move the robot arm to each important position. The robot records each position and later repeats the sequence. This is exactly how the first industrial manipulators worked in the 1960s.</p>
+
+          <p>Teach-and-play needs no camera, no object detection and no grasp planner. It only needs the arm to be in the same position every time. If the object moves by even a few centimetres, the grasp fails. For this reason, teach-and-play is only used today for tasks where the environment is tightly controlled: a welding station, a fixed assembly fixture, or a paint booth.</p>
+
+          <h3>Offline programming</h3>
+
+          <p><strong>Offline programming</strong> means programming the robot in simulation on a computer, not on the physical arm. You build a 3D model of the robot, the bin, the objects and the camera. You write the grasp plan and the motion plan inside the simulator. Once the simulation runs cleanly, you transfer the same program to the real robot.</p>
+
+          <p>The big advantage is safety and speed. You can make a hundred wrong grasps in simulation at zero cost. You can also debug the perception pipeline without a physical camera. Tools like ROS/Gazebo, MoveIt, NVIDIA Isaac and PyBullet are used for this today.</p>
+
+          <p>The risk is the <strong>sim-to-real gap</strong>. A grasp that works perfectly in simulation may fail on the real robot because of small differences in friction, object weight, or sensor noise. Always expect to spend time tuning the real system after simulation.</p>
+
+          <h3>Learning-based manipulation</h3>
+
+          <p><strong>Learning-based</strong> systems use data instead of rules. You collect thousands of examples of successful and failed grasps. A machine learning model learns which grasp shape works for which object. Modern systems can generalise to new objects they have never seen before.</p>
+
+          <p>This is the state of the art in research and in advanced warehouse robots such as the Amazon Robotics Sparrow. It is not yet the right starting point for a beginner. Learning systems need large datasets, GPU hardware, and expertise in machine learning that takes months to build.</p>
+
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> Tip</div>
+            <p>As a beginner, start with teach-and-play to learn how the arm moves. Then add a camera and a simple grasp planner. Only reach for learning-based methods once you can reliably run a hand-coded grasp 20 times in a row.</p>
+          </div>
+
+          <h2>Try it yourself</h2>
+
+          <p>You learn manipulation by thinking through real objects and real problems. These exercises need no parts at all — only observation and clear thinking.</p>
+
+          <ol>
+            <li><strong>Design a grasp for an egg.</strong> An average chicken egg is 55 mm long and weighs 60 grams. It has a curved shell that cracks under about 50 newtons. Using only a parallel-jaw gripper, how would you place the contact points? What grip force would you choose? What is one feature you would add to the gripper fingers to make the grasp safer?</li>
+            <li><strong>Design a gripper concept for a marker pen.</strong> A marker is 140 mm long, 14 mm in diameter, and weighs 15 grams. The clip on the cap is a natural handle. Draw a simple side-view sketch and label the contact points. Is this a precision grasp or a power grasp?</li>
+            <li><strong>Choose a gripper for three objects.</strong> For each object below, say which gripper type you would choose and why: (a) a flat cardboard parcel 300 mm &times; 200 mm weighing 1.2 kg, (b) a steel bearing 30 mm in diameter weighing 0.5 kg, (c) a peach weighing 150 grams with soft skin. You may add at most one sensor or finger pad to any choice.</li>
+            <li><strong>Write a complete pick-and-place state machine for a different task.</strong> Choose any simple object on your desk — a stapler, a phone, a book. Write the seven states, one clear rule per state, and the values you would use for speed, height and grip force.</li>
+            <li><strong>Trace a real failure.</strong> Find a video online of a robot arm failing to pick something up. Watch it once without sound. Write down the symptom, then guess the cause, then search for a fix. This trains the exact skill professional robotics engineers use every day.</li>
+          </ol>
+
+          <h2>Common mistakes in beginner manipulation designs</h2>
+
+          <p>Even experienced engineers make these errors when they start a new manipulation project. Recognising them early saves days of frustration.</p>
+
+          <ul>
+            <li><strong>Choosing the gripper last.</strong> The gripper is the only part that touches the object. Its choice shapes the whole system. Pick it first, then choose the arm and sensor around it.</li>
+            <li><strong>Grasping at the first plausible point.</strong> A grasp that is off-centre by 3 mm will tilt the object and cause a table collision on lift. Always verify the contact points are roughly symmetric about the centre of mass.</li>
+            <li><strong>Closing the gripper at full speed.</strong> A fast-closing gripper hits the object hard, moves it, and damages fragile items. Use a controlled speed and a force limit for every grasp.</li>
+            <li><strong>Skipping the pre-grasp pause.</strong> The arm vibrates slightly when it arrives. If you close the gripper immediately, the object shifts. A 100-200 ms pause lets vibrations settle.</li>
+            <li><strong>Ignoring the sim-to-real gap.</strong> A perfect simulation result is not a finished project. Expect to spend equal time tuning on the real hardware.</li>
+            <li><strong>Hard-coding every number.</strong> A grip force that works for a full bottle may break an empty one. Use a force sensor or at least a few pre-set force levels and choose based on the object.</li>
+            <li><strong>No safety stop or e-stop.</strong> Always add a way to cut power to the gripper and the arm from outside the program. One accidental close on a finger is one too many.</li>
+          </ul>
+
+          <h2>How professionals approach manipulation</h2>
+
+          <p>When you watch a professional robotics team test a new manipulation cell, the order of work looks different from a beginner's. Understanding this order will help you think like an engineer.</p>
+
+          <p><strong>First, simulation.</strong> Professionals run hundreds or thousands of grasps in simulation before touching real hardware. They measure success rate, cycle time and collision rate. Only grasps that score above a threshold move to hardware.</p>
+
+          <p><strong>Second, simple grasps first.</strong> The team starts with antipodal or surface-normal grasps — the simplest stable options. They only add complex multi-finger or learned grasps when simple ones fail. Simple grasps are easier to debug and easier to certify for safety.</p>
+
+          <p><strong>Third, force control, not just position control.</strong> A pure position controller can squeeze an object to destruction before it notices. Professionals always run a force loop in parallel. The gripper commands force, the wrist sensor measures it, and the controller corrects the difference in real time.</p>
+
+          <p><strong>Fourth, compliance.</strong> A <strong>compliant</strong> robot arm is designed to move slightly when it feels a force, like a spring. Compliance absorbs small position errors without damaging the object or the gripper. Many modern collaborative arms are compliant by design. When you buy or specify an arm, ask about its compliance.</p>
+
+          <p><strong>Fifth, robust perception with tolerances.</strong> Professionals add tolerances at every step. The perception system returns a position with an uncertainty ellipse. The planner chooses a grasp that is stable even if the object is 5 mm away from the estimate. The controller moves at a speed where the loop can react inside the uncertainty window.</p>
+
+          <p><strong>Sixth, logging and data.</strong> Every cycle is logged: success or failure, grasp force, lift speed, cycle time. Failures are tagged and reviewed. Over time, the team sees patterns — "grasps fail more often on Tuesday mornings because the humidity makes the cardboard slippery" — and fixes the root cause.</p>
+
+          <p><strong>Seventh, safety and certification.</strong> Professional systems are designed to fail safe. A power cut releases the gripper or holds the object in place. A collision is detected by the wrist sensor and the arm stops within milliseconds. Every safety feature is tested, not assumed.</p>
+
+          <div class="callout note">
+            <div class="callout__head"><i class="bi bi-info-circle-fill"></i> Note</div>
+            <p>The gap between a beginner's first working grasp and a production-ready manipulation cell is not intelligence. It is rigour, logging, tolerances, and testing. Every professional practice in this section can be started with a notebook and a spreadsheet on day one.</p>
+          </div>
+
+          <h2>Real systems in the field</h2>
+
+          <p>Manipulation is no longer just a research topic. Several commercial systems ship today and operate in real factories and warehouses.</p>
+
+          <p><strong>Rethink Robotics Baxter and Sawyer</strong> were among the first collaborative arms with built-in vision and easy programming. You could guide the arm by hand, show it an object, and it would plan a grasp. They are now out of production, but many still run in universities.</p>
+
+          <p><strong>Universal Robots UR series</strong> are the most widely deployed collaborative arms. They include built-in force control and easy scripting. Many manipulation projects start with a UR arm because the software ecosystem is mature.</p>
+
+          <p><strong>Boston Dynamics Stretch</strong> is a mobile base with a telescoping arm and a suction gripper. It is designed to unload trucks and move boxes in warehouses. Its design shows how far manipulation has come: it handles a wide range of box sizes with one gripper type, using only height and depth sensing.</p>
+
+          <p><strong>Amazon Robotics Sparrow</strong> is a fixed-arm system that identifies individual items in a mixed bin and picks them. It uses a vision system trained on millions of items. This is the kind of learning-based system mentioned earlier, now in production at scale.</p>
+
+          <p><strong>Magazino SOTO</strong> is a mobile robot that picks individual items from shelves and delivers them. It uses a combination of 2D cameras, depth sensors and a custom gripper with force feedback. It is a good example of how mobile manipulation combines the navigation skills from earlier chapters with the manipulation skills from this one.</p>
+
+          <div class="callout note">
+            <div class="callout__head"><i class="bi bi-info-circle-fill"></i> Note</div>
+            <p>All of these systems share the same three layers — perception, planning, control — and the same seven-state pick-and-place loop. The difference is in the quality of each layer and the amount of testing behind them.</p>
+          </div>
+
+          <h2>Going deeper (optional)</h2>
+
+          <p>If you want to explore beyond this chapter, two ideas are worth a look.</p>
+
+          <p><strong>Dextrous manipulation</strong> means using a multi-finger hand to re-orient an object inside the gripper. Instead of releasing and re-grasping, the hand rolls, slides and tilts the object to a better orientation. This is how humans turn a screwdriver or tie a shoe. It requires very accurate force control on each finger and is an active research area.</p>
+
+          <p><strong>Whole-arm manipulation</strong> uses the arm's links and the wrist, not just the gripper, to manipulate the object. Think of pushing a box across the table with the side of the arm instead of picking it up. This expands the workspace of the arm but requires collision-aware planning across the whole kinematic chain.</p>
+
+          <p>Both ideas build on the same foundations in this chapter: stable contacts, force control, and a clear state machine. Master those first, and these advanced topics will feel like natural extensions.</p>
+
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> Where this leads</div>
+            <p>You can plan a basic pick-and-place. Contact-rich work needs <strong>impedance and force control</strong>, MoveIt 2 planning and learned policies. Continue with <a href="ch30-advanced-manipulation-force.html">Chapter 30: Advanced Manipulation and Force Control</a>.</p>
+          </div>
+
+          <section class="takeaways">
+            <h2><i class="bi bi-pin-angle-fill"></i> Key takeaways</h2>
+            <ul>
+              <li><i class="bi bi-check2-circle"></i> Manipulation is physical interaction — forces, grasps and placements — not just reaching a point.</li>
+              <li><i class="bi bi-check2-circle"></i> Friction, weight, shape, compliance and uncertainty make manipulation harder than reach.</li>
+              <li><i class="bi bi-check2-circle"></i> Every pick-and-place system has three layers: perception, planning, and control.</li>
+              <li><i class="bi bi-check2-circle"></i> A good grasp plan defines the approach vector, pre-grasp pose, contact points and lift direction.</li>
+              <li><i class="bi bi-check2-circle"></i> Start with a parallel-jaw gripper unless the object clearly needs suction, soft fingers or a magnet.</li>
+              <li><i class="bi bi-check2-circle"></i> Minimum grip force follows from object weight and friction coefficient — a real calculation you should do.</li>
+              <li><i class="bi bi-check2-circle"></i> Pick-and-place as a seven-state machine (APPROACH to RETREAT) is the clearest way to write and test the task.</li>
+            </ul>
+          </section>
+
+          <section class="quiz">
+            <div class="quiz__head"><i class="bi bi-patch-question-fill"></i> Check your understanding</div>
+            <details>
+              <summary><span class="q-num">Q1.</span><span>What is the difference between reaching and manipulating?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Reaching is moving the robot tip to a position. Manipulation is touching the world with controlled force — grasping, lifting, placing and releasing an object.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q2.</span><span>Name the three layers of a pick-and-place system.</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Perception (find the object), planning (choose the grasp and path), and control (close, lift, move, place, release with the right force).</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q3.</span><span>Why is a USB cable harder to grasp than a brick?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> A cable is thin, flexible and has no stable shape — it deforms under the gripper and the grasp points are unclear. A brick is rigid, has flat faces, and is easy to predict.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q4.</span><span>What four elements does a beginner grasp plan need?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Approach vector, pre-grasp pose, contact points, and lift direction.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q5.</span><span>When should you choose a suction gripper over a parallel-jaw gripper?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> When the object has a flat, smooth, non-porous surface (a box, a panel). Avoid suction on rough, curved or porous objects.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q6.</span><span>What is the simple formula for minimum grip force, and what does each symbol mean?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> F<sub>grip</sub> &gt; m &times; g &divide; &mu;. m is object mass, g is 9.81 m/s&sup2;, and &mu; is the friction coefficient between finger and object.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q7.</span><span>List the seven states of the pick-and-place state machine in order.</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> APPROACH, GRASP, LIFT, MOVE, PLACE, RELEASE, RETREAT.</div>
+            </details>
+          </section>
+
+        </article>
+
+        <nav class="pager" id="pager" aria-label="Chapter navigation"></nav>
+      </div>
+    </main>
+  </div>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/book.js"></script>
+</body>
+</html>

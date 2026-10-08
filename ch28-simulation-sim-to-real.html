@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>try{var __t=localStorage.getItem("mr-theme");if(__t==="dark"||__t==="light")document.documentElement.setAttribute("data-theme",__t);}catch(e){}</script>
+  <title>Chapter 28: Modern Simulation and Sim-to-Real — Master Robotics</title>
+  <meta name="description" content="A plain-English guide to robot simulation: Gazebo, MuJoCo, Isaac Sim and Drake, system identification steps, and domain randomization for sim-to-real transfer.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/prose.css">
+</head>
+<body data-file="ch28-simulation-sim-to-real.html">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="topbar" id="topbar"></header>
+  <div class="progress-bar" id="progressBar"></div>
+
+  <div class="layout">
+    <div class="sidebar__backdrop" id="navBackdrop"></div>
+    <nav class="sidebar" id="sidebar" aria-label="Book contents"></nav>
+
+    <main class="main" id="main">
+      <div class="container">
+
+        <header class="chapter-head">
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="index.html">Home</a>
+            <i class="bi bi-chevron-right"></i>
+            <a href="index.html#advanced">Part 7 &middot; Advanced Foundations</a>
+            <i class="bi bi-chevron-right"></i>
+            <span>Chapter 28</span>
+          </nav>
+          <span class="chapter-kicker"><i class="bi bi-diagram-3"></i> Part 7 &middot; Advanced Foundations</span>
+          <h1>Modern Simulation and Sim-to-Real</h1>
+          <p class="lede">Real robots are slow, costly and breakable. Simulators let you train and test for thousands of hours in an afternoon. By the end, you will compare the big simulators simply, explain system identification steps, and describe domain randomization for sim-to-real transfer.</p>
+          <div class="chapter-meta">
+            <span><i class="bi bi-clock"></i> ~32 min read</span>
+            <span><i class="bi bi-bar-chart"></i> Advanced</span>
+            <span><i class="bi bi-list-check"></i> Chapter 28 of 30</span>
+          </div>
+          <div class="goals">
+            <h2>What you will learn</h2>
+            <ul>
+              <li><i class="bi bi-check-circle-fill"></i> Compare Gazebo, MuJoCo, Isaac Sim and Lab, and Drake simply.</li>
+              <li><i class="bi bi-check-circle-fill"></i> Explain the steps of system identification.</li>
+              <li><i class="bi bi-check-circle-fill"></i> Describe domain randomization for sim-to-real transfer.</li>
+            </ul>
+          </div>
+        </header>
+
+        <article class="article">
+
+          <p class="lead">Imagine teaching a teenager to drive. You would not start on a busy highway in the rain. You would start in an empty parking lot, with cones, no traffic and an instructor beside them. Only later comes the real road. Robot simulators are that empty parking lot.</p>
+
+          <p>A real robot gives you one hour of practice per hour. It needs charging. Its gears wear out. A bad learning experiment can snap a three-hundred-dollar arm. A simulator gives you thousands of practice hours per hour, for free, with an undo button. A learning robot can fall ten thousand times before breakfast and feel no pain.</p>
+
+          <p>But there is a catch. The simulator is never exactly like reality. Friction differs. Motors lag. Camera images look too clean. When your trained robot meets the real world, it may fail. This gap has a name: the <strong>sim-to-real gap</strong>. This chapter teaches you to pick the right simulator, close the gap with measurements, and cross what remains with randomization.</p>
+
+          <p>You already met cameras and vision in <a href="ch17-robot-vision.html">Chapter 17</a> and learning robots in <a href="ch19-robot-learning.html">Chapter 19</a>. Those chapters showed what robots can perceive and learn. This chapter shows where they practice safely before touching the real world.</p>
+
+          <h2>Why practice in a fake world first</h2>
+
+          <p>A <strong>simulator</strong> is a program that pretends to be a robot and its world. It computes how joints move, how wheels grip, how light hits the camera. Your control code talks to the fake robot through the same messages it would use on the real one. Good code cannot tell the difference.</p>
+
+          <p>Think of a flight simulator for pilots. New pilots crash again and again in the simulator, and nobody gets hurt. Each crash teaches a lesson. By the first real flight, the pilot already has hundreds of landings. Robot simulation gives your code the same safe childhood.</p>
+
+          <h3>Three jobs of a simulator</h3>
+
+          <p>First, <strong>testing</strong>. You try your controller on thousands of fake situations: stairs, slippery floors, heavy boxes. Second, <strong>training</strong>. A learning algorithm needs millions of tries, which only a fast simulator can supply. Third, <strong>design</strong>. You test a longer arm or a heavier base in software before buying any metal.</p>
+
+          <p>All three jobs share one need: <strong>physics you can trust</strong>. The simulator must compute contact, friction and motor forces close enough to reality. "Close enough" depends on the job. A grasping test needs good contact math. A camera test needs good pictures. Pick the tool that is strong where you need strength.</p>
+
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> The key idea</div>
+            <p>A simulator is a safe, fast, resettable copy of your robot. You test ideas cheaply in the copy, measure the real robot to fix the copy, and randomize the copy so your code survives the differences.</p>
+          </div>
+
+          <h2>Meet the four big simulators</h2>
+
+          <p>Four names cover almost all modern robot simulation: <strong>Gazebo</strong>, <strong>MuJoCo</strong>, <strong>Isaac</strong> and <strong>Drake</strong>. Each one grew up solving a different problem. Learn one honest sentence about each, and you will never pick blindly again.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Simulator</th><th>Best for</th><th>Speed style</th></tr></thead>
+              <tbody>
+                <tr><td>Gazebo</td><td>Full ROS 2 robot systems with sensors</td><td>One detailed world at a time</td></tr>
+                <tr><td>MuJoCo</td><td>Fast contact physics and learning</td><td>Thousands of worlds on GPU with MJX</td></tr>
+                <tr><td>Isaac Sim / Lab</td><td>Pretty sensors plus GPU training</td><td>Thousands of robots with nice cameras</td></tr>
+                <tr><td>Drake</td><td>Planning, control and checked proofs</td><td>Careful math over raw speed</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>Read the table like a vehicle guide. Gazebo is the delivery van: complete, practical, everywhere in ROS 2 work. MuJoCo is the race car: pure speed for contact and learning. Isaac is the film studio with a race track: beautiful images plus massive training. Drake is the engineering lab: slower, but it can prove your controller is safe.</p>
+
+          <h3>How to choose in one minute</h3>
+
+          <p>Building a full ROS 2 system with lidar, cameras and navigation? Start with Gazebo. Training a walking or grasping skill with reinforcement learning? Start with MuJoCo or Isaac Lab. Proving a controller will not fall, or planning smooth arm motions? Start with Drake. Most professionals eventually use two: Gazebo for the system, and MuJoCo or Isaac for the learning.</p>
+
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> In simple words</div>
+            <p>Sim-to-real means training in the fake world and succeeding in the real one. The gap is the list of ways the fake world is wrong. You shrink the list by measuring the real robot, and you survive the rest by training with extra variety.</p>
+          </div>
+
+          <h2>Gazebo: the classic workshop</h2>
+
+          <p><strong>Gazebo</strong> is the long-time simulator of the ROS world. Modern Gazebo pairs naturally with ROS 2: your nodes publish commands, Gazebo moves the fake robot, and sensor plugins return fake camera and lidar data through the same topics the real sensors use.</p>
+
+          <p>Think of Gazebo as a model railway room. You build the landscape once: floors, walls, tables, boxes. You place your train, which is your robot. Then you run your real control software against the model. If the room matches your lab, the software barely notices the swap.</p>
+
+          <h3>Worlds, models and plugins</h3>
+
+          <p>A Gazebo <strong>world</strong> is the stage: ground, lights, objects, gravity. A <strong>model</strong> is one actor on the stage: your robot, a box, a door. Each model is built from links and joints, usually coming from the same URDF file your real robot uses. One model file serves both worlds.</p>
+
+          <p>A <strong>plugin</strong> is a small program that adds behavior to the stage. A camera plugin renders pictures. A lidar plugin casts rays. A motor plugin applies your torque commands to the fake joints. You wire plugins with the same topic names as your hardware, so switching from fake to real means changing one launch setting.</p>
+
+          <h3>Where Gazebo shines, and where it slows</h3>
+
+          <p>Gazebo shines at whole-system tests. Navigation through a warehouse. An arm picking boxes while cameras watch. Multi-robot fleets sharing one map. Its sensor models and ROS 2 wiring are the most complete of any simulator.</p>
+
+          <p>It slows at massive learning. Gazebo runs one detailed world beautifully, but training a walking skill needs thousands of worlds at once. That is the job MuJoCo with MJX and Isaac Lab were built for, which you meet next.</p>
+
+          <h3>Your first Gazebo test in four steps</h3>
+
+          <p>A first Gazebo run is simpler than it looks. You reuse the same model file and the same topic names as your real robot, so almost nothing is new.</p>
+
+          <ol>
+            <li><strong>Load your URDF model</strong> into an empty world and check that every joint moves by hand in the viewer.</li>
+            <li><strong>Start your ROS 2 nodes unchanged</strong>, pointed at the simulated topics instead of the hardware ones.</li>
+            <li><strong>Drive a slow square path</strong> and watch the fake lidar draw the room in RViz.</li>
+            <li><strong>Compare with reality</strong> by replaying the same commands on the real robot and noting every difference.</li>
+          </ol>
+
+          <p>Step four is the habit that matters. Every difference you note becomes a calibration task or a randomization range. The simulator earns your trust one honest comparison at a time.</p>
+
+          <h2>MuJoCo, MJX and Playground: speed for learning</h2>
+
+          <p><strong>MuJoCo</strong> is a physics engine famous for accurate <strong>contact</strong>, the math of touching, pushing and gripping. Contact is the hardest part of simulation. A walking foot strikes the ground. Fingers squeeze a box. MuJoCo computes these touches stably and fast, which is why most learning researchers trust it.</p>
+
+          <p>Picture an abacus master. Each bead movement is small, exact and blindingly quick. MuJoCo moves the physics "beads" the same way: tiny exact steps, millions per second. Your learning algorithm gets honest answers about every touch, at a speed that keeps training practical.</p>
+
+          <h3>MJX: thousands of worlds on one GPU</h3>
+
+          <p><strong>MJX</strong> is MuJoCo running on a graphics card. A GPU does thousands of small jobs at once. MJX runs thousands of copies of your robot at once: one slips, one grips, one falls, one walks. The learner watches all of them and improves from every copy in parallel.</p>
+
+          <p>One CPU world might give 500 steps per second. Four thousand GPU worlds can give two million steps per second on one card. A skill that needs a year of practice finishes overnight. That speedup changed what robots can learn.</p>
+
+          <h3>Playground: ready-made lessons</h3>
+
+          <p><strong>MuJoCo Playground</strong> is a set of ready training tasks: walking, spinning, picking, balancing. Each task ships with a robot model, a reward recipe and training settings that already work. You start from a lesson that runs, then adapt it to your robot.</p>
+
+          <p>Think of a music school with practice rooms and sheet music. You do not build the piano or compose the first etude. You sit down and play. Playground is that school for robot skills.</p>
+
+          <div class="code">
+            <div class="code__bar">
+              <span class="code__dots"><span></span><span></span><span></span></span>
+              <span class="code__lang">Python</span>
+              <button class="code__copy" type="button"><i class="bi bi-clipboard"></i> Copy</button>
+            </div>
+            <pre><code>import mujoco
+
+model = mujoco.MjModel.from_xml_path('arm.xml')
+data = mujoco.MjData(model)
+
+for step in range(1000):
+    # Simple controller: pull joint 0 toward 0.5 rad.
+    target = 0.5
+    data.ctrl[0] = 8.0 * (target - data.qpos[0]) - 0.5 * data.qvel[0]
+    mujoco.mj_step(model, data)
+
+print('Final angle:', round(float(data.qpos[0]), 3), 'rad')</code></pre>
+          </div>
+
+          <p>This MuJoCo-style loop loads an arm, then steps physics one thousand times. Each step reads the joint angle, computes a small push toward the target, and advances the world. Real training wraps this loop in thousands of parallel copies with different masses and frictions.</p>
+
+          <h2>Isaac Sim, Isaac Lab and Gym: the NVIDIA stack</h2>
+
+          <p><strong>Isaac Sim</strong> renders beautiful, honest sensor data on NVIDIA graphics cards: cameras with real light, lidar with real rays, depth with real noise. When your vision code from <a href="ch17-robot-vision.html">Chapter 17</a> must train on pictures, pretty and truthful pictures matter.</p>
+
+          <p><strong>Isaac Lab</strong> is the training framework on top: thousands of parallel robots, ready tasks, and clean connections to learning libraries. The <strong>Gym</strong> interface is the shared plug shape: reset the world, take an action, get a reward. If you learned Gym-style training in <a href="ch19-robot-learning.html">Chapter 19</a>, Isaac Lab speaks the language you already know.</p>
+
+          <h3>When the NVIDIA stack wins</h3>
+
+          <p>Pick this stack when pictures matter as much as physics. Grasping mixed boxes from a camera. Navigating a store with changing light. Training hands with depth sensors. Isaac renders what the sensor would really see, while thousands of copies train at once.</p>
+
+          <p>The price is hardware and weight. You need a strong NVIDIA GPU and patience for large downloads. For pure joint-and-contact learning without cameras, MuJoCo plus MJX is lighter and faster to start.</p>
+
+          <div class="callout note">
+            <div class="callout__head"><i class="bi bi-info-circle-fill"></i> Note</div>
+            <p>Isaac Sim, Isaac Lab and Gym are three layers, not rivals. Sim draws the world, Lab runs the training school, and Gym defines the classroom rules. You use all three together.</p>
+          </div>
+
+          <h2>Drake: planning, control and proof</h2>
+
+          <p><strong>Drake</strong> is the careful scholar of the four. It cares less about raw speed and more about correct answers. Its tools plan smooth motions, design balancing controllers and even verify safety with math, not just testing.</p>
+
+          <p>Think of the difference between a stunt pilot and an aircraft certifier. The stunt pilot tries amazing moves. The certifier proves the wing holds in every storm. MuJoCo and Isaac are brilliant stunt fields. Drake is the certification office.</p>
+
+          <h3>TrajOpt, MPC and verification</h3>
+
+          <p><strong>TrajOpt</strong>, trajectory optimization, finds the smoothest path that respects your limits: joint ranges, speed caps, no collisions. You describe the start, the goal and the rules. Drake computes the graceful motion between them.</p>
+
+          <p><strong>MPC</strong>, model predictive control, re-plans many times per second. At each instant it looks a short distance ahead, picks the best first move, executes it, then looks again. It steers like a careful driver in fog: short view, constant correction, safe arrival.</p>
+
+          <p><strong>Verification</strong> goes one step further. It proves a controller keeps the robot inside a safe region, for all allowed pushes. Testing shows a thousand safe landings. Verification shows the thousand-and-first is safe too. For medical and factory robots, that proof is worth more than speed.</p>
+
+          <h3>Contact done carefully</h3>
+
+          <p>Drake models <strong>contact</strong> with extra care for stiffness and friction cones. A friction cone is the set of pushes a surface can resist without slipping. Drake respects these cones honestly, so a grasp that holds in Drake usually holds in steel and rubber too.</p>
+
+          <h2>Teach the simulator, then randomize it</h2>
+
+          <p>Now comes the heart of sim-to-real. First you measure the real robot and fix the simulator. Then you deliberately vary the simulator so your code survives whatever reality still hides. Measure first, randomize second, in that order.</p>
+
+          <div class="callout warn">
+            <div class="callout__head"><i class="bi bi-exclamation-triangle-fill"></i> Warning</div>
+            <p>Randomizing a wrong simulator teaches confident nonsense. If your arm model says 2 kg but the real arm weighs 5 kg, no amount of randomization fixes the lie. Identify first, randomize after.</p>
+          </div>
+
+          <h3>System identification in five steps</h3>
+
+          <p><strong>System identification</strong> means finding the true numbers of your robot: mass, inertia, friction, motor lag. <strong>Mass</strong> resists pushing. <strong>Inertia</strong> resists spinning. <strong>Friction</strong> fights every slide. <strong>Actuator dynamics</strong> describe how the motor lags behind your command, like a tired assistant who always arrives a moment late.</p>
+
+          <ol>
+            <li><strong>Pick what to find.</strong> For one joint: inertia, sticky friction, sliding friction and motor delay. Write down your starting guesses from the datasheet.</li>
+            <li><strong>Excite the joint with a chirp.</strong> A <strong>chirp trajectory</strong> is a wiggle that speeds up over time, from slow sways to fast shakes. Slow parts reveal sticky friction. Fast parts reveal inertia. One run shows everything.</li>
+            <li><strong>Record commands and motions.</strong> Log what you commanded and what the encoder measured, at a fixed fast rate, for the whole chirp.</li>
+            <li><strong>Fit the numbers.</strong> Adjust your friction and inertia values until the simulator replays the same motion. <strong>Differentiable simulation</strong>, for example the MuJoCo-XLA toolchain, computes exactly how each number changes the error, so fitting takes minutes instead of days.</li>
+            <li><strong>Verify on fresh data.</strong> Run a new, different motion the fitting never saw. If the simulator predicts it well, your numbers are real. If not, your model misses something, like belt stretch or backlash.</li>
+          </ol>
+
+          <p>A real team result shows the power of step 4. After fitting actuator dynamics with a differentiable simulator, their arm model's path error fell by 75 percent. In plain words: the fake arm now drifts only one quarter as far from the real arm. That is the difference between a grasp that misses and one that lands.</p>
+
+          <div class="formula"><span class="label">Prediction error</span> error = | predicted angle &minus; real angle | , averaged over the test motion</div>
+
+          <p>Track this single number across every identification round. If it falls, your simulator is learning the truth. When it stops falling, your model is complete enough, and further effort belongs to randomization instead.</p>
+
+          <h3>Domain randomization: practice in many weathers</h3>
+
+          <p><strong>Domain randomization</strong> varies the simulator on every training run: heavier links, stickier joints, noisier cameras, slower motors. The learner stops trusting exact numbers and learns habits that work across the whole range. The real world then feels like one more ordinary variation.</p>
+
+          <p>Think of football practice in sun, rain and wind. Match day brings whatever weather it wants, and the team is ready because it trained in all of them. Randomization is weather control for robots.</p>
+
+          <div class="code">
+            <div class="code__bar">
+              <span class="code__dots"><span></span><span></span><span></span></span>
+              <span class="code__lang">Python</span>
+              <button class="code__copy" type="button"><i class="bi bi-clipboard"></i> Copy</button>
+            </div>
+            <pre><code>import random
+
+for episode in range(10000):
+    # Randomize one fresh world per episode.
+    sim.friction = random.uniform(0.5, 1.5) * base_friction
+    sim.link_mass = random.uniform(0.9, 1.1) * base_mass
+    sim.motor_delay_ms = random.uniform(0.0, 8.0)
+    sim.camera_noise = random.uniform(0.0, 0.05)
+
+    reward = run_episode(sim, policy)
+    policy.improve(reward)
+
+print('Trained across 10,000 different worlds.')</code></pre>
+          </div>
+
+          <p>Each episode builds one fresh world from the ranges you trust, trains in it, and improves. Keep ranges honest: center them on your identified numbers, and widen them only as far as real measurements justify. Too narrow teaches fragility. Too wide teaches fear, and the robot moves like a timid guest.</p>
+
+          <ol>
+            <li><strong>Randomize physics first:</strong> mass, inertia, friction, motor delay and sensor noise.</li>
+            <li><strong>Randomize looks second:</strong> light, colors, backgrounds and camera angles for vision skills.</li>
+            <li><strong>Verify on the real robot last:</strong> start slow, with torque limits on, and compare against your error number.</li>
+          </ol>
+
+          <figure class="figure">
+            <div class="figure__box">
+              <svg viewBox="0 0 560 220" width="100%" role="img" aria-label="Sim-to-real loop diagram from real robot to simulator to policy and back">
+                <rect x="14" y="80" width="120" height="60" rx="10" fill="#e8eeff" stroke="#2d5bff"/>
+                <text x="74" y="106" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#1c2230">Real robot</text>
+                <text x="74" y="124" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#1c2230">chirp data</text>
+                <rect x="180" y="80" width="130" height="60" rx="10" fill="#e2f5ec" stroke="#0f9d78"/>
+                <text x="245" y="106" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#1c2230">Simulator</text>
+                <text x="245" y="124" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#1c2230">fitted + varied</text>
+                <rect x="356" y="80" width="120" height="60" rx="10" fill="#eef0f4" stroke="#7b849b"/>
+                <text x="416" y="106" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#1c2230">Policy</text>
+                <text x="416" y="124" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#1c2230">trained skill</text>
+                <line x1="134" y1="100" x2="178" y2="100" stroke="#2d5bff" stroke-width="2"/>
+                <polygon points="178,94 190,100 178,106" fill="#2d5bff"/>
+                <line x1="310" y1="100" x2="354" y2="100" stroke="#0f9d78" stroke-width="2"/>
+                <polygon points="354,94 366,100 354,106" fill="#0f9d78"/>
+                <path d="M 416 140 C 416 190, 74 190, 74 142" fill="none" stroke="#7b849b" stroke-width="2" stroke-dasharray="6 4"/>
+                <polygon points="68,148 74,140 80,148" fill="#7b849b"/>
+                <text x="245" y="208" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#7b849b">deploy, measure the gap, repeat</text>
+                <text x="156" y="92" font-family="Inter, sans-serif" font-size="11" fill="#1c2230">identify</text>
+                <text x="332" y="92" font-family="Inter, sans-serif" font-size="11" fill="#1c2230">train</text>
+              </svg>
+            </div>
+            <figcaption>Figure 1. The sim-to-real loop. Identify the simulator from real data, train the skill across varied worlds, deploy, measure the gap, and repeat.</figcaption>
+          </figure>
+
+          <h2>Worked example: calibrate a joint in an afternoon</h2>
+
+          <p>You own one robot arm joint that overshoots in the simulator but behaves well in reality, or the reverse. Goal: collect chirp data, fit friction, and verify the fix. Total time: one careful afternoon.</p>
+
+          <p><strong>Step 1. Collect chirp data.</strong> Command a wiggle that speeds up over 30 seconds, from 0.1 Hz to 3 Hz, with safe amplitude limits on. Log commanded torque and measured angle at 500 Hz. Watch the arm the whole time, with your hand near the stop button. Save the log as <code>chirp_run1.csv</code>.</p>
+
+          <p><strong>Step 2. Fit friction.</strong> Load the log and your simulator with the same arm model. Try sticky friction values from low to high and pick the one with the smallest prediction error from the formula above. Then adjust sliding friction the same way. Two numbers, one hour, honest fitting.</p>
+
+          <p><strong>Step 3. Verify on fresh motion.</strong> Command a new motion the fitting never saw: a slow pick-and-place arc. Compare predicted and real angles. Suppose the old error was 4.0 degrees average and the new error is 1.0 degree. That is 75 percent less drift, matching the team result quoted earlier. Your simulator now tells the truth about this joint.</p>
+
+          <p><strong>Step 4. Lock it in.</strong> Write the two friction numbers into your model file with today's date. Add the chirp log and the verification log to version control. Future training uses the fitted model plus randomization around it, never the old guesses.</p>
+
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> Tip</div>
+            <p>Plot commanded versus measured angle before fitting. A flat spot near zero speed means sticky friction. A steady lag that grows with speed means sliding friction or motor delay. Your eyes find in one minute what blind fitting finds in one hour.</p>
+          </div>
+
+          <h2>Common mistakes and how professionals do it</h2>
+
+          <h3>Common mistakes to avoid</h3>
+
+          <p><strong>Mistake 1: training on one perfect world.</strong> The policy memorizes exact friction and fails on any change. Fix: randomize from the first training day, not as an afterthought.</p>
+
+          <p><strong>Mistake 2: randomizing before identifying.</strong> Wide ranges around wrong centers teach fear, not skill. Fix: fit the centers with chirp data first, then randomize around them.</p>
+
+          <p><strong>Mistake 3: pretty pictures, wrong physics.</strong> Teams polish rendering while contact settings stay at defaults. Fix: verify touch-heavy tasks with force plots, not screenshots.</p>
+
+          <p><strong>Mistake 4: jumping straight to full speed.</strong> The first real-robot run at full torque breaks gears. Fix: verify slow, with limits on, then raise speed in small steps.</p>
+
+          <p><strong>Mistake 5: trusting the average.</strong> A policy that succeeds 95 percent and smashes 5 percent is not ready. Fix: test the worst cases on purpose, like heavy boxes and low batteries.</p>
+
+          <h3>How professionals do it</h3>
+
+          <p>Professionals keep a <strong>sim-to-real scorecard</strong>: prediction error after identification, success rate across randomized worlds, and success rate on the real robot. All three numbers are tracked weekly. If the real-robot number drops, training pauses until the gap is understood.</p>
+
+          <p>They also version everything: model files, friction numbers, randomization ranges, training seeds. Any result can be rebuilt exactly. And they define every term in a shared <a href="glossary.html">glossary</a> so the vision team and the controls team mean the same thing by "friction". Start your reading from <a href="index.html">the home page</a> whenever you feel lost in the structure.</p>
+
+          <h3>Going deeper (optional)</h3>
+
+          <p>Curious readers can explore <strong>differentiable simulation</strong>: simulators built so every output knows its sensitivity to every input. Change mass by one gram, and the simulator tells you exactly how the final position shifts. This turns system identification from blind search into guided downhill walking.</p>
+
+          <h2>Try it yourself</h2>
+
+          <ol>
+            <li><strong>Run the MuJoCo loop.</strong> Copy the MuJoCo-style code and change the target from 0.5 to 1.0 rad. Watch the final angle follow. Hint: the 8.0 is stiffness and the 0.5 is damping; raise damping if it overshoots.</li>
+            <li><strong>Design a chirp on paper.</strong> Write start frequency, end frequency, duration and amplitude for your joint, with safety limits. Hint: keep amplitude small and duration under a minute for the first run.</li>
+            <li><strong>Randomize one thing.</strong> Take the domain randomization loop and randomize only friction first. Train, then test with friction far outside the range. Hint: note exactly where success collapses; that edge is your honest range.</li>
+            <li><strong>Score one gap.</strong> Run the same motion in your simulator and on any real joint you can access. Compute the prediction error number. Hint: one motion, one number, written down, beats ten vague impressions.</li>
+          </ol>
+
+          <section class="takeaways">
+            <h2><i class="bi bi-pin-angle-fill"></i> Key takeaways</h2>
+            <ul>
+              <li><i class="bi bi-check2-circle"></i> Simulators give safe, fast, resettable practice that real robots cannot.</li>
+              <li><i class="bi bi-check2-circle"></i> Gazebo fits full ROS 2 systems, MuJoCo and Isaac fit fast learning, Drake fits planning and proofs.</li>
+              <li><i class="bi bi-check2-circle"></i> System identification teaches the simulator your robot's true mass, friction and motor lag.</li>
+              <li><i class="bi bi-check2-circle"></i> A chirp trajectory excites the joint so friction and inertia become visible in data.</li>
+              <li><i class="bi bi-check2-circle"></i> Domain randomization trains across many fake worlds so the real world feels familiar.</li>
+              <li><i class="bi bi-check2-circle"></i> Always verify on the real robot, starting slow with safety limits on.</li>
+            </ul>
+          </section>
+
+          <section class="quiz">
+            <div class="quiz__head"><i class="bi bi-patch-question-fill"></i> Check your understanding</div>
+            <details>
+              <summary><span class="q-num">Q1.</span><span>Why is training a walking robot on the real robot alone a bad idea?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Learning needs thousands of falls, and each real fall costs time, wears parts and can break the robot. A simulator gives those tries fast, free and safely.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q2.</span><span>Which simulator do you pick for a full ROS 2 warehouse system, and which for training 4,000 grasping robots at once?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Gazebo for the full ROS 2 system with sensors. MuJoCo with MJX or Isaac Lab for thousands of parallel training robots.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q3.</span><span>What is system identification in one sentence?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Measuring the real robot's true mass, friction and motor behavior and writing those numbers into the simulator.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q4.</span><span>Why does a chirp trajectory beat a slow sine wave for finding friction?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> The chirp sweeps many speeds and frequencies in one run, so both sticky slow friction and fast motion effects appear in the same data.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q5.</span><span>Your policy works in simulation but shakes on the real arm. Name two randomization fixes.</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Randomize joint friction and damping, and add sensor delay plus measurement noise, so the policy learns calm control under lag and noise.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q6.</span><span>What does "75% less drift" mean after fitting actuator dynamics?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> The simulator's predicted joint path stays four times closer to the real path, because the motor lag and friction numbers now match the hardware.</div>
+            </details>
+          </section>
+        </article>
+
+        <nav class="pager" id="pager" aria-label="Chapter navigation"></nav>
+      </div>
+    </main>
+  </div>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/book.js"></script>
+</body>
+</html>

@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>try{var __t=localStorage.getItem("mr-theme");if(__t==="dark"||__t==="light")document.documentElement.setAttribute("data-theme",__t);}catch(e){}</script>
+  <title>Chapter 8: Building a Solid Robot: Design Basics — Master Robotics</title>
+  <meta name="description" content="Learn the design basics that make a robot reliable: balance and centre of mass, saving weight without losing strength, wheel layout, and parts you can repair in minutes.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/prose.css">
+</head>
+<body data-file="ch08-designing-solid-robots.html">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="topbar" id="topbar"></header>
+  <div class="progress-bar" id="progressBar"></div>
+
+  <div class="layout">
+    <div class="sidebar__backdrop" id="navBackdrop"></div>
+    <nav class="sidebar" id="sidebar" aria-label="Book contents"></nav>
+
+    <main class="main" id="main">
+      <div class="container">
+
+        <header class="chapter-head">
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="index.html">Home</a>
+            <i class="bi bi-chevron-right"></i>
+            <a href="index.html#mechanics">Part 2 &middot; Mechanics and Motion</a>
+            <i class="bi bi-chevron-right"></i>
+            <span>Chapter 8</span>
+          </nav>
+          <span class="chapter-kicker"><i class="bi bi-gear-wide-connected"></i> Part 2 &middot; Mechanics and Motion</span>
+          <h1>Building a Solid Robot: Design Basics</h1>
+          <p class="lede">A robot that tips over or falls apart is a robot that cannot do its job. By the end of this chapter, you will be able to balance a robot, save weight without making it weak, and design parts that take minutes to repair.</p>
+          <div class="chapter-meta">
+            <span><i class="bi bi-clock"></i> ~21 min read</span>
+            <span><i class="bi bi-bar-chart"></i> Beginner</span>
+            <span><i class="bi bi-list-check"></i> Chapter 8 of 30</span>
+          </div>
+          <div class="goals">
+            <h2>What you will learn</h2>
+            <ul>
+              <li><i class="bi bi-check-circle-fill"></i> Balance a robot so it stays stable.</li>
+              <li><i class="bi bi-check-circle-fill"></i> Reduce weight without losing strength.</li>
+              <li><i class="bi bi-check-circle-fill"></i> Design parts that are easy to repair.</li>
+            </ul>
+          </div>
+        </header>
+
+        <article class="article">
+
+          <p class="lead">Imagine you finish your first wheeled robot. You switch it on, it lurches forward, and it tips onto its side with a sad plastic clatter. Then you try to fix it, and you discover the battery is buried under a plate that is glued shut. This chapter is about avoiding both problems before they happen.</p>
+
+          <p>Most beginner robots fail for boring reasons. They are top-heavy. They are held together with glue and hope. Their wires snag on the wheels. Their wheels are the wrong size. None of these are about clever code or expensive parts. They are about <strong>design</strong>.</p>
+
+          <p>Design is the set of choices you make before you build. Where does the heavy battery go? How wide should the robot be? Can you reach the screws? Good designers answer these questions on paper first, so their robot works on the floor later.</p>
+
+          <p>In this chapter, you will learn six design ideas that make a robot solid. You will learn how to keep it from tipping, how to keep it light, how to keep it stiff, how to lay out the wheels, how to make it easy to repair, and how to manage the cables. Then you will redesign a real wobbly robot step by step.</p>
+
+          <h2>Stability and balance</h2>
+
+          <p>A robot is <strong>stable</strong> when it does not fall over. Stability is not luck. It comes from two simple things: where the weight sits, and how wide the feet are. Get these right and the robot stands. Get them wrong and it tips at the first bump.</p>
+
+          <h3>Centre of mass — the balance point</h3>
+
+          <p>Every object has one special point where, in your mind, you could balance the whole thing on one finger. That point is the <strong>centre of mass</strong>, often shortened to <strong>CoM</strong>. It is the average location of all the weight.</p>
+
+          <p>Think of a broom. Balance it across your finger and it settles at one spot. That spot is its CoM. A robot has a CoM too. If you have heavy parts in the middle and light parts all around, the CoM is near the middle. If you put a heavy battery on top, the CoM moves up high.</p>
+
+          <p>Here is the rule that matters most: <strong>gravity pulls the robot down through its CoM</strong>. Imagine a thin string hanging straight down from the CoM. Wherever that string lands on the floor tells you which way the robot wants to fall.</p>
+
+          <h3>Base of support — the footprint</h3>
+
+          <p>The <strong>base of support</strong> is the shape you would see if you shaded the area on the floor touched by all the points that hold the robot up. For a four-wheeled robot, it is the rectangle between the four wheels. For a two-wheeled robot with one caster, it is a triangle.</p>
+
+          <p>Now the whole idea of balance becomes easy. Picture the string hanging down from the CoM. If that string lands <em>inside</em> the base of support, the robot is stable. If it lands <em>outside</em>, the robot tips over.</p>
+
+          <figure class="figure">
+            <div class="figure__box">
+              <svg viewBox="0 0 640 280" width="100%" role="img" aria-label="Two robots side by side. The left robot has a low centre of mass inside its base of support and is stable. The right robot has a high centre of mass whose hanging line falls outside the base of support, so it tips.">
+                <line x1="20" y1="230" x2="620" y2="230" stroke="#7b849b" stroke-width="2"></line>
+                <polygon points="20,230 150,230 150,224 20,224" fill="#7b849b"></polygon>
+
+                <rect x="60" y="150" width="120" height="80" rx="8" fill="#e2f6ef" stroke="#0f9d78" stroke-width="2"></rect>
+                <circle cx="90" cy="210" r="12" fill="#1c2230"></circle>
+                <circle cx="150" cy="210" r="12" fill="#1c2230"></circle>
+                <line x1="60" y1="230" x2="180" y2="230" stroke="#0f9d78" stroke-width="4"></line>
+                <line x1="120" y1="120" x2="120" y2="230" stroke="#2d5bff" stroke-width="2" stroke-dasharray="6 5"></line>
+                <circle cx="120" cy="190" r="7" fill="#2d5bff"></circle>
+                <text x="120" y="108" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#2d5bff">CoM</text>
+                <text x="120" y="255" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#0f9d78">STABLE</text>
+                <text x="120" y="272" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#4a5266">line lands inside footprint</text>
+
+                <rect x="430" y="110" width="120" height="120" rx="8" fill="#fdecec" stroke="#d64545" stroke-width="2"></rect>
+                <circle cx="460" cy="210" r="12" fill="#1c2230"></circle>
+                <circle cx="520" cy="210" r="12" fill="#1c2230"></circle>
+                <line x1="430" y1="230" x2="550" y2="230" stroke="#d64545" stroke-width="4"></line>
+                <line x1="470" y1="90" x2="470" y2="230" stroke="#d64545" stroke-width="2" stroke-dasharray="6 5"></line>
+                <circle cx="490" cy="120" r="7" fill="#d64545"></circle>
+                <text x="500" y="78" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#d64545">CoM high</text>
+                <path d="M430 190 C400 200 400 220 430 230" fill="none" stroke="#d64545" stroke-width="2" marker-end="url(#tipar)"></path>
+                <text x="490" y="255" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#d64545">TIPS OVER</text>
+                <text x="490" y="272" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#4a5266">line lands outside footprint</text>
+                <defs>
+                  <marker id="tipar" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+                    <path d="M0,0 L9,4.5 L0,9 z" fill="#d64545"></path>
+                  </marker>
+                </defs>
+              </svg>
+            </div>
+            <figcaption>Figure 8.1 — The hanging line from the centre of mass decides everything. If it lands inside the base of support, the robot stands (left). If it lands outside, the robot tips (right).</figcaption>
+          </figure>
+
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> The key idea</div>
+            <p>A robot is stable when its <strong>centre of mass</strong> sits low and the hanging line from it lands <strong>inside the base of support</strong>. Move the weight down, or make the footprint wider, and the robot becomes harder to tip.</p>
+          </div>
+
+          <h3>Why a low and wide robot tips less</h3>
+
+          <p>Two changes make any robot more stable. Lower the CoM, and widen the base of support.</p>
+
+          <p>Lowering the CoM works because the robot has to tip further before the hanging line leaves the footprint. A tall robot only needs to lean a little before the line escapes. A short, squat robot can lean a lot and still be safe.</p>
+
+          <p>Widening the base works because there is more floor area under the robot for the line to land in. A wide robot has a big footprint, so the line stays inside even when the robot leans.</p>
+
+          <p>This is why a bus is more stable than a bicycle, and why racing cars sit so close to the ground. It is also why you should put the heavy battery at the bottom of your robot, not on top.</p>
+
+          <h3>Static versus dynamic stability</h3>
+
+          <p><strong>Static stability</strong> means the robot stays upright while it is standing still. If you let go and it does not move, it is statically stable. A wide four-wheeled robot at rest is usually statically stable.</p>
+
+          <p><strong>Dynamic stability</strong> means the robot stays upright while it is moving, and motion adds forces. When a robot turns a corner, it leans outward. When it stops suddenly, it pitches forward. When it drives fast over a bump, it bounces. These moving forces can tip a robot that was fine standing still.</p>
+
+          <p>A two-wheeled balancing robot is never statically stable. If you switch off its motors, it falls. It stays up only by constantly adjusting, like you balancing on one leg. That is dynamic stability, and it needs fast sensors and motors.</p>
+
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> In simple words</div>
+            <p>Static stable means "it stands on its own". Dynamic stable means "it stays up only while it is moving and correcting". A parked car is static. A person on a skateboard is dynamic.</p>
+          </div>
+
+          <h3>Tipping moment versus restoring moment</h3>
+
+          <p>To decide if a robot will tip on a slope, engineers compare two turning forces. A <strong>moment</strong> is just a turning force. You feel it when you push a door near the hinge: the same push turns the door less than when you push near the handle.</p>
+
+          <p>The <strong>tipping moment</strong> tries to roll the robot over. The <strong>restoring moment</strong> tries to keep it flat. If the tipping moment is bigger, the robot falls.</p>
+
+          <p>On a slope of angle &theta;, with the CoM a height H above the ground and a distance B from the CoM's line to the tipping edge, the two moments are:</p>
+
+          <div class="formula"><span class="label">Tipping check</span> tipping moment = m &times; g &times; sin&theta; &times; H &nbsp;&nbsp; restoring moment = m &times; g &times; cos&theta; &times; B</div>
+
+          <p>Here m is the robot's mass, g is gravity (about 9.8 m/s&sup2;), and &theta; is the slope angle. The robot is safe while the restoring moment is bigger. If we cancel m and g from both sides, we get a very simple test:</p>
+
+          <div class="formula"><span class="label">Tip condition</span> it tips when tan&theta; &gt; B &divide; H</div>
+
+          <p>In plain words: the robot tips when the slope is steep enough that the leaning sweep (tan&theta; &times; H) reaches past the base edge (B). Notebooks and wheels do not change this. Only the shape does.</p>
+
+          <div class="callout note">
+            <div class="callout__head"><i class="bi bi-info-circle-fill"></i> Note</div>
+            <p>The mass m cancels out. A heavy robot and a light robot of the same shape tip at the same slope angle. Weight does not make a robot stable by itself. <em>Shape</em> does.</p>
+          </div>
+
+          <h3>Worked example: will this robot tip on a slope?</h3>
+
+          <p>Your robot has its centre of mass 20 cm above the ground. The halfway distance from the CoM's line to the tipping edge is 15 cm. The robot must climb a ramp at 25 degrees. Will it tip?</p>
+
+          <ol>
+            <li>Write down the two numbers. CoM height H = 20 cm. Base half-width B = 15 cm.</li>
+            <li>Find the tipping slope. tan&theta; = B &divide; H = 15 &divide; 20 = 0.75. The angle whose tan is 0.75 is about 36.9 degrees.</li>
+            <li>Compare with the ramp. The ramp is 25 degrees. The tip angle is 36.9 degrees. 25 is less than 36.9, so the robot is safe.</li>
+            <li>Check the margin. The robot has about 12 degrees of spare lean. That margin could vanish if it turns on the ramp, so keep the speed low at the top.</li>
+          </ol>
+
+          <p>Suppose the battery is moved to the top, pushing H up to 30 cm. Now tan&theta; = 15 &divide; 30 = 0.50, which is about 26.6 degrees. The 25-degree ramp is now dangerously close, and any turn would tip it. The fix is simple: move the battery back down. This is why layout, not motor power, is the first thing to get right.</p>
+
+          <h2>Weight and inertia</h2>
+
+          <p>Once a robot is stable, the next question is how heavy it is. Weight is a trade-off. Too heavy and your motors strain, your battery drains, and everything is slow. Too light and the robot may lack grip or feel flimsy. The goal is not "lightest" or "heaviest". It is "no heavier than it needs to be".</p>
+
+          <h3>Why mass matters for accelerating and stopping</h3>
+
+          <p>Mass is the amount of stuff in an object. It resists changes in movement. A heavy object is hard to start moving and hard to stop. Engineers call this resistance <strong>inertia</strong>.</p>
+
+          <p>Your robot's mass decides three things. How fast it can speed up, given the same motors. How long it takes to stop. And how much energy each movement costs. A robot that is twice as heavy will not accelerate as quickly and will drain its battery faster.</p>
+
+          <p>Stopping is even more important than starting. A heavy robot that is moving fast carries a lot of energy. If it meets a wall or a person, all of that energy has to go somewhere. Lighter robots are safer and easier to control.</p>
+
+          <h3>Rotating inertia in plain words</h3>
+
+          <p>Mass resists straight movement. There is a matching idea for spinning, called <strong>rotational inertia</strong> (or moment of inertia). It says how hard it is to make something spin, and how hard it is to stop it spinning.</p>
+
+          <p>Think of a spinning figure skater. With arms out wide, she spins slowly. When she pulls her arms in close, she spins much faster, without pushing any harder. Nothing about her changed except how far her weight sits from the spin axis.</p>
+
+          <p>This matters for your robot in one clear way. For a turning robot, weight that sits far from the centre makes turning sluggish. A robot with a heavy battery at the very corner feels like a figure skater with arms out. Keep heavy parts near the middle and turning becomes crisp.</p>
+
+          <h3>Keep heavy parts low and central</h3>
+
+          <p>Put these two rules together and you get the golden layout rule for beginner robots:</p>
+
+          <ul>
+            <li><strong>Heavy parts go low.</strong> The battery, the biggest motor drivers and any metal block belong at the bottom of the chassis. This lowers the CoM and makes the robot hard to tip.</li>
+            <li><strong>Heavy parts go central.</strong> Keep the same parts near the middle of the footprint. This lowers rotational inertia and makes turning sharp.</li>
+            <li><strong>Light parts go on top.</strong> Sensors, the controller and status lights are light, so they can sit high where you can see and reach them.</li>
+          </ul>
+
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> Tip</div>
+            <p>Before you drill a single hole, place every part on the deck and slide it around. Find a layout where the battery is low and central, and the light parts are on top. Take a photo. That photo is your design.</p>
+          </div>
+
+          <h2>Strength, stiffness and weight</h2>
+
+          <p>You want a robot that is light and strong at the same time. That sounds like a contradiction, but it is not. The trick is to stop thinking about <em>how much material</em> you use, and start thinking about <em>how you shape it</em>.</p>
+
+          <h3>Strength versus stiffness — two different things</h3>
+
+          <p>These two words get mixed up, so let us separate them.</p>
+
+          <p><strong>Strength</strong> is how much load a part can take before it breaks. A strong part snaps only under a heavy load.</p>
+
+          <p><strong>Stiffness</strong> is how much a part bends under a load. A stiff part barely bends at all. A floppy part bends a lot, even if it is strong enough not to break.</p>
+
+          <p>For a robot, stiffness often matters more than raw strength. A frame that bends makes the robot wobble, and a wobbly robot drives badly and measures positions badly. You want a frame that holds its shape, not just one that fails to break.</p>
+
+          <div class="callout warn">
+            <div class="callout__head"><i class="bi bi-exclamation-triangle-fill"></i> Watch out</div>
+            <p>A part can be strong and still useless if it is not stiff. A strip of rubber is hard to break, but it flops around. Your robot's frame should be stiff first, then strong enough. Do not swap one goal for the other.</p>
+          </div>
+
+          <h3>Use the right shape: tubes, I-beams and triangles</h3>
+
+          <p>Why is a hollow tube stiffer than a solid rod of the same weight? Because stiffness depends mostly on how far the material sits from the middle of the part. Material near the centre does almost nothing to resist bending. Material near the outer edge does the real work.</p>
+
+          <p>So move the material outward. Swap a solid rod for a tube and you keep most of the stiffness while cutting the weight a lot. This single idea is why bicycle frames, cranes and aircraft are hollow.</p>
+
+          <p>The <strong>I-beam</strong> pushes the same idea further. Its shape is literally a letter I. It puts a thick slab of material at the top and bottom, where bending stresses are highest, and only a thin web in the middle. I-beams are excellent for a long, flat span like a robot's base.</p>
+
+          <p><strong>Triangulation</strong> is about bracing, not beams. A square frame can squash into a parallelogram when you push it sideways. Add one diagonal bar and it cannot. A triangle is the only shape that cannot be deformed without changing the length of a side, so triangles are the strongest way to brace a frame.</p>
+
+          <figure class="figure">
+            <div class="figure__box">
+              <svg viewBox="0 0 640 220" width="100%" role="img" aria-label="Three shape ideas: a hollow tube is stiffer than a solid rod of the same weight, an I-beam puts material at the top and bottom, and a diagonal brace stops a square frame from squashing.">
+                <text x="30" y="30" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#1c2230">Tube beats solid rod</text>
+                <circle cx="70" cy="90" r="26" fill="#e8eeff" stroke="#2d5bff" stroke-width="2"></circle>
+                <text x="70" y="140" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#4a5266">hollow</text>
+                <circle cx="170" cy="90" r="26" fill="#7b849b"></circle>
+                <text x="170" y="140" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#4a5266">solid</text>
+
+                <text x="240" y="30" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#1c2230">I-beam</text>
+                <rect x="252" y="60" width="80" height="12" fill="#0f9d78"></rect>
+                <rect x="286" y="72" width="12" height="36" fill="#0f9d78"></rect>
+                <rect x="252" y="108" width="80" height="12" fill="#0f9d78"></rect>
+                <text x="292" y="140" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#4a5266">material top and bottom</text>
+
+                <text x="410" y="30" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#1c2230">Triangulate</text>
+                <rect x="420" y="60" width="80" height="72" fill="none" stroke="#d64545" stroke-width="2" stroke-dasharray="5 4"></rect>
+                <line x1="420" y1="132" x2="500" y2="60" stroke="#7a4ddb" stroke-width="3"></line>
+                <text x="460" y="150" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#4a5266">diagonal stops the squash</text>
+              </svg>
+            </div>
+            <figcaption>Figure 8.2 — Three ways to be light and stiff. Hollow shapes put material where it works. I-beams are for spans. Diagonals stop a frame from squashing.</figcaption>
+          </figure>
+
+          <h3>Choosing materials — a quick link back</h3>
+
+          <p>You met materials in Chapter 4. Here is how to pick them for a frame. Aluminium is light for its stiffness and cuts easily, so it is the favourite for robot chassis. Steel is stronger and stiffer but much heavier, so you use it in small parts like fasteners and shafts. Plywood and plastic are cheap and easy to work, which is perfect for early prototypes.</p>
+
+          <p>The beginner rule is simple. Prototype in the cheapest easy material, then rebuild the final frame in aluminium if you need less weight or more stiffness. Do not spend on the final material until the shape has stopped changing.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Material</th><th>Weight</th><th>Stiffness</th><th>Easy to work?</th><th>Best use</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Aluminium</td><td>Low</td><td>Good</td><td>Yes (drill, saw)</td><td>Final chassis and brackets</td></tr>
+                <tr><td>Steel</td><td>High</td><td>Very good</td><td>Harder</td><td>Small strong parts, shafts</td></tr>
+                <tr><td>Plywood</td><td>Medium</td><td>Medium</td><td>Very easy</td><td>Fast prototypes and decks</td></tr>
+                <tr><td>Acrylic / plastic</td><td>Low</td><td>Low to medium</td><td>Easy (may crack)</td><td>Light plates and covers</td></tr>
+                <tr><td>3D-printed plastic</td><td>Low</td><td>Low to medium</td><td>Very easy</td><td>Custom brackets and mounts</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 8.1 — A quick guide to frame materials. Match the material to the job, not to your favourite.</p>
+
+          <h2>Wheel layout and geometry</h2>
+
+          <p>The wheels decide how your robot moves. Before you buy motors, choose a layout. The layout sets how the robot turns, how stable it is, and how well it grips the floor. Two layouts cover almost every beginner robot.</p>
+
+          <h3>Two wheels plus a caster</h3>
+
+          <p>The most common beginner layout is two powered wheels, one on each side, plus a small free-spinning <strong>caster</strong> at the front or back. A caster is a small wheel in a swivel mount, like the little wheel under an office chair. It supports the robot but does not drive it.</p>
+
+          <p>This layout has real advantages. It needs only two motors, so it is cheaper and lighter. It can turn on the spot. And if you place the caster near the middle, the drive wheels carry most of the weight, which gives good grip.</p>
+
+          <p>The downside is that a triangle base does not resist tipping backward and forward as well as a rectangle. Keep the caster close to the drive axle and keep the CoM low, and this is rarely a problem.</p>
+
+          <h3>Four wheels</h3>
+
+          <p>A four-wheeled robot, with a wheel at each corner, is the calm, sturdy choice. The base of support is a rectangle, so it is hard to tip in any direction. It also lands squarely and drives straight with less wobble.</p>
+
+          <p>Four wheels cost more, weigh more, and often need four motors or a belt to link the sides. If only two corners are driven, that is called skid-steer, and turning scrubs the wheels sideways, which wastes energy.</p>
+
+          <h3>Differential drive and turning radius</h3>
+
+          <p><strong>Differential drive</strong> means the two sides drive separately. Spin the wheels at the same speed and the robot goes straight. Make one side faster and it curves. Spin them opposite ways and it turns on the spot. Almost every hobby robot uses this, because it needs no steering mechanism at all.</p>
+
+          <p>Here is the neat part about turning radius. When the two wheel speeds are v_left and v_right, and the distance between the wheels is R, the radius of the circle the robot follows is:</p>
+
+          <div class="formula"><span class="label">Turning radius</span> turn radius = (R &divide; 2) &times; (v_right + v_left) &divide; (v_right &minus; v_left)</div>
+
+          <p>Read it slowly. If both speeds are equal, the bottom is zero, which means the radius is infinite. A straight line is a circle of endless radius. That is a tidy way to say the robot goes straight. If the speeds are opposite, the top is zero, so the radius is zero: a spin on the spot.</p>
+
+          <h3>Ground clearance and wheel size</h3>
+
+          <p><strong>Ground clearance</strong> is the gap between the lowest part of the robot and the floor. Too little and the robot scrapes on every cable, rug edge or small stone. Too much and the robot becomes tall and learns to tip.</p>
+
+          <p>Wheel size sets the clearance under the axle. A small wheel keeps the robot low and stable but catches on obstacles. A big wheel climbs better but lifts the whole robot up, raising the CoM. For indoor floors, a medium wheel of about 6 to 8 cm diameter is a good balance. Match the wheel to the floor it will actually see, not the floor you wish you had.</p>
+
+          <h3>Traction and friction</h3>
+
+          <p><strong>Friction</strong> is the grip between two surfaces. <strong>Traction</strong> is the friction your wheels use to push the robot along. Without traction, a powerful motor just spins its wheel in place.</p>
+
+          <p>Traction depends on three things. The material of the tyre: rubber grips far better than hard plastic. The weight on the wheel: pressing a wheel down increases grip. The floor: smooth tile is slippery, carpet grips well. If one driven wheel lifts off the floor, it spins freely and you lose half your drive. This is why a flat, level chassis matters as much as motor power.</p>
+
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> Tip</div>
+            <p>Unsure between two and four wheels? Build the two-wheel-plus-caster version first. It is cheaper and shows problems sooner. Move to four wheels only when you truly need the extra stability.</p>
+          </div>
+
+          <h2>Serviceability and modularity</h2>
+
+          <p>Here is a truth every builder learns: <strong>your robot will break</strong>. A wire will come loose. A wheel will crack. A motor will die. The only question is whether the repair takes five minutes or five hours. Designing for easy repair has a name: <strong>serviceability</strong>.</p>
+
+          <h3>Design so a part can be replaced in minutes</h3>
+
+          <p>The test is simple. Pick any part — a motor, a battery, a sensor. Cover the robot, then time how long it takes to swap that part and switch the robot back on. If it takes more than a few minutes, your design is fighting you.</p>
+
+          <p>Good serviceability follows four rules. Reach the part without removing other parts. Use connectors so nothing is cut. Keep fasteners the same size. And leave room for your fingers and a screwdriver.</p>
+
+          <h3>Connectors, not glue</h3>
+
+          <p>Glue is fast and tempting, and it is the worst enemy of repair. A glued joint is permanent. To remove a glued part you cut, chip or break it, and you often damage a neighbour. Screws, bolts and plug connectors undo. Build with them and every part becomes a module you can lift out and replace.</p>
+
+          <p>A <strong>module</strong> is a self-contained chunk of the robot — for example a motor with its bracket, wheel and cable, ready to bolt on. Modular design means you swap the whole module quickly, then repair the old one on the bench while the robot keeps working.</p>
+
+          <h3>Accessible screws and standard fasteners</h3>
+
+          <p>An inaccessible screw sits where your tool cannot reach. It hides behind a wheel, or down a narrow tunnel, or under another plate. Allocate space around every screw head at design time.</p>
+
+          <p>Standard fasteners mean fewer tool changes. Use one or two sizes of screw everywhere. If the whole robot uses a single M3 screw and a single hex key, you never stop to hunt for a different driver.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Design choice</th><th>Repair time</th><th>Why</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Glued-on motor bracket</td><td>Very long</td><td>Must cut or break the joint</td></tr>
+                <tr><td>Screwed motor bracket, hidden</td><td>Long</td><td>Must remove other parts first</td></tr>
+                <tr><td>Screwed, open access</td><td>Short</td><td>Undo and lift out</td></tr>
+                <tr><td>Pluggable module</td><td>Minutes</td><td>Unplug, unbolt, swap, recharge</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 8.2 — Same part, four designs, four very different repair times.</p>
+
+          <h3>Labelled wiring and a service panel</h3>
+
+          <p>Label every cable at both ends. A piece of tape with "M1" on a motor wire saves you an hour of guessing months later. Labels turn a tangle into a map.</p>
+
+          <p>A <strong>service panel</strong> is one removable face of the robot that opens the whole inside. Behind it sit the battery, the controller and the main connectors. This one idea means you never again dismantle the whole robot to reach a single plug.</p>
+
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> In simple words</div>
+            <p>Serviceable means "easy to fix". Modular means "built from blocks you can swap". A serviceable, modular robot is one you can repair in minutes instead of rebuilding from scratch.</p>
+          </div>
+
+          <h2>Cable management as a design feature</h2>
+
+          <p>Beginners treat wires as an afterthought. Professionals treat them as a real design feature, because wires cause more failures than almost anything else. A wire that snags, rubs or tugs will fail at the worst time.</p>
+
+          <h3>Strain relief: never pull on a solder joint</h3>
+
+          <p>A <strong>solder joint</strong> is the tiny blob of metal that joins a wire to a board. It is strong in the direction that matters, but it hates being pulled. If a wire tugs hard, the joint cracks, and the fault is hard to find.</p>
+
+          <p><strong>Strain relief</strong> means clamping or tying a cable so that any pull is taken by the clamp, not by the joint. Tie the cable to the frame just before it reaches the board. Then a tug pulls the frame, not the solder.</p>
+
+          <h3>Routing: keep wires clean and short</h3>
+
+          <p>Route cables along the frame, out of the path of moving parts. Keep them away from wheels, gears and hot motors. Group power wires and signal wires in separate bundles, so the strong motor currents do not add noise to delicate signals.</p>
+
+          <ol>
+            <li>Plan a path for each cable before you plug it in.</li>
+            <li>Leave a small loop of slack near any part that moves.</li>
+            <li>Tie the bundle to the frame every few centimetres.</li>
+            <li>Keep cables clear of wheels, belts and sharp edges.</li>
+            <li>Label both ends, then test by gently tugging every wire.</li>
+          </ol>
+
+          <div class="callout danger">
+            <div class="callout__head"><i class="bi bi-shield-exclamation"></i> Danger</div>
+            <p>A wire that crosses a wheel will be cut. A wire that rubs a sharp metal edge will wear through and short out. A wire pulled tight to a solder joint will crack it. Route, clamp and slack every cable before the first drive.</p>
+          </div>
+
+          <h2>Design for test</h2>
+
+          <p>A solid robot is easy to check. When something goes wrong, you should be able to find the fault quickly and safely. Design gives you the tools for this. Adding a few small features at build time saves hours of debugging later.</p>
+
+          <h3>Test points and status LEDs</h3>
+
+          <p>A <strong>test point</strong> is a labelled spot where you can touch a probe to check a voltage, without hunting for a hidden wire. Expose a few key test points — battery voltage, motor supply, sensor signals — behind the service panel.</p>
+
+          <p><strong>Status LEDs</strong> are small lights that tell you what the robot is doing. One for power on. One for the controller running. One for the radio link. A glance at the LEDs tells you which stage has failed, before you even touch a tool.</p>
+
+          <h3>Lift the wheels off the ground</h3>
+
+          <p>Moving wheels are dangerous and make testing hard. Build in a way to <strong>raise the drive wheels</strong> so they spin in the air. A simple stand, or a small block under each side, lets you run the motors and test the code with the robot safely parked.</p>
+
+          <h3>An on/off switch you can reach fast</h3>
+
+          <p>An emergency stop must be quick to reach. Put the main switch where your hand naturally falls, and make it big and obvious. If the robot runs away or a wheel grabs a cable, you need power off in one second, not after a search under the chassis.</p>
+
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> The key idea</div>
+            <p>Build a robot you can observe. Test points, status LEDs, a lift stand and a reachable switch turn debugging from a mystery into a short checklist.</p>
+          </div>
+
+          <h2>A full worked example: fixing the wobbly starter robot</h2>
+
+          <p>Let us redesign a real beginner robot, step by step. Meet "Testbot". It is a small two-wheeled rover with a caster. It works, but badly. It tips when it turns. It wobbles as it drives. The battery is glued in. A wire touches the left wheel. And you cannot reach the motor screws.</p>
+
+          <p>We will fix every problem, and explain the reason for every change. Nothing here needs special tools.</p>
+
+          <h3>Step 1: find the centre of mass</h3>
+
+          <p>Lay Testbot on its side and try to balance it on one finger. You find the balance point sits high, about 18 cm up, because the heavy battery and controller are stacked on top. The base half-width is only 10 cm.</p>
+
+          <p>Reason for the next change: the tip angle is atan(10 &divide; 18), which is about 29 degrees. That sounds okay until the robot turns. Turning adds a lean, and the margin disappears. We must move the CoM down.</p>
+
+          <h3>Step 2: move the heavy parts down and central</h3>
+
+          <p>We move the battery to the bottom deck, between the two drive wheels. We move the controller to the middle of the deck, not the front. The balance point drops to about 10 cm. Now the tip angle is atan(10 &divide; 10), about 45 degrees. The robot has far more spare lean.</p>
+
+          <p>Reason: lowering the CoM increases the angle the robot can lean before tipping. Centralising the heavy parts also lowers rotational inertia, so the robot turns without fighting its own weight.</p>
+
+          <h3>Step 3: widen the wheelbase a little</h3>
+
+          <p>We move the drive wheels 3 cm further apart. The base half-width grows from 10 cm to 13 cm. With the CoM at 10 cm, the tip angle is now atan(13 &divide; 10), about 52 degrees. The robot is now hard to tip even when it turns.</p>
+
+          <p>Reason: a wider base gives the hanging line more room to stay inside the footprint. Small changes here matter a lot.</p>
+
+          <h3>Step 4: choose the right wheels</h3>
+
+          <p>The old wheels were 3 cm across, so the robot scraped on small bumps. We swap to 7 cm wheels with soft rubber tyres. Clearance improves, and grip improves too.</p>
+
+          <p>Reason: bigger wheels add clearance and traction. We keep them moderate so the robot does not grow tall. We checked that the new height did not raise the CoM above our target.</p>
+
+          <h3>Step 5: replace glue with screws and modules</h3>
+
+          <p>We unglue the battery tray and bolt it instead, using four M3 screws with open access from the service panel. Each motor now sits in a bracket that comes off with two screws. The motor, wheel and cable together form a swappable module.</p>
+
+          <p>Reason: screws undo, so any part can be replaced. Modules mean you swap and go, and repair the old part later.</p>
+
+          <h3>Step 6: fix the wires</h3>
+
+          <p>We reroute the motor cable away from the wheel, add a small loop of slack near the motor, and tie the cable to the frame with a clip 2 cm before the board. We label both ends "M1-L" and "M1-R".</p>
+
+          <p>Reason: the slack loop and the clip give strain relief, so a tug never reaches the solder joint. Routing away from the wheel removes the snag risk. Labels make future repairs fast.</p>
+
+          <h3>Step 7: add test features</h3>
+
+          <p>We cut a service panel on the top. Behind it we expose a test point for battery voltage and two status LEDs, one for power and one for the controller. We add a small stand that lifts both drive wheels off the floor. The main switch moves to the back edge, where a hand can reach it instantly.</p>
+
+          <p>Reason: the robot is now easy to observe and safe to test. Each feature took minutes to add and will save hours later.</p>
+
+          <h3>The result</h3>
+
+          <p>The redesigned Testbot is lower, wider, lighter where it can be, and bolted rather than glued. It no longer tips on a turn. A motor swap now takes under two minutes. Every change came from one of the six ideas in this chapter.</p>
+
+          <div class="callout note">
+            <div class="callout__head"><i class="bi bi-info-circle-fill"></i> Note</div>
+            <p>Notice we never changed the motors or the software. Only the design. Beginners often blame the motors for a wobble, when the real problem is layout. Fix the shape first, then the power.</p>
+          </div>
+
+          <h2>Common beginner mistakes</h2>
+
+          <p>Almost every first robot repeats the same handful of mistakes. Learn them now and save yourself a rebuild.</p>
+
+          <h3>Top-heavy builds</h3>
+
+          <p>Stacking the battery, controller and everything else high on the frame raises the CoM. The robot tips on every turn. The fix is always the same: put the heavy parts at the bottom, near the middle. This is the single biggest cause of tipping.</p>
+
+          <h3>Everything glued</h3>
+
+          <p>Glue speeds up the first build and ruins every repair after. When one part fails, you cannot remove it cleanly. Use screws and connectors from the start. If you must glue, glue only parts you will never replace.</p>
+
+          <h3>No access to the inside</h3>
+
+          <p>A sealed box with hidden screws means a five-minute fix becomes a five-hour dismantle. Cut a service panel. Leave space around every screw. Design the robot so your hand and a driver can reach the parts that wear out.</p>
+
+          <h3>Wires snagging</h3>
+
+          <p>Loose wires cross wheels and rub edges. They snag, wear through or cut, and the robot dies mid-run. Route, clamp and slack every cable. Test by tugging each one gently.</p>
+
+          <h3>Wrong wheel size</h3>
+
+          <p>Wheels too small catch on every bump. Wheels too large lift the robot and raise the CoM until it tips. Pick wheels to match the real floor, and check the effect on height and clearance.</p>
+
+          <div class="callout warn">
+            <div class="callout__head"><i class="bi bi-exclamation-triangle-fill"></i> Watch out</div>
+            <p>Do not judge a design by how it looks standing still. Push it, turn it, drive it over a bump. Many mistakes are invisible until the robot is moving, which is exactly when they cost you a cable or a wheel.</p>
+          </div>
+
+          <h2>How professionals do it</h2>
+
+          <p>Professional teams do not just design a robot that works once. They design one that can be built and maintained many times, quickly and reliably. Three ideas drive this, plus one habit.</p>
+
+          <h3>Design for manufacture and assembly (DFM and DFA)</h3>
+
+          <p><strong>DFM</strong> means design for manufacture. It asks: can this part be made easily? Rounded holes, simple cuts and standard stock save hours in the workshop. <strong>DFA</strong> means design for assembly. It asks: can this robot be put together fast and in the right order?</p>
+
+          <p>A DFA trick is to reduce part count. If two brackets can become one, you remove screws, mistakes and cost at the same time. Fewer parts is almost always better.</p>
+
+          <h3>Modular sub-assemblies</h3>
+
+          <p>Professionals break a robot into <strong>sub-assemblies</strong>: the drive unit, the power unit, the sensor head, the arm. Each is built and tested on a bench before it joins the robot. If one fails, you swap the whole unit and keep working. This is the same module idea from earlier, applied at a larger scale.</p>
+
+          <h3>Tolerance and fastener standards</h3>
+
+          <p><strong>Tolerance</strong> is how much a real part is allowed to differ from the drawing. A hole meant to be 3 mm might be made at 3.1 mm. If tolerances are too tight, parts are expensive. If too loose, they wobble. Professionals pick a sensible tolerance and keep to it.</p>
+
+          <p>Fastener standards mean the whole team agrees on screw sizes and tool types. One standard means anyone can repair any unit with the same tool.</p>
+
+          <h3>Maintenance schedules</h3>
+
+          <p>A robot that runs every day needs a plan. Professionals keep a maintenance schedule: check the battery weekly, inspect cables monthly, replace worn wheels on a set count. This turns surprise breakdowns into planned, cheap work.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Beginner habit</th><th>Professional practice</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Build first, think later</td><td>Sketch layout and CoM before cutting</td></tr>
+                <tr><td>Glue everything</td><td>Bolted, standard fasteners</td></tr>
+                <tr><td>One-off build</td><td>DFM and DFA, fewer parts</td></tr>
+                <tr><td>Repair when broken</td><td>Planned maintenance schedule</td></tr>
+                <tr><td>Guess the fault</td><td>Test points and status LEDs</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 8.3 — The same robot, two ways of thinking. Professionals are planning for the hundredth repair, not the first build.</p>
+
+          <h2>Try it yourself</h2>
+
+          <p>These exercises turn the chapter into skill. Do them in order, easy first. You need only a robot or a mock-up, a ruler, and a timer.</p>
+
+          <ol>
+            <li><strong>Find your centre of mass.</strong> Lay your robot on a narrow edge and slide it until it balances. Mark that point. Measure its height above the floor and the base half-width. Hint: do this twice, once with the battery on top and once at the bottom, and compare the balance point.</li>
+            <li><strong>Slope stability test.</strong> Put your robot on a board and slowly lift one end. Note the angle where it tips. Hint: use the formula tan&theta; = B &divide; H to predict the angle first, then see how close you got.</li>
+            <li><strong>Use a phone level.</strong> Many phones have a level or angle tool. Rest the phone on your ramp and read the exact tilt. Hint: repeat with the robot facing forward and then sideways; the sideways direction usually tips first.</li>
+            <li><strong>Repair-time challenge.</strong> Ask a friend to time you swapping one motor or one wheel. Then redesign that mounting with better access and time it again. Hint: aim to get under two minutes with no glue and no hidden screws.</li>
+            <li><strong>Widen-and-lower experiment.</strong> Make two small changes only: move the battery down and move the wheels 2 to 3 cm apart. Re-run the slope test. Hint: record the tip angle before and after so you can see, in numbers, that shape beats power.</li>
+          </ol>
+
+          <h2>Going deeper (optional)</h2>
+
+          <p>If you enjoyed the tipping formula, here is the idea that professional engineers use instead of a single CoM point. It is called the <strong>zero moment point</strong>, or ZMP.</p>
+
+          <p>When a robot accelerates or carries a moving arm, the forces are not just gravity. The ZMP is the point on the floor where the total turning effect becomes zero. If the ZMP stays inside the base of support, the robot will not tip. Walking robots use this idea to plan every step.</p>
+
+          <p>You do not need ZMP for a small wheeled robot. But if you ever build a two-legged walker, this is the concept that keeps it upright. Consider it a signpost for later chapters.</p>
+
+          <section class="takeaways">
+            <h2><i class="bi bi-pin-angle-fill"></i> Key takeaways</h2>
+            <ul>
+              <li><i class="bi bi-check2-circle"></i> A robot is stable when its centre of mass is low and its hanging line lands inside the base of support.</li>
+              <li><i class="bi bi-check2-circle"></i> It is the shape, not the weight, that decides the tipping angle: it tips when tan&theta; &gt; B &divide; H.</li>
+              <li><i class="bi bi-check2-circle"></i> Keep heavy parts low and central to resist tipping and turn sharply.</li>
+              <li><i class="bi bi-check2-circle"></i> Light and stiff beats heavy and strong: use tubes, I-beams and triangles.</li>
+              <li><i class="bi bi-check2-circle"></i> Bolt, do not glue, so every part can be replaced in minutes.</li>
+              <li><i class="bi bi-check2-circle"></i> Route, clamp and slack every cable, and label both ends.</li>
+              <li><i class="bi bi-check2-circle"></i> Add test points, status LEDs, a lift stand and a switch you can reach fast.</li>
+            </ul>
+          </section>
+
+          <section class="quiz">
+            <div class="quiz__head"><i class="bi bi-patch-question-fill"></i> Check your understanding</div>
+            <details>
+              <summary><span class="q-num">Q1.</span><span>What two things decide whether a robot is stable?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Where its centre of mass sits, and how big its base of support is. The robot stands when the hanging line from the CoM lands inside the base of support.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q2.</span><span>Two robots have the same shape, but one is twice as heavy. Which tips first on a slope, and why?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> They tip at the same angle. Mass cancels out of the tipping formula, so only the shape (B and H) sets the tip angle. Weight alone does not add stability.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q3.</span><span>A robot's CoM is 25 cm high, and the base half-width is 10 cm. Does it tip on a 20-degree slope?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> tan&theta; = B &divide; H = 10 &divide; 25 = 0.40, so it tips at about 21.8 degrees. That is very close to 20 degrees, so it is risky. Lower the CoM or widen the base.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q4.</span><span>Why is a hollow tube stiffer than a solid rod of the same weight?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Stiffness depends on how far the material sits from the middle. A tube puts its material at the outer edge, where it resists bending, while a solid rod wastes material near the centre.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q5.</span><span>Give two reasons to bolt a part instead of gluing it.</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Bolted parts can be undone and replaced, so repair is fast. Glue is permanent, so removing a part often breaks it or damages the parts around it.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q6.</span><span>What is strain relief, and why does it protect a solder joint?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Strain relief clamps or ties a cable so any pull is taken by the clamp instead of the joint. The solder joint then never feels a tug, so it cannot crack.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q7.</span><span>In a two-wheel-plus-caster robot, why should the caster sit close to the drive axle?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Keeping the caster near the drive axle makes most of the weight rest on the driven wheels, which improves traction, and it keeps the triangle base compact so the robot resists tipping.</div>
+            </details>
+          </section>
+        </article>
+
+        <nav class="pager" id="pager" aria-label="Chapter navigation"></nav>
+      </div>
+    </main>
+  </div>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/book.js"></script>
+</body>
+</html>

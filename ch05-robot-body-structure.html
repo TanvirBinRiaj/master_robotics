@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>try{var __t=localStorage.getItem("mr-theme");if(__t==="dark"||__t==="light")document.documentElement.setAttribute("data-theme",__t);}catch(e){}</script>
+  <title>Chapter 5: The Robot's Body: Structure and Frames — Master Robotics</title>
+  <meta name="description" content="Learn how a robot holds itself together. Understand the chassis, joint types, degrees of freedom and why a stiff, light frame beats a heavy, strong one.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/prose.css">
+</head>
+<body data-file="ch05-robot-body-structure.html">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="topbar" id="topbar"></header>
+  <div class="progress-bar" id="progressBar"></div>
+
+  <div class="layout">
+    <div class="sidebar__backdrop" id="navBackdrop"></div>
+    <nav class="sidebar" id="sidebar" aria-label="Book contents"></nav>
+
+    <main class="main" id="main">
+      <div class="container">
+
+        <header class="chapter-head">
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="index.html">Home</a>
+            <i class="bi bi-chevron-right"></i>
+            <a href="index.html#mechanics">Part 2 &middot; Mechanics and Motion</a>
+            <i class="bi bi-chevron-right"></i>
+            <span>Chapter 5</span>
+          </nav>
+          <span class="chapter-kicker"><i class="bi bi-gear-wide-connected"></i> Part 2 &middot; Mechanics and Motion</span>
+          <h1>The Robot's Body: Structure and Frames</h1>
+          <p class="lede">A robot is only as good as the frame that holds it. By the end of this chapter you will know what a chassis and a joint do, how to count degrees of freedom, and why stiff and light beats heavy and strong.</p>
+          <div class="chapter-meta">
+            <span><i class="bi bi-clock"></i> ~22 min read</span>
+            <span><i class="bi bi-bar-chart"></i> Beginner</span>
+            <span><i class="bi bi-list-check"></i> Chapter 5 of 30</span>
+          </div>
+          <div class="goals">
+            <h2>What you will learn</h2>
+            <ul>
+              <li><i class="bi bi-check-circle-fill"></i> Explain what a chassis and a joint do.</li>
+              <li><i class="bi bi-check-circle-fill"></i> Count a robot's degrees of freedom.</li>
+              <li><i class="bi bi-check-circle-fill"></i> Tell the difference between rigid and flexible designs.</li>
+            </ul>
+          </div>
+        </header>
+
+        <article class="article">
+
+          <p class="lead">Imagine a chef with the steadiest hands in the world. Now imagine that chef standing on a wobbly table. Every fine cut becomes a guess. The hands are perfect, but the table ruins the work.</p>
+
+          <p>A robot is the same. Its motors may be precise. Its sensors may be sharp. Its code may be clever. But all of that sits on a body — a frame of metal, plastic or wood. If that frame bends, twists or shakes, every accurate part above it becomes useless.</p>
+
+          <p>This chapter is about that frame. We will not talk about motors or software yet. We will talk about the skeleton: the shape that holds everything in the right place and carries the pushes and pulls of the real world.</p>
+
+          <p>By the end, you will look at a robot arm or a small rover and see it differently. You will see a set of links held by joints, and you will be able to count, on your fingers, how many ways it can move.</p>
+
+          <h2>What a chassis is</h2>
+
+          <p>A <strong>chassis</strong> is the main frame of a robot. It is the part that holds every other part in the right place. Motors, wheels, batteries, circuit boards and arms all bolt onto the chassis. The chassis keeps them at the distances and angles you planned.</p>
+
+          <p>Think of the frame of a bicycle. The two wheels do not touch each other. The pedals do not touch the seat. Everything stays in the correct spot because the metal tubes of the frame connect them. Remove one tube and the whole thing falls apart. That frame is the bicycle's chassis.</p>
+
+          <p>A robot chassis does the same job. The frame connects the wheels to the body so the wheels stay parallel. It connects the arm to the base so the arm does not walk away. It holds the battery low so the robot does not tip over.</p>
+
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> The key idea</div>
+            <p>The chassis is not just a box for parts. It is the part that decides where every other part sits, and it carries the forces between them. Get the chassis wrong and nothing else can work well.</p>
+          </div>
+
+          <h3>Why stiffness matters</h3>
+
+          <p><strong>Stiffness</strong> is a body's resistance to bending or flexing. A stiff part holds its shape when you push on it. A floppy part droops.</p>
+
+          <p>Stiffness matters because sensors and arms measure position. If the frame bends by two millimetres while a robot arm picks up an egg, the arm is no longer where the robot thinks it is. The robot says "I am at the egg" but the frame has quietly moved the arm somewhere else.</p>
+
+          <p>This is why cheap toy robots often look clumsy. The plastic body flexes under load. The motor turns exactly the right amount, but the frame gives the movement away. A stiff chassis keeps the promise that the motor made.</p>
+
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> In simple words</div>
+            <p>Stiff means "hard to bend". A stiff frame keeps all parts where you put them. A floppy frame lets parts drift, so the robot makes mistakes even when its motors are right.</p>
+          </div>
+
+          <figure class="figure">
+            <div class="figure__box">
+              <svg viewBox="0 0 640 300" width="100%" role="img" aria-label="A robot chassis holding a battery, wheels, motors, a controller and an arm, with a central plate and side rails">
+                <rect x="120" y="120" width="400" height="26" rx="6" fill="#e8eeff" stroke="#2d5bff" stroke-width="2"></rect>
+                <text x="320" y="112" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#2d5bff">main chassis plate</text>
+
+                <rect x="120" y="146" width="22" height="90" rx="5" fill="#dfe6f7" stroke="#7b849b" stroke-width="2"></rect>
+                <rect x="498" y="146" width="22" height="90" rx="5" fill="#dfe6f7" stroke="#7b849b" stroke-width="2"></rect>
+                <text x="131" y="262" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#4a5266">rail</text>
+                <text x="509" y="262" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#4a5266">rail</text>
+
+                <rect x="200" y="72" width="120" height="48" rx="8" fill="#e2f6ef" stroke="#0f9d78" stroke-width="2"></rect>
+                <text x="260" y="101" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#0f9d78">battery</text>
+
+                <rect x="350" y="72" width="130" height="48" rx="8" fill="#f0e9fd" stroke="#7a4ddb" stroke-width="2"></rect>
+                <text x="415" y="101" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#7a4ddb">controller</text>
+
+                <circle cx="200" cy="236" r="34" fill="#fff6e5" stroke="#c47f00" stroke-width="2"></circle>
+                <circle cx="200" cy="236" r="10" fill="#c47f00"></circle>
+                <circle cx="440" cy="236" r="34" fill="#fff6e5" stroke="#c47f00" stroke-width="2"></circle>
+                <circle cx="440" cy="236" r="10" fill="#c47f00"></circle>
+                <text x="320" y="292" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#4a5266">drive wheels on motors</text>
+
+                <line x1="510" y1="120" x2="560" y2="60" stroke="#2d5bff" stroke-width="4" stroke-linecap="round"></line>
+                <circle cx="510" cy="120" r="6" fill="#2d5bff"></circle>
+                <circle cx="560" cy="60" r="7" fill="#e8eeff" stroke="#2d5bff" stroke-width="2"></circle>
+                <text x="560" y="42" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#2d5bff">arm joint</text>
+              </svg>
+            </div>
+            <figcaption>Figure 5.1 — A simple chassis. The main plate holds the battery, controller and wheels in fixed positions. Side rails add stiffness, and the arm bolts to the same rigid frame.</figcaption>
+          </figure>
+
+          <h2>Load paths: how forces travel through a body</h2>
+
+          <p>When a robot moves, pushes or lifts, <strong>forces</strong> do not stay in one spot. They travel through the structure. The route a force takes is called the <strong>load path</strong>.</p>
+
+          <p>Picture a shelf bolted to a wall. You put a heavy box on it. The weight pushes down on the shelf. The shelf pushes that load into the brackets, and the brackets push it into the wall. The wall holds it. That is a load path: from the box, through the shelf, through the brackets, into the wall.</p>
+
+          <p>Good design makes the load path short, direct and thick enough. Bad design makes the load path long, curved and thin. A long, twisted load path bends and breaks.</p>
+
+          <h3>Five ways a structure feels a force</h3>
+
+          <p>Forces attack a structure in a few basic ways. Learn these five words and you can describe almost any frame.</p>
+
+          <h3>Tension — pulling apart</h3>
+          <p><strong>Tension</strong> is a force that stretches a part, trying to pull it apart. <em>Everyday example:</em> a rope in a tug-of-war. The rope is under tension; it is being pulled from both ends. <em>Robot example:</em> a belt driving a wheel is under tension on the pulling side. A cable lifting a heavy tool on a crane arm is in tension too.</p>
+
+          <h3>Compression — squashing together</h3>
+          <p><strong>Compression</strong> is a force that squeezes a part, trying to shorten it. <em>Everyday example:</em> a table leg holding up a table. The leg is squashed between the floor and the tabletop. <em>Robot example:</em> the legs of a walking robot are in compression each time it stands. The lower arm of a robot lifting a weight is also compressed.</p>
+
+          <h3>Bending — a push in the middle</h3>
+          <p><strong>Bending</strong> happens when a force pushes on the middle of a part that is held at both ends. <em>Everyday example:</em> standing in the middle of a plank lying across two bricks. The plank sags. <em>Robot example:</em> a long horizontal arm reaching out with a heavy tool at the tip bends downward at the middle, even if it does not break.</p>
+
+          <h3>Shear — sliding sideways</h3>
+          <p><strong>Shear</strong> is a force that tries to slide one part sideways past another, like cutting with scissors. <em>Everyday example:</em> pushing the top of a stack of papers while the bottom stays still — the sheets slide across each other. <em>Robot example:</em> a bolt holding a wheel fork feels shear when the wheel hits a kerb; the sideways jolt tries to slice the bolt in two.</p>
+
+          <h3>Torsion — twisting</h3>
+          <p><strong>Torsion</strong> is a twisting force. <em>Everyday example:</em> wringing out a wet towel. You twist the two ends in opposite directions. <em>Robot example:</em> one wheel gripping while the other spins freely can twist the chassis between them. A robot arm swinging sideways puts torsion on its base.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Force type</th><th>What it does to a part</th><th>Everyday example</th><th>Robot example</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><strong>Tension</strong></td><td>Pulls it longer</td><td>Rope in a tug-of-war</td><td>Drive belt pulling a wheel</td></tr>
+                <tr><td><strong>Compression</strong></td><td>Squashes it shorter</td><td>Table leg under a tabletop</td><td>Leg of a walking robot</td></tr>
+                <tr><td><strong>Bending</strong></td><td>Curves it in the middle</td><td>Plank across two bricks</td><td>Long arm reaching with a load</td></tr>
+                <tr><td><strong>Shear</strong></td><td>Slides layers sideways</td><td>Pushing a stack of paper</td><td>Bolt when a wheel hits a kerb</td></tr>
+                <tr><td><strong>Torsion</strong></td><td>Twists it around its length</td><td>Wringing a wet towel</td><td>Chassis when one wheel grips</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 5.1 — The five basic ways a structure feels a force. Every load path is built from these.</p>
+
+          <h3>How to follow a load path</h3>
+
+          <p>You can trace any load path with a simple method. You will use this habit for the rest of your building life.</p>
+
+          <ol>
+            <li><strong>Find the source.</strong> Where does the force start? A weight at the arm tip, or a wheel hitting a bump.</li>
+            <li><strong>Follow it inward.</strong> Trace the force through each part it touches, toward the ground or the heaviest part.</li>
+            <li><strong>Spot the weak link.</strong> Find the thinnest, longest or most bent part on that route. That is where it will fail.</li>
+            <li><strong>Straighten the path.</strong> Add a brace, use a thicker part, or move the load closer to the base.</li>
+          </ol>
+
+          <p>Skillful builders keep load paths short and straight. A force that travels in a straight line loses nothing. A force that zig-zags through curves and brackets bends things along the way.</p>
+
+          <h2>Degrees of freedom: counting the ways a robot can move</h2>
+
+          <p>A <strong>degree of freedom</strong>, or <strong>DoF</strong>, is one independent way a body can move. If a robot can move in a new way that is not just a mix of the ways it already has, that is one more degree of freedom.</p>
+
+          <p>Count them and you understand a machine. The number tells you how much reach and skill it has. A simple wheeled rover has few. A human-like arm has many. Let us build the idea from the ground up.</p>
+
+          <h3>A rigid body floating in space has 6 degrees of freedom</h3>
+
+          <p>Ignore motors for a moment. Imagine a single solid block floating in the air, free to go anywhere. It can move in three straight-line directions and turn in three ways. That is six total.</p>
+
+          <p>The three straight-line moves are called <strong>translation</strong>. The three turning moves are called <strong>rotation</strong>.</p>
+
+          <ul>
+            <li><strong>Translation along X</strong> — slide left and right.</li>
+            <li><strong>Translation along Y</strong> — slide forward and back.</li>
+            <li><strong>Translation along Z</strong> — slide up and down.</li>
+            <li><strong>Rotation roll</strong> — tilt side to side, like a boat rocking.</li>
+            <li><strong>Rotation pitch</strong> — tilt nose up or down, like a plane taking off.</li>
+            <li><strong>Rotation yaw</strong> — spin left or right, like turning your head.</li>
+          </ul>
+
+          <p>Notice the pattern: <strong>3 translation + 3 rotation = 6</strong>. Every free solid object in our 3D world has these same six ways to move. This is a fixed fact of geometry, not a choice.</p>
+
+          <div class="formula"><span class="label">Free rigid body in 3D</span> DoF = 3 translations (x, y, z) + 3 rotations (roll, pitch, yaw) = 6</div>
+
+          <figure class="figure">
+            <div class="figure__box">
+              <svg viewBox="0 0 640 320" width="100%" role="img" aria-label="Six degrees of freedom of a rigid body: three straight arrows for x y z translation and three curved arrows for roll pitch yaw rotation">
+                <rect x="230" y="130" width="180" height="70" rx="8" fill="#e8eeff" stroke="#2d5bff" stroke-width="2"></rect>
+                <text x="320" y="172" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#2d5bff">rigid body</text>
+
+                <line x1="320" y1="165" x2="150" y2="165" stroke="#0f9d78" stroke-width="3" marker-end="url(#g1)"></line>
+                <text x="140" y="160" text-anchor="end" font-family="Inter, sans-serif" font-size="12" fill="#0f9d78">x (left / right)</text>
+
+                <line x1="320" y1="165" x2="470" y2="245" stroke="#0f9d78" stroke-width="3" marker-end="url(#g1)"></line>
+                <text x="478" y="258" font-family="Inter, sans-serif" font-size="12" fill="#0f9d78">y (forward / back)</text>
+
+                <line x1="320" y1="130" x2="320" y2="40" stroke="#0f9d78" stroke-width="3" marker-end="url(#g1)"></line>
+                <text x="320" y="30" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#0f9d78">z (up / down)</text>
+
+                <path d="M230 130 C170 110 170 100 230 95" fill="none" stroke="#c47f00" stroke-width="3" marker-end="url(#o1)"></path>
+                <text x="120" y="96" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#c47f00">roll</text>
+
+                <path d="M410 130 C470 100 480 96 430 82" fill="none" stroke="#c47f00" stroke-width="3" marker-end="url(#o1)"></path>
+                <text x="510" y="82" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#c47f00">pitch</text>
+
+                <path d="M320 120 C280 80 360 80 320 120" fill="none" stroke="#c47f00" stroke-width="3" marker-end="url(#o1)"></path>
+                <text x="320" y="70" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#c47f00">yaw</text>
+
+                <text x="320" y="300" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#7b849b">green = translation &nbsp; | &nbsp; amber = rotation</text>
+                <defs>
+                  <marker id="g1" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+                    <path d="M0,0 L9,4.5 L0,9 z" fill="#0f9d78"></path>
+                  </marker>
+                  <marker id="o1" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+                    <path d="M0,0 L9,4.5 L0,9 z" fill="#c47f00"></path>
+                  </marker>
+                </defs>
+              </svg>
+            </div>
+            <figcaption>Figure 5.2 — A free rigid body has six degrees of freedom: three translation arrows (x, y, z) and three rotation arrows (roll, pitch, yaw).</figcaption>
+          </figure>
+
+          <h3>Joints take degrees of freedom away</h3>
+
+          <p>A <strong>joint</strong> is a connection that lets two parts move relative to each other. That sounds like joints add freedom. In fact, they almost always remove it.</p>
+
+          <p>Here is the trick. A free block starts with 6 DoF. When you bolt it to another block, the joint allows only some of those 6. A door hinge is a good picture. Bolt a door to a wall with a hinge and the door can no longer float around. It can only swing one way. The hinge took 5 of the 6 freedoms away and left 1.</p>
+
+          <p>So a joint defines exactly which movements are allowed and which are locked. Different joint shapes allow different numbers of DoF. That is why joint choice is the heart of robot design.</p>
+
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> In simple words</div>
+            <p>A joint is a moving connection between two parts. It says "you may move this way, but not that way". The type of joint decides how many ways are allowed.</p>
+          </div>
+
+          <h2>Joint types</h2>
+
+          <p>Engineers have names for the common joints. Table 5.2 lists the five you will meet most. Learn the picture and the DoF count, and you can read any robot design.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Joint name</th><th>Everyday picture</th><th>Allowed motion</th><th>DoF</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><strong>Revolute</strong> (hinge)</td><td>Door hinge</td><td>Rotate around one axis only</td><td>1</td></tr>
+                <tr><td><strong>Prismatic</strong> (slider)</td><td>Drawer sliding out</td><td>Slide straight along one axis</td><td>1</td></tr>
+                <tr><td><strong>Universal</strong></td><td>Tow bar on a trailer</td><td>Rotate around two axes (no twist)</td><td>2</td></tr>
+                <tr><td><strong>Ball</strong> (spherical)</td><td>Joystick on a game pad</td><td>Rotate around three axes</td><td>3</td></tr>
+                <tr><td><strong>Fixed</strong></td><td>Two parts bolted together</td><td>No motion at all</td><td>0</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 5.2 — The five common joint types. Most robot joints are revolute, because motors turn.</p>
+
+          <h3>Why revolute joints are the favourite</h3>
+
+          <p>Almost every robot arm uses <strong>revolute</strong> joints. The reason is simple: motors spin. A motor's natural output is rotation. A revolute joint uses that spin directly, so the design is clean and cheap.</p>
+
+          <p>A <strong>prismatic</strong> joint needs extra parts. To slide straight, you must first turn a spinning motor into straight-line motion, using a screw or a rack and pinion. That adds cost, weight and wear. So builders use sliders only when straight motion is truly needed, such as a 3D printer head or a gripper that opens in a straight line.</p>
+
+          <h3>Serial and parallel kinematic chains</h3>
+
+          <p>A <strong>kinematic chain</strong> is the set of links and joints that connect a robot's base to its hand or tool. There are two big families.</p>
+
+          <p>A <strong>serial</strong> chain is a single line, like a human arm. Base, then link, then joint, then link, then hand. Each joint carries the weight of everything after it. A <strong>parallel</strong> chain connects the base to the tool with several paths at once.</p>
+
+          <p>The classic parallel robot is the <strong>Stewart platform</strong>. Imagine six legs joining a base plate to a moving top plate. By shortening and lengthening the legs together, the top plate can tilt and shift with great precision. Flight simulators often use this design.</p>
+
+          <div class="callout note">
+            <div class="callout__head"><i class="bi bi-info-circle-fill"></i> Note</div>
+            <p>Serial and parallel chains trade different strengths. Serial gives long reach and a big working space. Parallel gives high stiffness and high accuracy in a small space. You cannot have both fully at once — that is the design trade you will keep meeting.</p>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th></th><th>Serial chain (robot arm)</th><th>Parallel chain (Stewart platform)</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><strong>Shape</strong></td><td>One line of links</td><td>Several legs sharing the load</td></tr>
+                <tr><td><strong>Reach</strong></td><td>Large working space</td><td>Small working space</td></tr>
+                <tr><td><strong>Stiffness</strong></td><td>Lower — errors add up</td><td>Higher — legs support each other</td></tr>
+                <tr><td><strong>Accuracy</strong></td><td>Good but drifts under load</td><td>Very high for small moves</td></tr>
+                <tr><td><strong>Typical use</strong></td><td>Factory pick-and-place arms</td><td>Flight simulators, precision platforms</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 5.3 — Serial versus parallel chains. Reach and stiffness pull in opposite directions.</p>
+
+          <h2>Rigid versus flexible</h2>
+
+          <p>A <strong>rigid</strong> design is one that tries not to bend. It holds its shape no matter which way the forces push. A <strong>flexible</strong> design is one that is meant to bend, at least a little.</p>
+
+          <p>Rigid is the default for good reason. When a frame stays stiff, the robot's math stays true. The controller commands "move the wheel 90 degrees" and the wheel really moves 90 degrees relative to the body. No surprises.</p>
+
+          <p>Flexibility, though, is not always bad. Sometimes bending is exactly what you want. A gripper that gives a little can hold an egg without cracking it. A robot that bends on impact can protect a person standing nearby.</p>
+
+          <h3>When flexible helps</h3>
+
+          <ul>
+            <li><strong>Grippers.</strong> Soft fingertips flex to match the shape of an object. They grip gently and hold many shapes with one tool.</li>
+            <li><strong>Safety.</strong> A slightly flexible arm absorbs a bump instead of passing a hard jolt to a person.</li>
+            <li><strong>Shock.</strong> A flexible mount lets a wheel ride over a bump smoothly, instead of hammering the frame.</li>
+            <li><strong>Assembly.</strong> A bit of give helps parts fit together when the holes are not perfectly aligned.</li>
+          </ul>
+
+          <h3>The cost of flexibility</h3>
+
+          <p>Flexibility has two main prices, and both hurt accuracy.</p>
+
+          <p>The first is <strong>vibration</strong>. A flexible part does not just bend and stop. It springs back and forth, like a ruler twanged on a desk edge. While it wobbles, the robot's position is unclear. A camera on the end shakes. The robot sees a blurred world.</p>
+
+          <p>The second is <strong>backlash</strong>. Backlash is the tiny free play between two connected parts. Picture a worn door handle that turns a little before the latch moves. In a robot, backlash means the motor turns but the arm does not move for a moment. Every reversal loses a little accuracy. It adds up fast.</p>
+
+          <div class="callout warn">
+            <div class="callout__head"><i class="bi bi-exclamation-triangle-fill"></i> Watch out</div>
+            <p>Vibration and backlash are quiet killers. They may not break anything, but they steal accuracy from every move. If a robot suddenly seems sloppy, check for loose joints and floppy frames before blaming the code.</p>
+          </div>
+
+          <figure class="figure">
+            <div class="figure__box">
+              <svg viewBox="0 0 640 260" width="100%" role="img" aria-label="Four joint symbols: revolute hinge, prismatic slider, ball, and fixed joint, each labelled with its degrees of freedom">
+                <rect x="30" y="40" width="130" height="150" rx="10" fill="#f6f8fd" stroke="#7b849b" stroke-width="1.5"></rect>
+                <circle cx="95" cy="95" r="20" fill="#e8eeff" stroke="#2d5bff" stroke-width="3"></circle>
+                <line x1="70" y1="140" x2="120" y2="140" stroke="#2d5bff" stroke-width="4" stroke-linecap="round"></line>
+                <text x="95" y="175" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#1c2230">revolute</text>
+                <text x="95" y="60" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#2d5bff">1 DoF</text>
+
+                <rect x="185" y="40" width="130" height="150" rx="10" fill="#f6f8fd" stroke="#7b849b" stroke-width="1.5"></rect>
+                <rect x="215" y="78" width="70" height="26" rx="4" fill="#e2f6ef" stroke="#0f9d78" stroke-width="3"></rect>
+                <line x1="215" y1="125" x2="285" y2="125" stroke="#0f9d78" stroke-width="3" marker-end="url(#g2)"></line>
+                <text x="250" y="175" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#1c2230">prismatic</text>
+                <text x="250" y="60" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#0f9d78">1 DoF</text>
+
+                <rect x="340" y="40" width="130" height="150" rx="10" fill="#f6f8fd" stroke="#7b849b" stroke-width="1.5"></rect>
+                <circle cx="405" cy="100" r="22" fill="#f0e9fd" stroke="#7a4ddb" stroke-width="3"></circle>
+                <circle cx="405" cy="100" r="7" fill="#7a4ddb"></circle>
+                <line x1="405" y1="78" x2="405" y2="55" stroke="#7a4ddb" stroke-width="3"></line>
+                <line x1="383" y1="100" x2="360" y2="100" stroke="#7a4ddb" stroke-width="3"></line>
+                <line x1="405" y1="122" x2="425" y2="140" stroke="#7a4ddb" stroke-width="3"></line>
+                <text x="405" y="175" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#1c2230">ball</text>
+                <text x="405" y="60" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#7a4ddb">3 DoF</text>
+
+                <rect x="495" y="40" width="130" height="150" rx="10" fill="#f6f8fd" stroke="#7b849b" stroke-width="1.5"></rect>
+                <rect x="525" y="88" width="70" height="26" rx="4" fill="#fff6e5" stroke="#c47f00" stroke-width="3"></rect>
+                <line x1="560" y1="80" x2="560" y2="122" stroke="#c47f00" stroke-width="4"></line>
+                <text x="560" y="175" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#1c2230">fixed</text>
+                <text x="560" y="60" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#c47f00">0 DoF</text>
+
+                <defs>
+                  <marker id="g2" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+                    <path d="M0,0 L9,4.5 L0,9 z" fill="#0f9d78"></path>
+                  </marker>
+                </defs>
+              </svg>
+            </div>
+            <figcaption>Figure 5.3 — Four joint types and their degrees of freedom. Revolute and prismatic allow one motion, ball allows three, and a fixed joint allows none.</figcaption>
+          </figure>
+
+          <h2>Structural basics: staying stiff without getting heavy</h2>
+
+          <p>Now you know forces and joints. The next question is how to build a frame that resists all those forces without turning the robot into a brick. Weight is the enemy of every moving machine.</p>
+
+          <h3>Triangulation</h3>
+
+          <p><strong>Triangulation</strong> means adding diagonal braces so the frame is made of triangles. Triangles are magic in structures. A square frame can squash into a diamond shape. A triangle cannot change shape without bending one of its sides. So triangles stay rigid.</p>
+
+          <p>Look at a bridge, a crane or an electricity pylon. You will see triangles everywhere. It is not decoration. It is stiffness with a small amount of material.</p>
+
+          <h3>Gussets and ribs</h3>
+
+          <p>A <strong>gusset</strong> is a small flat piece added across a corner to stop it folding. It spreads the load over a wider area, so the corner is much harder to bend. Think of a metal corner bracket on a wooden box.</p>
+
+          <p>A <strong>rib</strong> is a thin raised strip along a flat panel. Ribs add stiffness to a flat sheet without making it thick and heavy. Look inside a plastic storage box or a car door and you will see ribs doing exactly this job.</p>
+
+          <h3>Stiff is not the same as strong</h3>
+
+          <p>Beginners mix these two up. They are different.</p>
+
+          <ul>
+            <li><strong>Strong</strong> means it will not break. A strong part survives a big force before failing.</li>
+            <li><strong>Stiff</strong> means it will not bend much. A stiff part holds its shape under force.</li>
+          </ul>
+
+          <p>A steel ruler is stiff but not very strong — press the middle hard enough and it bends and stays bent. A rubber band is strong but not stiff — it stretches a long way without breaking. Both ideas matter, but for robots, <strong>stiffness usually matters more</strong>.</p>
+
+          <p>Why? Because a robot's accuracy depends on holding exact positions. A part that flexes two millimetres has already failed the task, even if it never cracks. Breaking is rare. Bending is common.</p>
+
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> The key idea</div>
+            <p>For a moving robot, a light and stiff frame beats a heavy and strong one. Extra weight must be carried by every motor, so it slows the robot and drains the battery. Stiffness with low weight is the goal.</p>
+          </div>
+
+          <h2>Worked example: a 2-wheel robot with a 3-joint arm</h2>
+
+          <p>Let us count the degrees of freedom of a common beginner project. Picture a small rover with two driven wheels and one small arm on top. The arm has three joints. We will go joint by joint, then add everything up.</p>
+
+          <h3>Step 1 — Count the base movement</h3>
+
+          <p>The robot drives on a flat floor. On a flat floor, a wheeled robot moves in a plane, so it has three ways to move:</p>
+          <ol>
+            <li>Drive forward and back (one DoF).</li>
+            <li>Slide left and right sideways — only if the wheels allow it (one DoF, often not used).</li>
+            <li>Spin around (turn, or yaw) (one DoF).</li>
+          </ol>
+          <p>So the base contributes <strong>3 DoF</strong> on the floor. In the air it would have 6, but the floor removes the up-and-down and the two tilts.</p>
+
+          <h3>Step 2 — Count the arm joints</h3>
+
+          <p>The arm has three revolute joints. Each revolute joint adds <strong>1 DoF</strong>. A typical beginner arm looks like this:</p>
+          <ol>
+            <li><strong>Base joint.</strong> Swings the whole arm left and right, like a turntable. Adds 1 DoF.</li>
+            <li><strong>Shoulder joint.</strong> Lifts the arm up and down. Adds 1 DoF.</li>
+            <li><strong>Elbow joint.</strong> Folds the forearm. Adds 1 DoF.</li>
+          </ol>
+
+          <h3>Step 3 — Add it all up</h3>
+
+          <div class="formula"><span class="label">Degrees of freedom</span> Total DoF = base (3) + arm joints (1 + 1 + 1) = 6</div>
+
+          <p>So this little robot has <strong>6 degrees of freedom</strong>: three from driving, three from the arm. That is a lot of movement from a simple machine.</p>
+
+          <h3>Step 4 — Describe what each joint does</h3>
+
+          <p>Counting is only half the job. You must also explain the <em>role</em> of each joint. Here is how a designer would describe this robot:</p>
+
+          <ul>
+            <li>The <strong>wheels</strong> set where the robot is on the floor. They decide the arm's reach across the room.</li>
+            <li>The <strong>base joint</strong> aims the arm in a direction, like turning your whole body to face a shelf.</li>
+            <li>The <strong>shoulder joint</strong> sets how high the arm reaches, like lifting your upper arm.</li>
+            <li>The <strong>elbow joint</strong> sets the distance to the target, like bending your forearm to bring your hand close.</li>
+          </ul>
+
+          <p>Notice that the base joint and the shoulder joint together decide where the hand goes in the plane. The elbow then fine-tunes the reach. Good arm design spreads the work across joints so no single motor is overloaded.</p>
+
+          <h2>Second example: counting DoF of a human-like arm</h2>
+
+          <p>Now try a bigger one. Count the arm of a humanoid robot, the kind that can wave hello. Use the same method.</p>
+
+          <ol>
+            <li><strong>Shoulder.</strong> A human shoulder is close to a ball joint, allowing three rotations. But many humanoid robots use two or three revolute joints instead. Count <strong>3 DoF</strong>.</li>
+            <li><strong>Elbow.</strong> A simple hinge, like a door. Count <strong>1 DoF</strong>.</li>
+            <li><strong>Wrist.</strong> Rolls, bends and turns the hand. Count <strong>3 DoF</strong>.</li>
+          </ol>
+
+          <div class="formula"><span class="label">Human-like arm</span> Total DoF = shoulder (3) + elbow (1) + wrist (3) = 7</div>
+
+          <p>Seven degrees of freedom. Your own arm has about the same number. That is why a human arm can reach around an obstacle, twist to open a jar, and still hold a cup steady. More DoF means more skill — and also more motors, more weight and more complex control.</p>
+
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> Tip</div>
+            <p>To count DoF, do not guess. Walk from the base to the tip and ask one question at each joint: "How many independent ways can this joint move?" Add the answers. That is the whole method.</p>
+          </div>
+
+          <h2>Common beginner mistakes</h2>
+
+          <p>Almost every new builder makes the same handful of errors. Knowing them now saves you hours later.</p>
+
+          <h3>1. Building a flimsy frame</h3>
+          <p>Beginners often pick a thin sheet of plastic or a light aluminium bar because it is easy to cut. Under load it flexes, and the robot's accuracy dies. <strong>Fix:</strong> before you commit, press on the frame with your hand. If it bends easily, add a brace or use a thicker part.</p>
+
+          <h3>2. Over-tightening plastic parts</h3>
+          <p>Plastic is soft. When you tighten a screw hard, you squeeze the plastic and can crack it or strip the hole. The joint then wobbles. <strong>Fix:</strong> tighten screws firmly, not with all your strength. Use a washer to spread the pressure, or a metal insert where screws will be removed often.</p>
+
+          <h3>3. Forgetting triangulation</h3>
+          <p>A frame of squares and rectangles looks strong but can squash sideways. Without diagonals, it racks out of shape. <strong>Fix:</strong> add a diagonal brace or a gusset across open corners. Turn squares into triangles.</p>
+
+          <h3>4. Ignoring cable routing</h3>
+          <p>Wires are part of the body. If you do not plan a path for them, they snag on moving parts, rub through, or stop a joint from turning. A cable that is too tight can fight the motor. <strong>Fix:</strong> decide the wire path early. Leave a gentle loop at every joint, use clips to hold wires, and keep them away from sharp edges.</p>
+
+          <h3>5. Putting heavy parts up high</h3>
+          <p>A heavy battery on top makes a tall robot tip over in turns. <strong>Fix:</strong> keep the heaviest parts low and near the centre. It is the same idea that makes a racing car sit low to the ground.</p>
+
+          <div class="callout danger">
+            <div class="callout__head"><i class="bi bi-shield-exclamation"></i> Safety</div>
+            <p>Never test a moving joint with your fingers near it. Pinch points between links can crush a fingertip. Build first with the motors off, check the full range of movement by hand, and only then power up.</p>
+          </div>
+
+          <h2>How professionals do it</h2>
+
+          <p>Professionals use the same ideas you just learned, but with tools that make them precise. Here is what changes at industrial scale.</p>
+
+          <h3>They simulate before they build (FEA)</h3>
+          <p><strong>FEA</strong> stands for Finite Element Analysis. It is software that chops a design into thousands of tiny pieces and calculates the forces on each one. The engineer sees a colour map of red (high stress) and blue (low stress). Red spots get thicker parts. Blue spots get thinner parts and save weight. This finds weak points before any metal is cut.</p>
+
+          <h3>They chase stiffness per unit mass</h3>
+          <p>A professional asks: how much stiffness do I get for each gram of weight? Hollow tubes beat solid bars here. A hollow tube is almost as stiff as a solid one, but far lighter. This single habit explains why robot arms are often tubes, not solid blocks.</p>
+
+          <h3>They use modular frames</h3>
+          <p>Instead of welding one custom frame, teams often use a kit of standard beams and brackets. You can rebuild the robot in a day when the task changes. It is like building with a toy construction set, but in metal and at full size.</p>
+
+          <h3>They damp vibration on purpose</h3>
+          <p>Professionals add <strong>damping</strong>: material or mounts that soak up vibration and stop the wobble quickly. Rubber pads under motors and soft mounts under cameras turn a shaky robot into a steady one.</p>
+
+          <h3>They control joint tolerances tightly</h3>
+          <p>A <strong>tolerance</strong> is the allowed error in a part's size. A loose tolerance makes a wobbly joint. A tight tolerance costs money to make. Professionals choose the tightest tolerance they can afford exactly where it matters — in the bearings and joint fits — rather than everywhere.</p>
+
+          <h2>Try it yourself</h2>
+
+          <p>Reading builds knowledge. Doing builds skill. Try these in order, easy to harder. You need only everyday objects for the first few.</p>
+
+          <ol>
+            <li><strong>Count the DoF of a book on a table.</strong> <em>Hint:</em> it can slide along the table and spin flat. Up, down and tilt are blocked. How many freedoms are left?</li>
+            <li><strong>Count the DoF of your own arm, wrist and hand.</strong> <em>Hint:</em> start at the shoulder and walk to the fingertips. Count each joint's independent motions.</li>
+            <li><strong>Test a frame's stiffness.</strong> Build a square from four sticks with pinned corners. Press a corner sideways and watch it rack into a diamond. Now add one diagonal. Press again. <em>Hint:</em> the diagonal is doing all the work.</li>
+            <li><strong>Find the load path in a chair.</strong> Sit down and trace the force from your body, through the seat, down the legs, into the floor. <em>Hint:</em> look for the thinnest part on the route — that is the weak link.</li>
+            <li><strong>Plan a wire path on paper.</strong> Sketch a two-joint arm and draw where the wires go at each joint. Leave a loop at the elbow. <em>Hint:</em> the loop must be long enough to allow the full range of motion.</li>
+          </ol>
+
+          <h2>Going deeper (optional)</h2>
+
+          <p>If you are curious, here is one idea that professionals use and beginners rarely meet. It is called <strong>workspace analysis</strong>.</p>
+
+          <p>Every arm can only reach certain points in space. That set of reachable points is its workspace. Some points can be reached in only one arm shape; others can be reached in several. The places an arm <em>cannot</em> reach are just as important as the places it can.</p>
+
+          <p>Designers map the workspace to check two things: can the robot reach every task point, and is it far from any dead spots or awkward singularities? A <strong>singularity</strong> is a position where the arm loses a degree of freedom for a moment and cannot move the way you expect. Understanding your robot's real reach is the difference between a design that works on paper and one that works on the floor.</p>
+
+
+          <section class="takeaways">
+            <h2><i class="bi bi-pin-angle-fill"></i> Key takeaways</h2>
+            <ul>
+              <li><i class="bi bi-check2-circle"></i> The chassis is the frame that holds every part in the right place.</li>
+              <li><i class="bi bi-check2-circle"></i> A stiff frame keeps sensors and arms accurate. A floppy frame ruins good motors.</li>
+              <li><i class="bi bi-check2-circle"></i> Forces follow a load path through the structure toward the ground.</li>
+              <li><i class="bi bi-check2-circle"></i> The five basic forces are tension, compression, bending, shear and torsion.</li>
+              <li><i class="bi bi-check2-circle"></i> A free rigid body has 6 DoF: 3 translation and 3 rotation (roll, pitch, yaw).</li>
+              <li><i class="bi bi-check2-circle"></i> A joint removes freedom. Revolute and prismatic allow 1 DoF, ball allows 3, fixed allows 0.</li>
+              <li><i class="bi bi-check2-circle"></i> Rigid frames keep accuracy; flexibility helps grips and safety but brings vibration and backlash.</li>
+              <li><i class="bi bi-check2-circle"></i> For moving robots, light and stiff beats heavy and strong.</li>
+            </ul>
+          </section>
+
+          <section class="quiz">
+            <div class="quiz__head"><i class="bi bi-patch-question-fill"></i> Check your understanding</div>
+            <details>
+              <summary><span class="q-num">Q1.</span><span>In your own words, what does a chassis do?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> It is the main frame. It holds every other part in the right place and carries forces between them.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q2.</span><span>Why does a floppy frame make a robot inaccurate even when the motors are precise?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Because the frame bends under load, so the arm or sensor moves away from where the robot thinks it is.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q3.</span><span>Name the five basic ways a structure feels a force.</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Tension, compression, bending, shear and torsion.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q4.</span><span>How many degrees of freedom does a free rigid body have in 3D, and how do they break down?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Six: three translation (x, y, z) and three rotation (roll, pitch, yaw).</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q5.</span><span>How many DoF does a revolute joint allow, and how many does a fixed joint allow?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> A revolute (hinge) joint allows 1 DoF. A fixed joint allows 0 DoF.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q6.</span><span>What is the difference between "strong" and "stiff"?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Strong means it will not break. Stiff means it will not bend much. For accuracy, stiffness usually matters more.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q7.</span><span>Why do serial arms reach farther but parallel arms are more accurate?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> A serial chain is one line of links, so it covers a large space but its errors add up. A parallel chain shares the load across several legs, so it is stiffer and more accurate, but only in a small space.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q8.</span><span>Count the DoF of the 2-wheel robot with the 3-joint arm from the worked example.</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Three on the floor (forward/back, sideways, spin) plus three arm joints equals 6 degrees of freedom.</div>
+            </details>
+          </section>
+        </article>
+
+        <nav class="pager" id="pager" aria-label="Chapter navigation"></nav>
+      </div>
+    </main>
+  </div>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/book.js"></script>
+</body>
+</html>

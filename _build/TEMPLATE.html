@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- TITLE FORMAT: "Chapter N: Chapter Title — Master Robotics" -->
+  <title>Chapter 1: What Is a Robot? A Simple Start — Master Robotics</title>
+  <!-- 140-160 char description, plain English -->
+  <meta name="description" content="CHAPTER DESCRIPTION">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/prose.css">
+</head>
+<!-- data-file MUST match the exact chapter filename, e.g. ch01-what-is-a-robot.html -->
+<body data-file="ch01-what-is-a-robot.html">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="topbar" id="topbar"></header>
+  <div class="progress-bar" id="progressBar"></div>
+
+  <div class="layout">
+    <div class="sidebar__backdrop" id="navBackdrop"></div>
+    <nav class="sidebar" id="sidebar" aria-label="Book contents"></nav>
+
+    <main class="main" id="main">
+      <div class="container">
+
+        <header class="chapter-head">
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="index.html">Home</a>
+            <i class="bi bi-chevron-right"></i>
+            <a href="index.html#foundations">Part 1 &middot; Foundations</a>
+            <i class="bi bi-chevron-right"></i>
+            <span>Chapter 1</span>
+          </nav>
+          <span class="chapter-kicker"><i class="bi bi-rocket-takeoff"></i> Part 1 &middot; Foundations</span>
+          <h1>What Is a Robot? A Simple Start</h1>
+          <p class="lede">One or two short sentences. Tell the reader exactly what they will be able to do after this chapter. Use simple words.</p>
+          <div class="chapter-meta">
+            <span><i class="bi bi-clock"></i> ~18 min read</span>
+            <span><i class="bi bi-bar-chart"></i> Beginner</span>
+            <span><i class="bi bi-list-check"></i> Chapter 1 of 24</span>
+          </div>
+          <div class="goals">
+            <h2>What you will learn</h2>
+            <ul>
+              <li><i class="bi bi-check-circle-fill"></i> First clear goal, written as an action.</li>
+              <li><i class="bi bi-check-circle-fill"></i> Second clear goal.</li>
+              <li><i class="bi bi-check-circle-fill"></i> Third clear goal.</li>
+            </ul>
+          </div>
+        </header>
+
+        <article class="article">
+          <!--
+            BODY GOES HERE.
+
+            Section heading:  <h2>Section title</h2>
+            Sub heading:      <h3>Sub title</h3>
+            Paragraph:        <p>Text.</p>
+            Bullets:          <ul><li>One.</li></ul>
+            Numbered:         <ol><li>One.</li></ol>
+            Key term:         <strong>term</strong> the first time, then plain.
+            Inline code:      <code>pinMode()</code>
+
+            Callout:
+            <div class="callout note">
+              <div class="callout__head"><i class="bi bi-info-circle-fill"></i> Note</div>
+              <p>Text.</p>
+            </div>
+            Callout types: simple, tip, note, warn, danger, key
+            Callout icons: simple=bi-translate, tip=bi-lightbulb, note=bi-info-circle-fill,
+                           warn=bi-exclamation-triangle-fill, danger=bi-shield-exclamation, key=bi-key-fill
+
+            Code block (escape < > & as &lt; &gt; &amp; inside):
+            <div class="code">
+              <div class="code__bar">
+                <span class="code__dots"><span></span><span></span><span></span></span>
+                <span class="code__lang">Arduino C++</span>
+                <button class="code__copy" type="button"><i class="bi bi-clipboard"></i> Copy</button>
+              </div>
+              <pre><code>code here</code></pre>
+            </div>
+
+            Table:
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Head</th><th>Head</th></tr></thead>
+                <tbody><tr><td>Cell</td><td>Cell</td></tr></tbody>
+              </table>
+            </div>
+
+            Formula (plain text / HTML entities only, no MathJax):
+            <div class="formula"><span class="label">Ohm's law</span> V = I &times; R</div>
+
+            Figure (inline SVG only, no external images):
+            <figure class="figure">
+              <div class="figure__box">
+                <svg viewBox="0 0 400 160" width="100%" height="auto" role="img" aria-label="Describe the diagram">
+                  <!-- simple shapes with hardcoded light/dark friendly colors -->
+                </svg>
+              </div>
+              <figcaption>Figure 1. Caption in plain English.</figcaption>
+            </figure>
+          -->
+
+          <section class="takeaways">
+            <h2><i class="bi bi-pin-angle-fill"></i> Key takeaways</h2>
+            <ul>
+              <li><i class="bi bi-check2-circle"></i> One short sentence the reader must remember.</li>
+              <li><i class="bi bi-check2-circle"></i> Second takeaway.</li>
+              <li><i class="bi bi-check2-circle"></i> Third takeaway.</li>
+            </ul>
+          </section>
+
+          <section class="quiz">
+            <div class="quiz__head"><i class="bi bi-patch-question-fill"></i> Check your understanding</div>
+            <details>
+              <summary><span class="q-num">Q1.</span><span>Question the reader can answer from this chapter.</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Short, clear answer.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q2.</span><span>Second question.</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Short, clear answer.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q3.</span><span>Third question.</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Short, clear answer.</div>
+            </details>
+          </section>
+        </article>
+
+        <nav class="pager" id="pager" aria-label="Chapter navigation"></nav>
+      </div>
+    </main>
+  </div>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/book.js"></script>
+</body>
+</html>

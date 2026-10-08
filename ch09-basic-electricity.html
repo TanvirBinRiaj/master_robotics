@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>try{var __t=localStorage.getItem("mr-theme");if(__t==="dark"||__t==="light")document.documentElement.setAttribute("data-theme",__t);}catch(e){}</script>
+  <title>Chapter 9: Basic Electricity for Robots — Master Robotics</title>
+  <meta name="description" content="Learn voltage, current, resistance, power and Ohm's law in plain English. Read circuit diagrams, choose a resistor for an LED, and measure safely with a multimeter.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/prose.css">
+</head>
+<body data-file="ch09-basic-electricity.html">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="topbar" id="topbar"></header>
+  <div class="progress-bar" id="progressBar"></div>
+
+  <div class="layout">
+    <div class="sidebar__backdrop" id="navBackdrop"></div>
+    <nav class="sidebar" id="sidebar" aria-label="Book contents"></nav>
+
+    <main class="main" id="main">
+      <div class="container">
+
+        <header class="chapter-head">
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="index.html">Home</a>
+            <i class="bi bi-chevron-right"></i>
+            <a href="index.html#electronics">Part 3 &middot; Electronics and Power</a>
+            <i class="bi bi-chevron-right"></i>
+            <span>Chapter 9</span>
+          </nav>
+          <span class="chapter-kicker"><i class="bi bi-cpu"></i> Part 3 &middot; Electronics and Power</span>
+          <h1>Basic Electricity for Robots</h1>
+          <p class="lede">Every robot runs on electricity. Before you connect a single wire, you need to understand the three things that flow through it. In this chapter you will learn voltage, current and resistance with a picture you will never forget, then use them to design your own circuits.</p>
+          <div class="chapter-meta">
+            <span><i class="bi bi-clock"></i> ~22 min read</span>
+            <span><i class="bi bi-bar-chart"></i> Beginner</span>
+            <span><i class="bi bi-list-check"></i> Chapter 9 of 30</span>
+          </div>
+          <div class="goals">
+            <h2>What you will learn</h2>
+            <ul>
+              <li><i class="bi bi-check-circle-fill"></i> Explain voltage, current and resistance simply.</li>
+              <li><i class="bi bi-check-circle-fill"></i> Use Ohm's law to solve a basic circuit.</li>
+              <li><i class="bi bi-check-circle-fill"></i> Read a simple circuit diagram.</li>
+            </ul>
+          </div>
+        </header>
+
+        <article class="article">
+
+          <p class="lead">Imagine your robot arrives at night. It needs to light a small lamp so it can "see". You hold a battery, a tiny light, and a few bits of wire. If you join them the wrong way, the light pops and dies. If you join them the right way, it glows for hours. The difference is not luck. It is electricity, and electricity follows a few simple rules you can learn in one sitting.</p>
+
+          <p>This chapter is about those rules. We will not use heavy maths. We will use water flowing through pipes, which is the clearest way to picture electricity. By the end, you will be able to read a circuit diagram and work out the numbers for a real circuit on your own bench.</p>
+
+          <p>Electricity scares some beginners. That is healthy, but it should not stop you. Work at low voltage, follow the safety rules, and you will be safe.</p>
+
+          <h2>The water-pipe picture</h2>
+
+          <p>Electricity is invisible, so we borrow a picture from something you can see: water in pipes. Picture a closed loop of pipe. A pump pushes water around the loop.</p> Part of the pipe is wide and easy to pass. Part of the pipe is narrow and hard to pass. Water flows round and round, always coming back to the pump. That is a circuit.</p>
+
+          <figure class="figure">
+            <div class="figure__box">
+              <svg viewBox="0 0 680 300" width="100%" role="img" aria-label="A loop of pipe with a pump, a wide section and a narrow section, showing pressure, flow and resistance">
+                <path d="M60 90 L620 90 L620 210 L60 210 Z" fill="none" stroke="#7b849b" stroke-width="16" stroke-linejoin="round"></path>
+                <path d="M330 90 L430 90" fill="none" stroke="#1c2230" stroke-width="10"></path>
+                <path d="M330 210 L430 210" fill="none" stroke="#1c2230" stroke-width="10"></path>
+
+                <rect x="30" y="120" width="60" height="60" rx="8" fill="#e8eeff" stroke="#2d5bff" stroke-width="3"></rect>
+                <text x="60" y="146" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#2d5bff">Pump</text>
+                <text x="60" y="164" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#4a5266">voltage</text>
+
+                <text x="210" y="70" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#0f9d78">wide pipe = low resistance</text>
+                <text x="510" y="70" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#b23b3b">narrow pipe = high resistance</text>
+
+                <path d="M150 150 L250 150" stroke="#0f9d78" stroke-width="6" fill="none" marker-end="url(#flow)"></path>
+                <text x="200" y="140" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#0f9d78">flow = current</text>
+
+                <path d="M470 150 L560 150" stroke="#0f9d78" stroke-width="6" fill="none" marker-end="url(#flow)"></path>
+                <text x="515" y="140" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#0f9d78">slower flow</text>
+
+                <text x="340" y="255" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#4a5266">the water always returns to the pump, so every circuit is a loop</text>
+
+                <defs>
+                  <marker id="flow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+                    <path d="M0,0 L10,5 L0,10 z" fill="#0f9d78"></path>
+                  </marker>
+                </defs>
+              </svg>
+            </div>
+            <figcaption>Figure 9.1 — The water-pipe picture. The pump is voltage, the moving water is current, and a narrow pipe is resistance.</figcaption>
+          </figure>
+
+          <p>Now map each part of the picture to an electrical idea.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Water pipe</th><th>Electric circuit</th><th>Plain meaning</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Pump pressure</td><td><strong>Voltage</strong></td><td>How hard the electrons are pushed</td></tr>
+                <tr><td>Water flow</td><td><strong>Current</strong></td><td>How much electricity moves past each second</td></tr>
+                <tr><td>Narrow pipe</td><td><strong>Resistance</strong></td><td>How much the path fights the flow</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 9.1 — The three quantities and their water-pipe twins.</p>
+
+          <h3>Voltage — the push</h3>
+          <p><strong>Voltage</strong> is the push that makes electricity move. It is like the pressure a pump adds to water. A battery is a pump for electricity. The higher the voltage, the harder the push. A 9 volt battery pushes harder than a 1.5 volt battery.</p>
+          <p>Voltage is measured in <strong>volts</strong>, written with the letter <strong>V</strong>. A small robot battery may be 7.4 V. A phone charger gives about 5 V. Mains electricity from a wall socket is around 120 V or 230 V, depending on your country, far too high for bare hands on a breadboard.</p>
+
+          <h3>Current — the flow</h3>
+          <p><strong>Current</strong> is the amount of electricity flowing past a point each second. It is like counting litres of water moving through the pipe. Large current means lots of electricity is moving. Small current means only a trickle.</p>
+          <p>Current is measured in <strong>amperes</strong>, or <strong>amps</strong> for short, written with the letter <strong>A</strong>. A small LED needs about 0.02 A. A motor might need 0.5 A or more. Because robot currents are often small, we also use the <strong>milliamp</strong> (mA), which is one thousandth of an amp. So 0.02 A is the same as 20 mA.</p>
+
+          <h3>Resistance — the squeeze</h3>
+          <p><strong>Resistance</strong> is how much a part fights the flow of electricity. It is like the narrow part of the pipe. More resistance means less current for the same push. A thin wire has low resistance. A resistor is a small part made on purpose to add resistance.</p>
+          <p>Resistance is measured in <strong>ohms</strong>, written with the symbol <strong>&Omega;</strong>. A long wire might be 1 &Omega;. A resistor used with an LED is often 220 &Omega; or 330 &Omega;. A large value like 10,000 &Omega; is written as 10 k&Omega;, where "k" means one thousand.</p>
+
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> In simple words</div>
+            <p><strong>Voltage</strong> is the push (volts, V). <strong>Current</strong> is the flow (amps, A). <strong>Resistance</strong> is the squeeze (ohms, &Omega;). Push harder and more flows. Squeeze the pipe and less flows.</p>
+          </div>
+
+          <div class="callout note">
+            <div class="callout__head"><i class="bi bi-info-circle-fill"></i> Note</div>
+            <p>The water picture has one limit. In a pipe, water is what moves. In a wire, tiny charged particles called <strong>electrons</strong> drift along. You do not need to study electrons to build circuits. Just remember: electricity is the flow of electrons, and we push them with voltage.</p>
+          </div>
+
+          <h2>Ohm's law — the master rule</h2>
+
+          <p>Voltage, current and resistance are tied together by one famous rule. It is called <strong>Ohm's law</strong>, after the scientist Georg Ohm.</p>
+
+          <div class="formula"><span class="label">Ohm's law</span> V = I &times; R</div>
+
+          <p>In words: the voltage equals the current multiplied by the resistance. Here <strong>V</strong> is voltage in volts, <strong>I</strong> is current in amps, and <strong>R</strong> is resistance in ohms. Engineers use the letter I for current, from the old word "intensity".</p>
+
+          <p>This one rule can be rearranged into three forms. Each form answers a different question.</p>
+
+          <div class="formula"><span class="label">Find voltage</span> V = I &times; R</div>
+          <div class="formula"><span class="label">Find current</span> I = V &divide; R</div>
+          <div class="formula"><span class="label">Find resistance</span> R = V &divide; I</div>
+
+          <p>Here is the easy way to remember them. Picture a triangle with V on top and I and R below. Cover the one you want, and you will see the sum you need.</p>
+
+          <h3>Worked example 1 — find the current</h3>
+          <p>A 9 V battery is connected to a 100 &Omega; resistor. How much current flows?</p>
+          <ol>
+            <li>Write down what you know. V = 9 V, R = 100 &Omega;.</li>
+            <li>Choose the right form. You want current, so use I = V &divide; R.</li>
+            <li>Put the numbers in. I = 9 &divide; 100.</li>
+            <li>Do the division. I = 0.09 A.</li>
+            <li>Convert if useful. 0.09 A is the same as 90 mA.</li>
+          </ol>
+          <p>So the current is 0.09 A, or 90 mA. That is too much for a common LED, which wants only about 20 mA. Keep that thought, because it comes back later.</p>
+
+          <h3>Worked example 2 — find the resistance</h3>
+          <p>You want a current of 20 mA (0.02 A) to flow from a 5 V supply. What resistance do you need?</p>
+          <ol>
+            <li>Write down what you know. V = 5 V, I = 0.02 A.</li>
+            <li>Choose the right form. You want resistance, so use R = V &divide; I.</li>
+            <li>Put the numbers in. R = 5 &divide; 0.02.</li>
+            <li>Do the division. R = 250 &Omega;.</li>
+            <li>Pick a real part. 250 &Omega; is not a common value, so you would choose 270 &Omega; from the standard range.</li>
+          </ol>
+          <p>So the resistance is 250 &Omega;, and in practice you would fit a 270 &Omega; resistor. This is exactly the kind of sum you do when you connect an LED to a power supply.</p>
+
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> Tip</div>
+            <p>Always write the units next to your numbers. If V is in volts and R is in ohms, the answer I comes out in amps. If you forget the units, it is easy to mix up amps and milliamps and be out by a factor of one thousand.</p>
+          </div>
+
+          <h2>Electrical power — heat and work</h2>
+
+          <p>Current flowing through a resistance does two things. It can do useful work, like light a lamp or spin a motor. It also makes heat. The rate at which energy is used is called <strong>power</strong>, measured in <strong>watts</strong>, written with the letter <strong>W</strong>.</p>
+
+          <p>Power tells you how much energy a part uses each second. A small LED uses a fraction of a watt. A powerful motor might use hundreds of watts. Two formulas give us power.</p>
+
+          <div class="formula"><span class="label">Power from volts and amps</span> P = V &times; I</div>
+          <div class="formula"><span class="label">Power from current and resistance</span> P = I&sup2; &times; R</div>
+
+          <p>The first formula is the easy one: power equals voltage times current. The second is useful when you know the current and the resistance. The small 2 means "squared", so you multiply the current by itself. Some books also write P = V&sup2; &divide; R, which is the same idea rearranged.</p>
+
+          <h3>Worked example 3 — the heat in a resistor</h3>
+          <p>A resistor of 100 &Omega; carries a current of 0.1 A. How much power does it turn into heat?</p>
+          <ol>
+            <li>Write down what you know. I = 0.1 A, R = 100 &Omega;.</li>
+            <li>Choose the right form. You know I and R, so use P = I&sup2; &times; R.</li>
+            <li>Square the current. 0.1 &times; 0.1 = 0.01.</li>
+            <li>Multiply by R. 0.01 &times; 100 = 1.</li>
+            <li>Add the unit. P = 1 W.</li>
+          </ol>
+          <p>So the resistor gives off 1 watt of heat. That matters, because resistors are sold with a <strong>watt rating</strong>. A small resistor is often rated for only 0.25 W. One watt would make it very hot, so for this job you would choose a resistor rated 2 W or more.</p>
+
+          <div class="callout warn">
+            <div class="callout__head"><i class="bi bi-exclamation-triangle-fill"></i> Watch out</div>
+            <p>The watt rating of a resistor is the maximum heat it can safely shed. If you push more power through it, it overheats, drifts in value, smokes or fails. Always pick a rating at least double the power you calculated.</p>
+          </div>
+
+          <h2>Series and parallel circuits</h2>
+
+          <p>Parts can be joined in two basic ways. They can sit in a single line, one after another. Or they can sit side by side, sharing the same two points. These two arrangements behave very differently, and every circuit you build is a mix of them.</p>
+
+          <h3>Series — one path</h3>
+          <p>In a <strong>series</strong> circuit, all parts sit on one single path. The current has only one route, so the same current flows through every part. That is the key rule: <strong>in series, the current is the same everywhere.</strong></p>
+          <p>The voltage, however, is shared out. Each part takes some of the total push. If two identical resistors sit in series across a 9 V supply, each takes half. The voltages add back up to the whole.</p>
+          <p>Resistances also add up. Two 100 &Omega; resistors in series act like one 200 &Omega; resistor. This is how you make a value you do not have in your box.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Rule</th><th>Series</th><th>Parallel</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Current</td><td>Same through every part</td><td>Divides between the paths</td></tr>
+                <tr><td>Voltage</td><td>Divides between the parts</td><td>Same across every part</td></tr>
+                <tr><td>Total resistance</td><td>Adds up: R1 + R2</td><td>Less than the smallest part</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 9.2 — The two ways to join parts, and how each one behaves.</p>
+
+          <h3>Parallel — many paths</h3>
+          <p>In a <strong>parallel</strong> circuit, parts sit side by side across the same two points. Now every part sees the same voltage. That is the key rule: <strong>in parallel, the voltage is the same across every part.</strong></p>
+          <p>The current, however, divides. Each path takes the current it needs, and the supply gives the total. If you connect two lamps in parallel across a battery, each gets the full battery voltage, and the battery supplies the sum of both currents.</p>
+          <p>Parallel resistance is odd at first: adding a path lowers the total resistance, because there are more routes for current. Two 100 &Omega; resistors in parallel act like one 50 &Omega; resistor. The total is always smaller than the smallest part.</p>
+
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> The key idea</div>
+            <p>In <strong>series</strong>, the current is shared and the voltage divides. In <strong>parallel</strong>, the voltage is shared and the current divides. Say that sentence to yourself until it feels obvious.</p>
+          </div>
+
+          <h3>A numeric example</h3>
+          <p>Take two 100 &Omega; resistors and a 9 V battery.</p>
+          <p>In series, they add to 200 &Omega;. The current is I = 9 &divide; 200 = 0.045 A, or 45 mA. Each resistor drops 4.5 V, and 4.5 + 4.5 adds back to the full 9 V.</p>
+          <p>In parallel, the total resistance is 50 &Omega;. The current from the battery is I = 9 &divide; 50 = 0.18 A, or 180 mA. Each resistor gets the full 9 V, so each takes 90 mA, and the two currents add to 180 mA. Voltage same, current divides, exactly as the rule says.</p>
+
+          <h2>DC and AC — two kinds of electricity</h2>
+
+          <p>Electricity comes in two flavours. They differ in one simple way: does the flow keep going one direction, or does it keep swapping?</p>
+
+          <p><strong>DC</strong> stands for <strong>direct current</strong>. The current flows steadily in one direction. A battery makes DC. Almost every robot uses DC, because robots carry batteries.</p>
+
+          <p><strong>AC</strong> stands for <strong>alternating current</strong>. The current swaps direction many times every second. Mains electricity from a wall socket is AC. AC is great for travelling long distances through power lines, but most small electronics cannot use it directly.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Point</th><th>DC (direct current)</th><th>AC (alternating current)</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Direction</td><td>Always the same way</td><td>Swaps many times a second</td></tr>
+                <tr><td>Where it comes from</td><td>Batteries, solar cells, power supplies</td><td>Wall sockets, generators</td></tr>
+                <tr><td>Typical level</td><td>3 V to 24 V in robots</td><td>120 V or 230 V from mains</td></tr>
+                <tr><td>Used by robots?</td><td>Almost always</td><td>Rarely, and only inside a safe power supply</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 9.3 — The two kinds of electricity. Robots live in the left column.</p>
+
+          <h3>Why robots use low-voltage DC</h3>
+          <p>Robots use DC for three good reasons. First, it is portable: batteries give DC directly, with no conversion needed. Second, motors and most chips are built for DC. Third, and most important, it is <strong>safe</strong>.</p>
+          <p>Safety is worth saying clearly. A 12 V DC supply will not normally hurt you through dry skin. That is why you can touch the terminals of a battery and feel nothing. Mains AC at 230 V can kill. This is why every beginner should build on low-voltage DC first.</p>
+
+          <div class="callout danger">
+            <div class="callout__head"><i class="bi bi-shield-exclamation"></i> Danger</div>
+            <p>Never build or probe circuits that plug into a wall socket. Mains electricity can stop your heart. If your project needs mains power, use a sealed adapter or power supply that outputs low DC, and never open it. Low-voltage DC is where you learn.</p>
+          </div>
+
+          <h2>Ground, loops and closed circuits</h2>
+
+          <p>Every circuit is a loop. Electricity leaves the battery, travels through the parts, and must return to the battery to keep flowing. If the loop is broken anywhere, everything stops. This is the single most important idea for understanding any diagram.</p>
+
+          <h3>Open and closed</h3>
+          <p>A <strong>closed circuit</strong> is a complete loop. Current can flow. A lamp lights. An <strong>open circuit</strong> has a gap somewhere. Current cannot flow, so nothing happens. A switch is simply a part that opens and closes the loop on purpose.</p>
+          <p>This is why a torch with a dead bulb or a loose wire does nothing. The loop is open. The battery is fine, but no current can complete the journey.</p>
+
+          <h3>Ground and common</h3>
+          <p><strong>Ground</strong> is the name we give to the reference point of a circuit, the zero volts line. In a battery circuit, the minus terminal is usually the ground. When you read "9 V", you really mean "9 V above ground".</p>
+          <p><strong>Common</strong> is a point where many parts share the same connection, often the ground line. On a circuit board you will see a long rail marked GND or common.</p>
+
+          <h3>Short circuits — the dangerous shortcut</h3>
+          <p>A <strong>short circuit</strong> happens when current finds a path with almost no resistance. It is like opening a huge hole in the pipe. The flow becomes enormous. A wire touching the battery terminals directly is a short.</p>
+          <p>Short circuits are dangerous for two reasons. The huge current makes heat, which can melt wires and start fires. It also drains the battery in seconds, or in a lithium battery can cause it to swell and catch fire. Always check for shorts before you switch on a new circuit.</p>
+
+          <div class="callout warn">
+            <div class="callout__head"><i class="bi bi-exclamation-triangle-fill"></i> Watch out</div>
+            <p>A short circuit is the fastest way to kill a battery, and the fastest way to start a fire. Before you power up, look along each wire with your eyes and check it reaches the part you meant, not straight back to the other terminal.</p>
+          </div>
+
+          <h2>Components you will meet</h2>
+
+          <p>You do not need to know every electronic part to start building. A small handful covers most beginner robots. Meet them one at a time, each with a job.</p>
+
+          <h3>Resistor</h3>
+          <p>A <strong>resistor</strong> is a part that adds a known resistance to limit current. Think of it as a pipe with a fixed narrow part. Its value is measured in ohms. In robots you use resistors to protect LEDs, to pull signals to a known level, and to divide voltages. The common small resistors are the size of a grain of rice, with coloured stripes that show their value.</p>
+
+          <h3>Capacitor</h3>
+          <p>A <strong>capacitor</strong> stores a small amount of electrical energy, like a tiny rechargeable battery that fills and empties very fast. In robots, capacitors smooth out sudden changes in voltage, so a chip does not reset when a motor switches on.</p>
+
+          <h3>Diode</h3>
+          <p>A <strong>diode</strong> is a one-way valve for current. Current flows easily in one direction and is blocked in the other. This lets you protect a circuit from being connected the wrong way round. A diode has a marked end, usually a stripe, that shows which way it points.</p>
+
+          <h3>LED</h3>
+          <p>An <strong>LED</strong>, or light-emitting diode, is a diode that glows when current flows through it. It is the little coloured light on almost every gadget. It only lights if you connect it the right way. LEDs are used for indicators, displays and even robot eyes.</p>
+
+          <h3>Transistor — the switch</h3>
+          <p>A <strong>transistor</strong> is a tiny electronic switch with no moving parts. A small current at one pin lets it control a much bigger current through the other pins. Think of it as a tap: a light touch on the handle releases a strong flow of water.</p>
+          <p>Your robot's controller can only give a tiny current, but a motor needs much more. The transistor lets the small current switch the big one, so the controller stays safe while the motor gets its power.</p>
+
+          <h3>Breadboard — your build surface</h3>
+          <p>A <strong>breadboard</strong> is a plastic block full of tiny holes for pushing in parts and wires. No soldering is needed, so you can build, test and change circuits in seconds. It has <strong>rails</strong> along the edges and <strong>rows</strong> in the middle.</p>
+          <p>The two long rails, marked red and blue, run the full length of the board. One is for the positive supply and one is for ground. Every hole in a rail is joined to the others in that rail. The middle rows are different: each group of five holes is joined together, but not to the row beside it. Knowing this saves hours of confusion.</p>
+
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> Tip</div>
+            <p>On a breadboard, the two edge rails are not connected to the middle rows. You must add short wires to link them. Many beginners build a perfect circuit and wonder why nothing works. A missing link between a rail and a row is a very common cause.</p>
+          </div>
+
+          <h2>Reading a schematic</h2>
+
+          <p>A <strong>schematic</strong> is a drawing of a circuit using symbols instead of pictures. It does not show where parts sit on the board. It shows how they connect. Once you can read schematics, any circuit in any book or datasheet opens up to you.</p>
+
+          <p>Wires are drawn as straight lines. A dot where lines cross means the wires are joined. Lines that cross without a dot are not joined.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Part</th><th>Symbol shape</th><th>What it does</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Battery</td><td>Long and short lines, repeated</td><td>Supplies voltage</td></tr>
+                <tr><td>Resistor</td><td>A zigzag line</td><td>Limits current</td></tr>
+                <tr><td>LED</td><td>A triangle with a bar and two arrows</td><td>Lights up; one-way</td></tr>
+                <tr><td>Ground</td><td>Short lines getting smaller</td><td>The zero-volt reference</td></tr>
+                <tr><td>Switch</td><td>A line with a hinge</td><td>Opens or closes the loop</td></tr>
+                <tr><td>Motor</td><td>A circle with the letter M</td><td>Turns electricity into motion</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 9.4 — The symbols you will meet first, and what each one means.</p>
+
+          <p>Let us walk through a complete example symbol by symbol. Figure 9.2 shows a battery, a resistor and an LED, all in one loop.</p>
+
+          <figure class="figure">
+            <div class="figure__box">
+              <svg viewBox="0 0 660 300" width="100%" role="img" aria-label="A schematic with a battery on the left, a resistor at the top, an LED at the bottom and a ground symbol">
+                <line x1="120" y1="70" x2="120" y2="140" stroke="#1c2230" stroke-width="2"></line>
+                <line x1="120" y1="160" x2="120" y2="235" stroke="#1c2230" stroke-width="2"></line>
+                <line x1="100" y1="140" x2="140" y2="140" stroke="#1c2230" stroke-width="3"></line>
+                <line x1="108" y1="160" x2="132" y2="160" stroke="#1c2230" stroke-width="3"></line>
+                <text x="82" y="155" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#2d5bff">9 V</text>
+
+                <line x1="120" y1="70" x2="300" y2="70" stroke="#1c2230" stroke-width="2"></line>
+                <line x1="300" y1="70" x2="300" y2="90" stroke="#1c2230" stroke-width="2"></line>
+                <path d="M300 90 L320 105 L280 120 L320 135 L280 150 L300 165 L300 185" fill="none" stroke="#b23b3b" stroke-width="2.5"></path>
+                <text x="360" y="125" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#b23b3b">resistor</text>
+                <line x1="300" y1="185" x2="300" y2="235" stroke="#1c2230" stroke-width="2"></line>
+
+                <line x1="300" y1="235" x2="440" y2="235" stroke="#1c2230" stroke-width="2"></line>
+                <polygon points="440,220 440,250 470,235" fill="#e8eeff" stroke="#2d5bff" stroke-width="2"></polygon>
+                <line x1="470" y1="220" x2="470" y2="250" stroke="#2d5bff" stroke-width="3"></line>
+                <line x1="460" y1="205" x2="452" y2="192" stroke="#f0a500" stroke-width="2"></line>
+                <line x1="474" y1="205" x2="482" y2="192" stroke="#f0a500" stroke-width="2"></line>
+                <text x="455" y="278" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#2d5bff">LED</text>
+
+                <line x1="470" y1="235" x2="120" y2="235" stroke="#1c2230" stroke-width="2"></line>
+                <text x="170" y="270" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#0f9d78">ground</text>
+                <line x1="150" y1="235" x2="150" y2="248" stroke="#0f9d78" stroke-width="2.5"></line>
+                <line x1="138" y1="248" x2="162" y2="248" stroke="#0f9d78" stroke-width="2.5"></line>
+                <line x1="142" y1="255" x2="158" y2="255" stroke="#0f9d78" stroke-width="2.5"></line>
+                <line x1="146" y1="262" x2="154" y2="262" stroke="#0f9d78" stroke-width="2.5"></line>
+
+                <text x="330" y="290" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#7b849b">current flows out of the long line, round the loop, back to ground</text>
+              </svg>
+            </div>
+            <figcaption>Figure 9.2 — A simple LED circuit. Battery, then resistor, then LED, then back to ground. One loop, always.</figcaption>
+          </figure>
+
+          <p>Follow the loop with your finger.</p>
+
+          <ol>
+            <li>Start at the battery. The long line is the positive terminal. That is where the push begins.</li>
+            <li>The wire leads to the <strong>resistor</strong>, the zigzag. It slows the current before it reaches the LED.</li>
+            <li>The wire then reaches the <strong>LED</strong>, the triangle with the bar. The triangle points the way current is allowed to flow.</li>
+            <li>The wire returns to the battery through the <strong>ground</strong> symbol, the little staircase. That closes the loop.</li>
+            <li>Current flows all the way round, so the LED glows. Break the loop anywhere and the light goes out.</li>
+          </ol>
+
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> In simple words</div>
+            <p>A schematic is a map of connections, not a picture of the board. Follow the lines as if you were a drop of water. If you can trace one closed loop from the plus terminal back to ground, you understand the circuit.</p>
+          </div>
+
+          <h2>Why LEDs need a resistor</h2>
+
+          <p>This is the single most common mistake beginners make. An LED is not like a normal lamp. Its resistance is not fixed. Once the voltage across it is high enough, its resistance drops sharply and the current can run away.</p>
+
+          <p>If you connect an LED straight across a battery, the current may rise far above what the LED can take. Within a second or two, the tiny part overheats and fails. The fix is simple: put a resistor in series with the LED to limit the current.</p>
+
+          <p>LEDs also have a small fixed voltage drop across them when lit. This is called the <strong>forward voltage</strong>. For a red LED it is about 2 V. For blue or white it is about 3 V. That drop matters in the sum.</p>
+
+          <h3>Choosing the resistor for an LED</h3>
+          <p>Here is the method, step by step. We want to run a red LED at 20 mA from a 9 V battery.</p>
+
+          <ol>
+            <li>Find the voltage the resistor must drop. That is the supply minus the LED drop: 9 V &minus; 2 V = 7 V.</li>
+            <li>Decide the current you want. A safe common choice is 20 mA, which is 0.02 A.</li>
+            <li>Use Ohm's law to find the resistance. R = V &divide; I = 7 &divide; 0.02 = 350 &Omega;.</li>
+            <li>Pick the nearest standard value above it. The standard range has 330 &Omega; and 390 &Omega;. Here you choose 390 &Omega; to be a little safer.</li>
+            <li>Check the power in the resistor. P = V &times; I = 7 &times; 0.02 = 0.14 W. A standard 0.25 W resistor is fine.</li>
+          </ol>
+
+          <p>So a 390 &Omega; resistor, rated 0.25 W, protects the LED. The maths never changes, only the numbers. Change the battery to 5 V and the resistor to 150 &Omega;, and the same steps give you the answer.</p>
+
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> The key idea</div>
+            <p>An LED always needs a current-limiting resistor in series. The resistor value is (supply voltage &minus; LED forward voltage) &divide; desired current.</p>
+          </div>
+
+          <h2>Measuring with a multimeter</h2>
+
+          <p>A <strong>multimeter</strong> is the most useful tool on your bench. It measures several electrical things in one handheld box. It has two probe wires, one red and one black, and a dial to choose what you want to measure.</p>
+
+          <h3>Measuring voltage</h3>
+          <p>To measure voltage, set the dial to DC volts (often shown as V with a straight line). Touch the black probe to ground and the red probe to the point you want to check. The meter shows the voltage between those two points. This is called measuring <strong>across</strong> a part. Probes go in parallel with the part. This is safe and is how you confirm a supply is working.</p>
+
+          <h3>Measuring current</h3>
+          <p>To measure current, the meter must become part of the loop. You break the circuit and send the current through the meter. This is called measuring <strong>in series</strong>. Get this wrong and you can blow the meter's fuse. The biggest beginner error is leaving the probes across the supply while the meter is set to measure current. That is a short circuit through the meter.</p>
+
+          <div class="callout danger">
+            <div class="callout__head"><i class="bi bi-shield-exclamation"></i> Danger</div>
+            <p>Never measure current with the probes across a supply. Current is measured in series, with the meter inside the loop. Voltage is measured in parallel, across two points. Mixing these up will blow the meter fuse or damage the circuit.</p>
+          </div>
+
+          <h3>Measuring resistance and continuity</h3>
+          <p>To measure resistance, switch off the power first. Then touch the probes to the two ends of the part. The meter sends a tiny known current and works out the resistance. Measuring a part while power is on gives a wrong answer and can damage the meter.</p>
+          <p><strong>Continuity</strong> is a mode that beeps when two points are joined by a good path. Touch the ends of a wire and hear a beep, and you know the wire is good. Silence means it is broken or you have the wrong holes.</p>
+
+          <ol>
+            <li>Check the meter battery and dial position before you start.</li>
+            <li>For voltage, probe across a part with power on. Black to ground, red to the test point.</li>
+            <li>For current, break the loop and put the meter in series. Start on the highest range.</li>
+            <li>For resistance, switch the power off, then probe across the part.</li>
+            <li>For continuity, use the beep mode to trace wires and check a loop is complete.</li>
+          </ol>
+
+          <h2>A full worked example: the power light</h2>
+
+          <p>Let us design a real circuit from start to finish. Your robot has a motor driver board and you want a small green light that says "the power is on". This is a job every builder does, and it uses everything in this chapter.</p>
+
+          <p>The design brief is simple: the supply is 7.4 V, the LED is green with a forward voltage of about 2.1 V, it should run at 15 mA, and it must be safe to leave on for hours.</p>
+
+          <h3>Step 1 — write down what you know</h3>
+          <p>Supply V = 7.4 V. LED forward voltage = 2.1 V. Desired current I = 15 mA = 0.015 A. These three numbers are all we need.</p>
+
+          <h3>Step 2 — find the voltage across the resistor</h3>
+          <p>The LED takes 2.1 V of the supply. The resistor must take the rest. So the resistor voltage is 7.4 V &minus; 2.1 V = 5.3 V.</p>
+
+          <div class="formula"><span class="label">Resistor voltage</span> V<sub>R</sub> = V<sub>supply</sub> &minus; V<sub>LED</sub> = 7.4 &minus; 2.1 = 5.3 V</div>
+
+          <h3>Step 3 — use Ohm's law to size the resistor</h3>
+          <p>We know the voltage across the resistor and the current we want. So we use the resistance form.</p>
+
+          <div class="formula"><span class="label">Resistor value</span> R = V &divide; I = 5.3 &divide; 0.015 = 353 &Omega;</div>
+
+          <h3>Step 4 — pick a real value and re-check</h3>
+          <p>353 &Omega; is not a value you can buy. The nearest standard values are 330 &Omega; and 390 &Omega;. You pick 390 &Omega; to keep the LED gentle, then re-check with the real part.</p>
+
+          <div class="formula"><span class="label">Actual current</span> I = V &divide; R = 5.3 &divide; 390 = 0.0136 A &asymp; 13.6 mA</div>
+
+          <p>So the real current is about 13.6 mA, a little less than the 15 mA we aimed for. That is perfectly fine. The LED will still be bright, and running slightly below the target makes it last longer.</p>
+
+          <h3>Step 5 — check the power in the resistor</h3>
+          <p>The resistor must shed this heat without getting too hot. Use P = V &times; I.</p>
+
+          <div class="formula"><span class="label">Resistor power</span> P = 5.3 &times; 0.0136 = 0.072 W</div>
+
+          <p>That is well under the 0.25 W rating of a standard small resistor, so it will stay cool. Even the tiniest common resistor would be safe here.</p>
+
+          <h3>Step 6 — check the LED polarity</h3>
+          <p>An LED only works one way round. The longer leg is the positive side, called the <strong>anode</strong>. The shorter leg and the flat edge are the negative side, called the <strong>cathode</strong>. The anode must face the resistor and the positive supply. If you fit it backwards, the LED simply will not light.</p>
+
+          <h3>Step 7 — build and measure</h3>
+          <p>Push the resistor and LED into the breadboard in series. Link the positive rail to one end of the resistor. Link the other end of the resistor to the LED anode. Link the LED cathode to the ground rail. Then connect the battery.</p>
+
+          <ol>
+            <li>Set your multimeter to DC volts. Check the battery reads close to 7.4 V.</li>
+            <li>Measure across the resistor. It should read close to 5.3 V.</li>
+            <li>Measure across the LED. It should read close to 2.1 V.</li>
+            <li>Add the two readings. They should nearly equal the battery voltage, because the loop shares the push out.</li>
+            <li>If the measured current is close to 13.6 mA, your circuit matches your design.</li>
+          </ol>
+
+          <p>That is a complete design. You started with a description and finished with a built, measured circuit. Every result was predicted by Ohm's law before you touched a wire. This is the heart of electronics as a profession: predict, build, measure, compare.</p>
+
+          <h2>Common beginner mistakes</h2>
+
+          <p>Everyone makes these mistakes once. Read them now and you will save parts, time and a little money.</p>
+
+          <h3>Forgetting the current-limiting resistor</h3>
+          <p>This is mistake number one. An LED without a series resistor will draw too much current and fail, often in a second. Always calculate and fit the resistor. A burned LED smells faintly of burnt plastic and never works again.</p>
+
+          <h3>Reversing polarity</h3>
+          <p>Many parts only work one way round. An LED fitted backwards will not light. An <strong>electrolytic capacitor</strong>, the small cylinder type, can be damaged or even burst if its polarity is reversed. It has a stripe that marks the negative side. Check the mark before you push it in. A diode or battery fitted backwards stops the circuit or sends current the wrong way.</p>
+
+          <h3>Measuring current across a supply</h3>
+          <p>If you leave the meter in current mode and touch the probes across a battery, you place almost zero resistance across the supply. That is a short circuit through your meter. It blows the meter's fuse and can damage the circuit. Check your dial before you touch anything.</p>
+
+          <h3>Mixing up series and parallel</h3>
+          <p>Beginners often say "series" when they mean "parallel". Check the rule: is there one path or many? Look at the wires with your own eyes. One path means series, so the current is the same. Many paths sharing two points means parallel, so the voltage is the same.</p>
+
+          <h3>Forgetting to connect the grounds</h3>
+          <p>Two parts of a circuit must share a common ground to understand each other. On a breadboard, the rails are not linked to the middle rows automatically. A missing ground link is one of the most common reasons a circuit silently does nothing.</p>
+
+          <div class="callout warn">
+            <div class="callout__head"><i class="bi bi-exclamation-triangle-fill"></i> Watch out</div>
+            <p>Do not connect a motor straight to your controller's pins. Motors pull far more current than the controller can give, and the sudden switch-off can send a voltage spike that damages the chip. Use a transistor or a motor driver, and add a protection diode. You will meet this in the next chapter.</p>
+          </div>
+
+          <h2>How professionals do it</h2>
+
+          <p>When the circuits leave the breadboard and join a real product, a few new habits appear. None of them is mysterious. Each one solves a problem you would meet at scale.</p>
+
+          <h3>Power budgets</h3>
+          <p>A professional adds up every part's current before the design is finished. This is called a <strong>power budget</strong>. If the sensors, controller, motors and lights together need 2 A, the battery and wires must be chosen for at least that, with spare room. Guessing leads to a robot that browns out and resets when the motors start.</p>
+
+          <h3>Decoupling capacitors</h3>
+          <p>A small capacitor is placed right next to each chip, between its power pin and ground. It is called a <strong>decoupling capacitor</strong>. It acts as a local store of energy, so when the chip suddenly needs a burst of current, the supply does not dip. This tiny part is one of the reasons professional boards are reliable.</p>
+
+          <h3>Solid grounding</h3>
+          <p>Professionals give their ground a wide, clean path. A weak ground, or one shared carelessly with a big motor, causes noise and strange faults. On a printed circuit board the ground is often a whole layer of copper, so every part has a short route home.</p>
+
+          <h3>Protection diodes and flyback</h3>
+          <p>Motors and coils store energy while they run. When you switch them off quickly, they push back and can create a sudden high-voltage spike. A diode placed across the motor, called a <strong>flyback diode</strong>, gives that energy a harmless path.</p>
+
+          <h3>Fuses</h3>
+          <p>A <strong>fuse</strong> is a thin piece of wire that melts and breaks if too much current flows. It is a deliberate weak point that fails safely before a short circuit can start a fire. Professionals fit one where a battery meets a circuit.</p>
+
+          <h3>PCB instead of breadboard</h3>
+          <p>A breadboard is for testing. When the design is proven, it moves to a <strong>printed circuit board</strong>, or PCB. A PCB uses copper tracks instead of loose wires. It is far more reliable, because nothing can shake loose, and thousands can be made with the same result every time.</p>
+
+          <h2>Try it yourself</h2>
+
+          <p>These exercises go from easy to harder. Read the hint only if you get stuck. You need a small breadboard, a few resistors, one or two LEDs, a 9 V battery or a small DC supply, and a multimeter.</p>
+
+          <ol>
+            <li><strong>Light one LED safely.</strong> Build a single LED circuit with a current-limiting resistor. Use a 9 V supply, a red LED (2 V drop) and aim for about 15 mA. Work out the resistance first, then pick the nearest standard value. <em>Hint: the resistor voltage is 9 &minus; 2 = 7 V, and R = 7 &divide; 0.015 = 467 &Omega;, so choose 470 &Omega;.</em></li>
+            <li><strong>Prove Ohm's law.</strong> Use two different resistors in turn and measure the current each time. Check that the measured currents match I = V &divide; R. <em>Hint: measure the voltage across the resistor, not the whole supply, because the LED takes some too.</em></li>
+            <li><strong>Series and parallel test.</strong> Take two identical resistors. First join them in series, then in parallel, with your multimeter set to ohms. Compare the readings. <em>Hint: with two 100 &Omega; parts, series should read about 200 &Omega; and parallel about 50 &Omega;.</em></li>
+            <li><strong>Trace a loop with continuity.</strong> Put your meter in beep mode. Touch the probes to the two far ends of the positive rail, then to the two far ends of a middle row. Find out which holes are joined. <em>Hint: you will hear a beep across a whole row of five holes, but silence between two different rows.</em></li>
+            <li><strong>Build the power light.</strong> Follow the full worked example and build the green power indicator. Measure every voltage and check it matches the design. <em>Hint: if the LED does not light, flip it round first, then check your ground link.</em></li>
+          </ol>
+
+          <h2>Going deeper: why the loop must close</h2>
+
+          <p>Here is one optional idea for the curious. We said current must return to the battery. A battery cannot give current unless it also takes current back. The number of electrons leaving the minus terminal must equal the number returning to the plus terminal, second by second.</p>
+
+          <p>This is why a single wire touching one battery terminal does nothing. There is no return path, so no loop, so no current.</p>
+
+          <section class="takeaways">
+            <h2><i class="bi bi-pin-angle-fill"></i> Key takeaways</h2>
+            <ul>
+              <li><i class="bi bi-check2-circle"></i> Voltage is the push, current is the flow, resistance is the squeeze.</li>
+              <li><i class="bi bi-check2-circle"></i> Ohm's law is V = I &times; R, and it rearranges to find any one of the three.</li>
+              <li><i class="bi bi-check2-circle"></i> Power is P = V &times; I, and it shows up as heat in a resistor, so watch watt ratings.</li>
+              <li><i class="bi bi-check2-circle"></i> In series the current is the same and voltage divides; in parallel the voltage is the same and current divides.</li>
+              <li><i class="bi bi-check2-circle"></i> Robots use low-voltage DC because it is portable, fits motors and chips, and is far safer than mains.</li>
+              <li><i class="bi bi-check2-circle"></i> Every circuit is a closed loop, and an LED always needs a current-limiting resistor.</li>
+            </ul>
+          </section>
+
+          <section class="quiz">
+            <div class="quiz__head"><i class="bi bi-patch-question-fill"></i> Check your understanding</div>
+            <details>
+              <summary><span class="q-num">Q1.</span><span>In the water picture, what do the pump, the flowing water and a narrow pipe stand for?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> The pump is voltage (the push), the flowing water is current (the flow), and the narrow pipe is resistance (the squeeze).</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q2.</span><span>A 12 V supply is connected to a 400 &Omega; resistor. What current flows?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Use I = V &divide; R = 12 &divide; 400 = 0.03 A, which is 30 mA.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q3.</span><span>Two 100 &Omega; resistors in series and then in parallel. What is the total resistance each way?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> In series they add to 200 &Omega;. In parallel they act like 50 &Omega;, which is less than either one.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q4.</span><span>Why does a resistor have a watt rating, and when does it matter?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> The watt rating is the maximum heat the resistor can safely shed. It matters whenever the calculated power is close to or above the rating, because too much heat makes it drift, smoke or fail.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q5.</span><span>Why do most robots run on DC rather than AC?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Batteries give DC directly, motors and chips are built for DC, and low-voltage DC is much safer to work with than mains AC.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q6.</span><span>What is a short circuit, and why is it dangerous?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> A short circuit is a path with almost no resistance, so current becomes enormous. It overheats wires, can start a fire, and can destroy the battery in seconds.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q7.</span><span>You want a red LED (2 V drop) to run at 20 mA from a 9 V supply. What resistor value do you need?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> The resistor drops 9 &minus; 2 = 7 V. Then R = V &divide; I = 7 &divide; 0.02 = 350 &Omega;, so you would fit a standard 390 &Omega; resistor.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q8.</span><span>How is measuring current different from measuring voltage, and why does it matter?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Voltage is measured across a part, with the probes in parallel. Current is measured in series, with the meter placed inside the loop. Placing the probes across a supply in current mode creates a short circuit and blows the meter fuse.</div>
+            </details>
+          </section>
+
+        </article>
+
+        <nav class="pager" id="pager" aria-label="Chapter navigation"></nav>
+      </div>
+    </main>
+  </div>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/book.js"></script>
+</body>
+</html>

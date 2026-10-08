@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>try{var __t=localStorage.getItem("mr-theme");if(__t==="dark"||__t==="light")document.documentElement.setAttribute("data-theme",__t);}catch(e){}</script>
+  <title>Chapter 22: Your First Robot Project: Step by Step — Master Robotics</title>
+  <meta name="description" content="Build a complete autonomous obstacle-avoiding robot step by step. Shopping list, wiring, code, testing, debugging and a project write-up, all in plain English.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/prose.css">
+</head>
+<body data-file="ch22-first-robot-project.html">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="topbar" id="topbar"></header>
+  <div class="progress-bar" id="progressBar"></div>
+
+  <div class="layout">
+    <div class="sidebar__backdrop" id="navBackdrop"></div>
+    <nav class="sidebar" id="sidebar" aria-label="Book contents"></nav>
+
+    <main class="main" id="main">
+      <div class="container">
+
+        <header class="chapter-head">
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="index.html">Home</a>
+            <i class="bi bi-chevron-right"></i>
+            <a href="index.html#career">Part 6 &middot; Practice and Career</a>
+            <i class="bi bi-chevron-right"></i>
+            <span>Chapter 22</span>
+          </nav>
+          <span class="chapter-kicker"><i class="bi bi-mortarboard"></i> Part 6 &middot; Practice and Career</span>
+          <h1>Your First Robot Project: Step by Step</h1>
+          <p class="lede">This is the chapter where the whole book becomes one machine. You will plan, build, test and debug a small robot that drives around a room and avoids the walls. Take it slowly, one stage at a time.</p>
+          <div class="chapter-meta">
+            <span><i class="bi bi-clock"></i> ~34 min read</span>
+            <span><i class="bi bi-bar-chart"></i> Beginner</span>
+            <span><i class="bi bi-list-check"></i> Chapter 22 of 30</span>
+          </div>
+          <div class="goals">
+            <h2>What you will learn</h2>
+            <ul>
+              <li><i class="bi bi-check-circle-fill"></i> Plan and build a small working robot.</li>
+              <li><i class="bi bi-check-circle-fill"></i> Test each part before combining them.</li>
+              <li><i class="bi bi-check-circle-fill"></i> Debug a real problem from symptom to fix.</li>
+            </ul>
+          </div>
+        </header>
+
+        <article class="article">
+
+          <p class="lead">Nobody becomes a robotics engineer by reading only. At some point you put parts on a table, wire them together, and watch a machine move on its own for the first time. That moment is the goal of this chapter.</p>
+
+          <p>Imagine a small plastic box on the floor with two wheels and a caster. It rolls forward. A wall appears. It stops, turns, and rolls away cleanly. No person is driving it. It decided by itself. That is the robot you are about to build.</p>
+
+          <p>You already have every idea you need. Motors (Chapter 6), power (Chapter 12), a microcontroller (Chapter 11), sensors (Chapter 10) and a control loop (Chapter 15). Here we join them into one working machine. We will move slowly and test every part alone before joining anything.</p>
+
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> How to use this chapter</div>
+            <p>Do not rush to the finished robot. Each stage ends with something you can check. If a stage fails its check, stop and fix it before moving on. This one habit will save you hours.</p>
+          </div>
+
+          <h2>Why build an obstacle-avoiding robot</h2>
+
+          <p>Many beginner projects look impressive but teach little. A blinking light teaches a little. A robot that follows a line teaches a bit more. The project in this chapter is special because it uses almost every idea in the book at the same time.</p>
+
+          <p>Think about what this small robot must do. It must sense distance (Chapter 10), drive motors (Chapter 6), manage power (Chapter 12), run a program (Chapter 14), and close a control loop (Chapter 15). It must also stand and roll on a stiff body (Chapters 5 and 8). That is the whole book on four wheels.</p>
+
+          <p>It is also affordable. You do not need a workshop or an expensive kit. A breadboard, an Arduino-compatible board, a small motor driver, two cheap DC gearmotors and one distance sensor are enough. A starter kit such as the SparkFun Inventor's Kit or the Arduino Starter Kit covers most of these parts and ends with a similar robot. So the same money buys the path and the destination.</p>
+
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> In simple words</div>
+            <p>We are not building this to have a toy. We are building it because it touches every skill in the book at once. If you can finish this robot and explain it, you understand beginner robotics.</p>
+          </div>
+
+          <h3>What "autonomous" means here</h3>
+
+          <p><strong>Autonomous</strong> means the robot decides by itself. You switch it on, then you step back. It senses the world and chooses its own moves. You are not pressing buttons. Compare this with a remote-controlled car, where a person makes every decision.</p>
+
+          <p>Our robot has one simple rule: go forward, but turn away before hitting anything. That rule is tiny, but it is a real decision, made by the robot, many times every second.</p>
+
+          <h2>The specification: what success looks like</h2>
+
+          <p>In Chapter 2 you learned to turn a vague wish into numbers. We do that again here, before buying a single part. A <strong>specification</strong> is a short list of what the robot must do and how well. It is your target and your test sheet at the same time.</p>
+
+          <p>The wish: "a small robot that drives around a room and never hits the walls." Now we make it real.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Requirement</th><th>Target value</th><th>Why this number</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Size</td><td>Fits inside a 20 cm &times; 20 cm square</td><td>Small enough to build cheaply and test on a table</td></tr>
+                <tr><td>Floor</td><td>Flat, hard indoor floor</td><td>Gearmotors and small wheels handle smooth floors well</td></tr>
+                <tr><td>Speed</td><td>About 0.3 m per second</td><td>Fast enough to be fun, slow enough to stop in time</td></tr>
+                <tr><td>Stop distance</td><td>Turn when closer than 20 cm</td><td>Leaves room to turn before touching the wall</td></tr>
+                <tr><td>Runtime</td><td>At least 30 minutes per charge</td><td>Enough for a real play session</td></tr>
+                <tr><td>Budget</td><td>About 80 to 120 EUR</td><td>The cost of a starter kit plus a chassis</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 22.1 — The specification. Every row is something you can measure at the end.</p>
+
+          <h3>Checking the stop distance against speed</h3>
+
+          <p>Can the robot really stop or turn in time? We can check with simple maths before building anything. If the robot moves at 0.3 m per second, how far does it travel while the program reacts?</p>
+
+          <p>Suppose the program reads the sensor and decides ten times every second. That is a loop period of 0.1 seconds. In that time the robot moves:</p>
+
+          <div class="formula"><span class="label">Distance in one loop</span> d = speed &times; time = 0.3 &times; 0.1 = 0.03 m = 3 cm</div>
+
+          <p>So the robot moves only 3 cm between decisions. Our turn distance of 20 cm is much larger than that. The robot has plenty of time to react. This is why we do the calculation first: it proves the plan is safe before we spend money.</p>
+
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> The key idea</div>
+            <p>Turn distance must be bigger than the distance the robot covers while it thinks. If speed rises or the loop slows down, increase the turn distance.</p>
+          </div>
+
+          <h3>Sizing the battery</h3>
+
+          <p>Power is the other number to check early (Chapter 12). Two small DC gearmotors might draw about 150 mA each while driving. The board and sensor add about 50 mA. So the total is roughly 350 mA.</p>
+
+          <div class="formula"><span class="label">Runtime estimate</span> runtime = capacity &divide; current = 2000 mAh &divide; 350 mA &asymp; 5.7 hours (ideal)</div>
+
+          <p>In real life you never get the ideal number. Motors draw a big surge when they start, and batteries lose energy as they empty. So plan for about half: roughly 2 to 3 hours. That is far more than our 30-minute target, which is good. Extra margin means the robot will not reset when the motors kick in.</p>
+
+          <h2>The shopping list (bill of materials)</h2>
+
+          <p>A <strong>bill of materials</strong>, or BOM, is a shopping list with a role beside each item. Professionals always start a project this way, because it stops them buying the wrong thing twice. Table 22.2 lists what our robot needs.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Item</th><th>Typical part</th><th>Role in the robot</th><th>Notes</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Chassis</td><td>2-wheel robot chassis plate kit</td><td>The body that holds everything</td><td>Or cut one from plastic or thin wood</td></tr>
+                <tr><td>DC gearmotors</td><td>2 &times; yellow TT gearmotors</td><td>Turn electricity into wheel motion</td><td>Gears give torque, not just speed</td></tr>
+                <tr><td>Wheels</td><td>2 &times; wheels to match motors</td><td>Grip the floor and move the robot</td><td>Usually sold with the gearmotors</td></tr>
+                <tr><td>Motor driver</td><td>L293D or L298N module</td><td>Lets the small board control big motors</td><td>An H-bridge: it can reverse direction</td></tr>
+                <tr><td>Microcontroller</td><td>Arduino Uno or compatible</td><td>The brain that reads and decides</td><td>Runs the behaviour program</td></tr>
+                <tr><td>Distance sensor</td><td>HC-SR04 ultrasonic or IR module</td><td>Senses how far the wall is</td><td>One is enough to start</td></tr>
+                <tr><td>Battery pack</td><td>4 &times; AA or a 6 V NiMH pack</td><td>Supplies energy to board and motors</td><td>Rechargeable saves money</td></tr>
+                <tr><td>Battery holder</td><td>Holder for the chosen cells</td><td>Holds cells and connects them</td><td>Match the number of cells</td></tr>
+                <tr><td>Power switch</td><td>Simple on/off rocker switch</td><td>Your main on/off control</td><td>Reachable, so you can cut power fast</td></tr>
+                <tr><td>Caster</td><td>Small ball or wheel caster</td><td>Third support point at the back</td><td>Stops the robot tipping forward</td></tr>
+                <tr><td>Jumper wires</td><td>Male-to-male and male-to-female set</td><td>Connect board, driver and sensor</td><td>Buy extra; they are cheap</td></tr>
+                <tr><td>Connectors</td><td>Battery clip and screw terminals</td><td>Join power wires safely</td><td>Avoid loose twists</td></tr>
+                <tr><td>Fasteners</td><td>M3 screws, nuts, standoffs</td><td>Bolt parts to the chassis</td><td>A small box lasts years</td></tr>
+                <tr><td>Bumper (optional)</td><td>Foam or card strip</td><td>Soft front edge so light bumps do no harm</td><td>Nice while you tune the code</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 22.2 — The bill of materials. A starter kit covers most rows; you mostly add the chassis, motors and wheels.</p>
+
+          <div class="callout note">
+            <div class="callout__head"><i class="bi bi-info-circle-fill"></i> Note</div>
+            <p>Prices move around. Treat the budget as a rough guide, not a promise. The idea is that this project is cheap enough to start today.</p>
+          </div>
+
+          <h2>Safety first</h2>
+
+          <p>You have already met safety in Chapter 3. It stays with us here, because a robot combines electricity, moving parts and a spinning motor. None of these is dangerous if you are careful. All of them punish carelessness.</p>
+
+          <div class="callout danger">
+            <div class="callout__head"><i class="bi bi-shield-exclamation"></i> Safety rules for this build</div>
+            <p>Wear safety glasses whenever the robot is powered and on the floor. Always remove power before wiring, so no current flows while you work. Check the polarity of every power connection: red to positive, black to negative, never the other way. Keep the power switch within reach so you can stop the robot instantly. Never let a wheel spin against your fingers or hair. Run the first test with the wheels off the ground.</p>
+          </div>
+
+          <p>An <strong>emergency stop</strong>, or E-stop, is the fastest way to cut power. On our robot the switch itself is the E-stop. It must be easy to reach with one hand while the robot is moving. If you have to hunt for it, it is in the wrong place.</p>
+
+          <div class="callout warn">
+            <div class="callout__head"><i class="bi bi-exclamation-triangle-fill"></i> Watch out</div>
+            <p>Motors can move suddenly the moment power connects. Treat every powered robot as if it will lurch. Keep fingers, cables and long hair away from the wheels.</p>
+          </div>
+
+          <h2>Building it: the eight stages</h2>
+
+          <p>Here is the whole build, broken into eight stages. Each stage has something you can check before you move on. The order matters: we build the body, then the muscles, then the senses and power, then test each part alone, then combine them.</p>
+
+          <figure class="figure">
+            <div class="figure__box">
+              <svg viewBox="0 0 640 320" width="100%" role="img" aria-label="Top and side view of the finished obstacle-avoiding robot showing two drive wheels, a rear caster, a sensor facing forward, the board and driver in the middle, and the battery pack">
+                <rect x="180" y="40" width="280" height="200" rx="18" fill="#eef2ff" stroke="#2d5bff" stroke-width="2"></rect>
+                <text x="320" y="70" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#2d5bff">chassis (top view)</text>
+
+                <rect x="205" y="80" width="90" height="70" rx="8" fill="#e8eeff" stroke="#2d5bff" stroke-width="1.5"></rect>
+                <text x="250" y="110" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#1c2230">Arduino</text>
+                <text x="250" y="128" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#4a5266">board</text>
+
+                <rect x="345" y="80" width="90" height="70" rx="8" fill="#f0e9fd" stroke="#7a4ddb" stroke-width="1.5"></rect>
+                <text x="390" y="110" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#1c2230">motor</text>
+                <text x="390" y="128" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#4a5266">driver</text>
+
+                <rect x="240" y="172" width="160" height="46" rx="8" fill="#f6f0e0" stroke="#b58a1d" stroke-width="1.5"></rect>
+                <text x="320" y="200" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#1c2230">battery pack</text>
+
+                <rect x="120" y="90" width="46" height="100" rx="8" fill="#1c2230" opacity="0.08" stroke="#1c2230" stroke-width="1.5"></rect>
+                <rect x="474" y="90" width="46" height="100" rx="8" fill="#1c2230" opacity="0.08" stroke="#1c2230" stroke-width="1.5"></rect>
+                <text x="143" y="150" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#1c2230">wheel</text>
+                <text x="497" y="150" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#1c2230">wheel</text>
+
+                <rect x="300" y="250" width="40" height="34" rx="8" fill="#e2f6ef" stroke="#0f9d78" stroke-width="1.5"></rect>
+                <text x="320" y="272" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#0f9d78">caster</text>
+
+                <rect x="290" y="14" width="60" height="22" rx="6" fill="#e2f6ef" stroke="#0f9d78" stroke-width="1.5"></rect>
+                <text x="320" y="29" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#0f9d78">sensor</text>
+                <line x1="320" y1="36" x2="320" y2="40" stroke="#0f9d78" stroke-width="1.5"></line>
+
+                <line x1="320" y1="10" x2="320" y2="0" stroke="#0f9d78" stroke-width="1.5" stroke-dasharray="4 4"></line>
+                <text x="320" y="308" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#7b849b">front of robot (sensor faces obstacles)</text>
+              </svg>
+            </div>
+            <figcaption>Figure 22.1 — The finished robot. Two drive wheels sit on the sides. A caster at the back is the third support. The sensor faces forward, and the battery sits low in the middle for balance.</figcaption>
+          </figure>
+
+          <h3>Stage 1 — Assemble the chassis and mount the motors and caster</h3>
+
+          <p>Start with the body. In Chapter 5 you learned that a robot needs a stiff frame, and in Chapter 8 that a strong base makes every later problem easier. A floppy chassis twists, and a twisted robot cannot drive straight.</p>
+
+          <ol>
+            <li><strong>Lay out the plate.</strong> Put the chassis plate flat on the table. Mark the front with a sticker or marker. The front is where the sensor will go.</li>
+            <li><strong>Fit the motors.</strong> Push each gearmotor into its mount or slot on the sides, near the middle. Tighten the screws, but do not crush the plastic.</li>
+            <li><strong>Attach the wheels.</strong> Press a wheel onto each motor shaft. Push it on fully, so it does not slip under load.</li>
+            <li><strong>Add the caster.</strong> Bolt the caster at the back centre. It should touch the floor when the wheels do.</li>
+            <li><strong>Check the stance.</strong> Sit the partly built robot on a flat table. All three contact points should touch at once, with no wobble.</li>
+          </ol>
+
+          <div class="callout warn">
+            <div class="callout__head"><i class="bi bi-exclamation-triangle-fill"></i> Common pitfall</div>
+            <p>Wheels that are not aligned make the robot curve to one side. Check that both wheels are parallel and pushed on by the same amount. If one wheel sticks out further, the robot will pull sideways even with perfect code.</p>
+          </div>
+
+          <h3>Stage 2 — Wire the motor driver and the motors</h3>
+
+          <p>Now the muscles. Your board cannot drive motors directly, because motors need more current than a board pin can safely give. In Chapter 6 you met the idea that a driver is the middleman. In Chapter 13 you learned to wire cleanly. The <strong>motor driver</strong> is an <strong>H-bridge</strong>: a circuit that can send current through a motor in either direction, so the wheel can spin forwards or backwards.</p>
+
+          <ol>
+            <li><strong>Mount the driver.</strong> Screw the driver board onto the chassis, or stick it down with foam tape away from the motors.</li>
+            <li><strong>Wire motor power.</strong> Connect the battery positive and negative to the driver's motor-power input. This is a separate supply for the motors.</li>
+            <li><strong>Wire the two motors.</strong> Each motor has two wires. Connect one motor to output A and the other to output B. Remember which is left and which is right.</li>
+            <li><strong>Wire the control lines.</strong> Connect the driver's control pins to the board's digital pins. These small wires tell the driver which way to spin.</li>
+            <li><strong>Share the ground.</strong> Connect the board ground to the driver ground. Without a shared ground, the control signals mean nothing.</li>
+          </ol>
+
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> The key idea</div>
+            <p>Motors get their power from the motor supply, not from the board's pins. The board only sends small control signals. Mixing these two is the most common beginner error.</p>
+          </div>
+
+          <h3>Stage 3 — Wire the sensor and the power</h3>
+
+          <p>Next come the senses and the energy. In Chapter 10 you learned that an ultrasonic sensor sends a sound pulse and times the echo. In Chapter 12 you learned to budget power and protect the circuit. Now we connect both.</p>
+
+          <ol>
+            <li><strong>Fit the sensor.</strong> Mount the sensor at the very front, facing forward, above bumper height so it can see over small bumps.</li>
+            <li><strong>Wire the sensor power.</strong> Connect its power pins to the board's 5 V and ground. Use short wires so the signal stays clean.</li>
+            <li><strong>Wire the sensor signals.</strong> Connect the trigger and echo pins to two board digital pins. Note which pin is which.</li>
+            <li><strong>Add the switch.</strong> Put the on/off switch in the battery positive line, where you can reach it with one hand.</li>
+            <li><strong>Add protection.</strong> If your kit has a fuse, fit it in the motor power line. A fuse is a thin wire that melts and cuts the current if something shorts.</li>
+          </ol>
+
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> In simple words</div>
+            <p>Two power paths: a strong one for the motors and a gentle one for the board and sensor. Keep them separate, and join only their grounds. The switch is your off button. The fuse is a safety wire that dies to save the rest.</p>
+          </div>
+
+          <h3>Checkpoint: what the wiring should look like</h3>
+
+          <figure class="figure">
+            <div class="figure__box">
+              <svg viewBox="0 0 660 300" width="100%" role="img" aria-label="Block diagram of the robot wiring: battery feeds the switch, then the motor driver and the board; the board connects to the sensor; both share a common ground">
+                <rect x="20" y="120" width="120" height="60" rx="10" fill="#f6f0e0" stroke="#b58a1d" stroke-width="2"></rect>
+                <text x="80" y="148" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#b58a1d">Battery</text>
+                <text x="80" y="166" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#4a5266">4&times;AA</text>
+
+                <rect x="175" y="120" width="110" height="60" rx="10" fill="#eef2ff" stroke="#2d5bff" stroke-width="2"></rect>
+                <text x="230" y="155" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#2d5bff">Switch</text>
+
+                <rect x="320" y="40" width="130" height="60" rx="10" fill="#f0e9fd" stroke="#7a4ddb" stroke-width="2"></rect>
+                <text x="385" y="68" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#7a4ddb">Motor driver</text>
+                <text x="385" y="86" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#4a5266">H-bridge</text>
+
+                <rect x="320" y="200" width="130" height="60" rx="10" fill="#e8eeff" stroke="#2d5bff" stroke-width="2"></rect>
+                <text x="385" y="228" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#2d5bff">Board</text>
+                <text x="385" y="246" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#4a5266">the brain</text>
+
+                <rect x="500" y="40" width="120" height="60" rx="10" fill="#1c2230" opacity="0.85" stroke="#1c2230" stroke-width="2"></rect>
+                <text x="560" y="75" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#ffffff">Motors</text>
+
+                <rect x="500" y="200" width="120" height="60" rx="10" fill="#e2f6ef" stroke="#0f9d78" stroke-width="2"></rect>
+                <text x="560" y="235" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#0f9d78">Sensor</text>
+
+                <line x1="140" y1="150" x2="175" y2="150" stroke="#b58a1d" stroke-width="2" marker-end="url(#ar2)"></line>
+                <line x1="285" y1="150" x2="320" y2="90" stroke="#b58a1d" stroke-width="2" marker-end="url(#ar2)"></line>
+                <line x1="285" y1="150" x2="320" y2="215" stroke="#b58a1d" stroke-width="2" marker-end="url(#ar2)"></line>
+                <line x1="450" y1="70" x2="500" y2="70" stroke="#7a4ddb" stroke-width="2" marker-end="url(#ar3)"></line>
+                <line x1="450" y1="230" x2="500" y2="230" stroke="#2d5bff" stroke-width="2" marker-end="url(#ar2)"></line>
+                <line x1="385" y1="100" x2="385" y2="200" stroke="#7b849b" stroke-width="2" stroke-dasharray="5 5" marker-end="url(#ar4)"></line>
+                <text x="410" y="155" font-family="Inter, sans-serif" font-size="11" fill="#7b849b">control lines</text>
+                <text x="330" y="290" font-family="Inter, sans-serif" font-size="11" fill="#7b849b">all blocks share one common ground (not drawn)</text>
+                <defs>
+                  <marker id="ar2" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#2d5bff"></path></marker>
+                  <marker id="ar3" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#7a4ddb"></path></marker>
+                  <marker id="ar4" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#7b849b"></path></marker>
+                </defs>
+              </svg>
+            </div>
+            <figcaption>Figure 22.2 — The wiring plan. The battery feeds the switch, which powers the motor driver and the board. The board sends control signals to the driver and reads the sensor. Everything shares one ground.</figcaption>
+          </figure>
+
+          <h3>Stage 4 — Test each part alone (do not skip this)</h3>
+
+          <p>This stage is the heart of the chapter. Beginners want to wire everything, upload the full program, and watch. When it fails, they have no idea which part is wrong. Professionals do the opposite: they prove each part alone, then combine. This is called <strong>staged testing</strong>, and it saves hours of guessing.</p>
+
+          <p>Think of it like learning to swim. You do not jump into deep water first. You test floating, then kicking, then breathing, then put them together. Every part of your robot is a small skill. Prove each one before you combine them.</p>
+
+          <h4>Test A — Blink the board's own LED</h4>
+
+          <p>This proves four things at once: your board has power, your computer can talk to it, your code uploads, and your board can run code. It uses no external part, so nothing else can confuse the result. If this fails, every later test will fail too.</p>
+
+          <div class="code">
+            <div class="code__bar">
+              <span class="code__dots"><span></span><span></span><span></span></span>
+              <span class="code__lang">Arduino C++</span>
+              <button class="code__copy" type="button"><i class="bi bi-clipboard"></i> Copy</button>
+            </div>
+            <pre><code>// Test A: blink the built-in LED
+// If this works, the board, cable and upload are all fine.
+
+void setup() {
+  pinMode(LED_BUILTIN, OUTPUT);   // the tiny LED on the board
+}
+
+void loop() {
+  digitalWrite(LED_BUILTIN, HIGH); // LED on
+  delay(500);                      // wait half a second
+  digitalWrite(LED_BUILTIN, LOW);  // LED off
+  delay(500);                      // wait half a second
+}</code></pre>
+          </div>
+
+          <h4>Test B — Spin one motor, then both, in the right direction</h4>
+
+          <p>Now the muscles. Upload a tiny test that spins one motor forward, stops, then spins it backward. Watch the wheel. If it turns the way you expect, that motor and that driver channel work. Then test the second motor alone.</p>
+
+          <div class="code">
+            <div class="code__bar">
+              <span class="code__dots"><span></span><span></span><span></span></span>
+              <span class="code__lang">Arduino C++</span>
+              <button class="code__copy" type="button"><i class="bi bi-clipboard"></i> Copy</button>
+            </div>
+            <pre><code>// Test B: spin one motor forward, then backward
+// Change LEFT_PWM / LEFT_DIR to match your wiring.
+
+const int LEFT_PWM = 5;   // speed pin for the left motor
+const int LEFT_DIR = 7;   // direction pin for the left motor
+
+void setup() {
+  pinMode(LEFT_PWM, OUTPUT);
+  pinMode(LEFT_DIR, OUTPUT);
+}
+
+void loop() {
+  digitalWrite(LEFT_DIR, HIGH);   // choose forward
+  analogWrite(LEFT_PWM, 150);     // medium speed
+  delay(1500);                    // spin for a moment
+
+  analogWrite(LEFT_PWM, 0);       // stop
+  delay(500);
+
+  digitalWrite(LEFT_DIR, LOW);    // choose backward
+  analogWrite(LEFT_PWM, 150);
+  delay(1500);
+
+  analogWrite(LEFT_PWM, 0);       // stop
+  delay(500);
+}</code></pre>
+          </div>
+
+          <p>Run this for the left motor, then swap the pins for the right motor and run again. Before you finish this test, you must know two things: which pin spins which wheel, and which direction each one turns. Write it on paper. You will need it in the code.</p>
+
+          <div class="callout warn">
+            <div class="callout__head"><i class="bi bi-exclamation-triangle-fill"></i> Common pitfall</div>
+            <p>One motor turns the opposite way. This is normal, not a fault. Motors are made in pairs and can be mounted facing each other. The fix is simple: swap that motor's two wires, or flip its direction in the code. Do not fight it in the wiring forever.</p>
+          </div>
+
+          <h4>Test C — Read the distance sensor by hand</h4>
+
+          <p>Finally the senses. Upload a small program that prints the distance to the serial monitor — a text window on your computer that shows what the board says. Hold your hand in front of the sensor at different distances. You should see the number change.</p>
+
+          <div class="code">
+            <div class="code__bar">
+              <span class="code__dots"><span></span><span></span><span></span></span>
+              <span class="code__lang">Arduino C++</span>
+              <button class="code__copy" type="button"><i class="bi bi-clipboard"></i> Copy</button>
+            </div>
+            <pre><code>// Test C: print the distance to the serial monitor
+// HC-SR04 ultrasonic sensor on trigger pin 9, echo pin 10.
+
+const int TRIG = 9;
+const int ECHO = 10;
+
+void setup() {
+  Serial.begin(9600);          // open the text channel
+  pinMode(TRIG, OUTPUT);
+  pinMode(ECHO, INPUT);
+}
+
+void loop() {
+  digitalWrite(TRIG, LOW);
+  delayMicroseconds(2);
+  digitalWrite(TRIG, HIGH);    // send a short sound pulse
+  delayMicroseconds(10);
+  digitalWrite(TRIG, LOW);
+
+  long time = pulseIn(ECHO, HIGH);        // time for the echo
+  int cm = time / 58;                     // convert to centimetres
+  Serial.print(cm);
+  Serial.println(" cm");
+  delay(100);                             // do not flood the screen
+}</code></pre>
+          </div>
+
+          <p>The number 58 in that code is worth understanding. Sound travels about 343 metres per second, and the echo goes to the wall and back — twice the distance. Dividing the echo time in microseconds by 58 gives centimetres. You do not need to memorise it; just know that <code>time / 58</code> turns time into distance.</p>
+
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> Why test alone first</div>
+            <p>When only one part is connected, any problem must belong to that part. When everything is connected, a fault could be in any of ten places. Testing alone turns a hard puzzle into a short checklist.</p>
+          </div>
+
+          <h3>Stage 5 — Write the behaviour program</h3>
+
+          <p>Now we combine the proven parts into one program. This is a <strong>control loop</strong> (Chapter 15): read the distance, decide, act, and repeat, many times each second. The behaviour is exactly the rule from our specification.</p>
+
+          <ol>
+            <li><strong>Read</strong> the distance from the sensor.</li>
+            <li><strong>Decide:</strong> if the distance is less than the turn distance, turn; otherwise go forward.</li>
+            <li><strong>Act</strong> by setting the motor speeds.</li>
+            <li><strong>Repeat</strong> the loop with no long delays, so the robot reacts quickly.</li>
+          </ol>
+
+          <p>Two habits make this code easy to read and easy to fix. First, use <strong>named constants</strong> at the top: give clear names to pins and numbers, so the code reads like English. Second, keep <strong>delays short</strong>, because a long delay blindfolds the robot — it cannot sense while it waits.</p>
+
+          <div class="code">
+            <div class="code__bar">
+              <span class="code__dots"><span></span><span></span><span></span></span>
+              <span class="code__lang">Arduino C++</span>
+              <button class="code__copy" type="button"><i class="bi bi-clipboard"></i> Copy</button>
+            </div>
+            <pre><code>// Obstacle-avoiding robot: read, decide, act, repeat.
+
+// ---- Pins (match your wiring from Test B and C) ----
+const int LEFT_PWM  = 5;
+const int LEFT_DIR  = 7;
+const int RIGHT_PWM = 6;
+const int RIGHT_DIR = 8;
+const int TRIG      = 9;
+const int ECHO      = 10;
+
+// ---- Tunable numbers ----
+const int TURN_CM   = 20;   // turn when the wall is closer than this
+const int CRUISE    = 150;  // normal motor speed (0 to 255)
+const int TURN      = 130;  // motor speed while turning
+
+// ---- Read the distance once, in centimetres ----
+int readDistanceCm() {
+  digitalWrite(TRIG, LOW);
+  delayMicroseconds(2);
+  digitalWrite(TRIG, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(TRIG, LOW);
+  long t = pulseIn(ECHO, HIGH, 25000);  // give up after ~4 m
+  if (t == 0) return 999;               // no echo means clear space
+  return t / 58;
+}
+
+// ---- Drive both wheels forward ----
+void forward() {
+  digitalWrite(LEFT_DIR, HIGH);
+  digitalWrite(RIGHT_DIR, HIGH);
+  analogWrite(LEFT_PWM, CRUISE);
+  analogWrite(RIGHT_PWM, CRUISE);
+}
+
+// ---- Spin in place to the right ----
+void turnRight() {
+  digitalWrite(LEFT_DIR, HIGH);    // left wheel forward
+  digitalWrite(RIGHT_DIR, LOW);    // right wheel backward
+  analogWrite(LEFT_PWM, TURN);
+  analogWrite(RIGHT_PWM, TURN);
+}
+
+// ---- Stop both wheels ----
+void stopMotors() {
+  analogWrite(LEFT_PWM, 0);
+  analogWrite(RIGHT_PWM, 0);
+}
+
+void setup() {
+  pinMode(LEFT_PWM, OUTPUT);
+  pinMode(LEFT_DIR, OUTPUT);
+  pinMode(RIGHT_PWM, OUTPUT);
+  pinMode(RIGHT_DIR, OUTPUT);
+  pinMode(TRIG, OUTPUT);
+  pinMode(ECHO, INPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  int cm = readDistanceCm();     // 1. SENSE
+  Serial.println(cm);            //    log it for debugging
+
+  if (cm &lt; TURN_CM) {            // 2. DECIDE
+    turnRight();                 //    close wall: turn away
+  } else {
+    forward();                   //    clear path: go on
+  }
+  delay(20);                     // 3. small pause, then REPEAT
+}</code></pre>
+          </div>
+
+          <h3>Line-by-line: what the code is really saying</h3>
+
+          <p>Do not just copy this. Read it as a story. The top block names the pins, so you never wonder which wire is which. The tunable numbers sit together, so you can change the robot's mood in one place. The <code>readDistanceCm()</code> function does the sensor timing and returns a number you can use.</p>
+
+          <ul>
+            <li><code>const int</code> means "a fixed whole number". Naming it makes the code readable.</li>
+            <li><code>readDistanceCm()</code> sends a pulse, times the echo, and converts it to centimetres.</li>
+            <li>The <code>if (cm &lt; TURN_CM)</code> line is the whole decision. Close wall means turn; otherwise forward.</li>
+            <li><code>turnRight()</code> spins the wheels in opposite directions, so the robot turns on the spot.</li>
+            <li><code>delay(20)</code> is short on purpose. It gives the robot a tiny rest but keeps it watching the world.</li>
+          </ul>
+
+          <div class="callout note">
+            <div class="callout__head"><i class="bi bi-info-circle-fill"></i> Note</div>
+            <p>The 25000 in <code>pulseIn</code> is a safety limit. It stops waiting after a short time and returns 0, which we treat as clear space. This keeps the robot from freezing when no echo comes back.</p>
+          </div>
+
+          <h3>Stage 6 — First powered test, wheels off the ground</h3>
+
+          <p>Never put a new robot on the floor first. Prop the chassis on a box or a stack of books so both wheels spin freely in the air. Power on, and watch.</p>
+
+          <ol>
+            <li><strong>Prop the robot up.</strong> The wheels must not touch anything.</li>
+            <li><strong>Power on.</strong> Your hand stays near the switch.</li>
+            <li><strong>Check directions.</strong> When the code says forward, do both wheels turn as if pushing the robot forward? If one is wrong, fix it now.</li>
+            <li><strong>Check the turn.</strong> Move your hand in front of the sensor. Do the wheels spin in opposite directions to turn the robot?</li>
+            <li><strong>Check readings.</strong> Watch the serial monitor. Does the number change sensibly as your hand moves?</li>
+          </ol>
+
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> Tip</div>
+            <p>Stick a small piece of tape on each wheel as a marker. The tape makes it easy to see the direction and speed at a glance.</p>
+          </div>
+
+          <h3>Stage 7 — Floor test, set the threshold, observe</h3>
+
+          <p>Now the floor. Clear a space at least 2 m by 2 m, with soft walls or furniture you do not mind a light bump against. Power on and step back.</p>
+
+          <ol>
+            <li><strong>Watch the first run.</strong> Does it drive forward and turn before the wall?</li>
+            <li><strong>Measure the stop point.</strong> When it turns, how far is the wall really? A tape measure is fine.</li>
+            <li><strong>Set the threshold.</strong> If it turns too late, raise <code>TURN_CM</code>. If it turns too early and looks nervous, lower it.</li>
+            <li><strong>Adjust for the floor.</strong> Carpets and shiny floors change grip, so you may need a different speed.</li>
+            <li><strong>Run it several times.</strong> Watch for patterns. Does it always fail in the same corner?</li>
+          </ol>
+
+          <p>Tuning is normal, not a sign of failure. Every robot is tuned to its own body, its own floor and its own battery. The numbers in the code are your dials.</p>
+
+          <h3>Stage 8 — Improve the behaviour</h3>
+
+          <p>Once it works, make it work better. Each small change teaches you something. Change one thing, test, and keep it only if the robot improves.</p>
+
+          <ul>
+            <li><strong>Slower turning.</strong> A gentler turn is more controlled and less likely to overshoot. Lower <code>TURN</code> a little.</li>
+            <li><strong>A sensor sweep.</strong> A small servo can swing the sensor left and right, so the robot can "look around" before choosing a direction.</li>
+            <li><strong>A little randomness.</strong> If the robot gets stuck in a corner, add a small random turn time so it does not repeat the same failed move.</li>
+            <li><strong>A second sensor.</strong> Add a sensor on the side or back, so the robot can reverse or check two directions at once.</li>
+          </ul>
+
+          <h2>Debugging: from symptom to fix</h2>
+
+          <p>Something will go wrong. That is not a failure; it is the normal work of engineering. A <strong>symptom</strong> is what you see. A <strong>cause</strong> is the real problem underneath. A <strong>fix</strong> is the change that removes the cause. Good debugging means moving calmly from symptom to cause to fix, changing one thing at a time.</p>
+
+          <p>Here is the troubleshooting order a professional uses. Work down this list in order. Do not jump around.</p>
+
+          <ol>
+            <li><strong>Power.</strong> Is the battery charged and the switch on? A dying battery fakes many faults.</li>
+            <li><strong>Connections.</strong> Are all wires seated? Wiggle each one gently while watching. Most faults live here.</li>
+            <li><strong>One subsystem.</strong> Test the suspect part alone, as in Stage 4.</li>
+            <li><strong>Code.</strong> Only now suspect the program.</li>
+            <li><strong>Change one thing.</strong> After each change, test again. Two changes at once hide the real fix.</li>
+          </ol>
+
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> The golden rule of debugging</div>
+            <p>Change one thing at a time, then test. If you change three things and it works, you have learned nothing and you may have added two new bugs.</p>
+          </div>
+
+          <h3>The symptom table</h3>
+
+          <p>Table 22.3 lists the faults beginners meet most often. Find your symptom, then check the likely cause in the order shown.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Symptom</th><th>Likely cause</th><th>Fix</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Nothing happens at all</td><td>Battery flat, switch off, or a loose power wire</td><td>Charge battery, check switch, reseat power wires</td></tr>
+                <tr><td>Robot spins in circles</td><td>One motor reversed or its two wires swapped</td><td>Swap that motor's wires, or flip its direction in code</td></tr>
+                <tr><td>Robot ignores the wall</td><td>Threshold wrong, sensor blocked, or a noisy reading</td><td>Check the number in the serial monitor, clear the sensor, tune the threshold</td></tr>
+                <tr><td>Robot resets when motors start</td><td>Power brownout: motors drain the logic supply</td><td>Give motors their own stronger supply and share only the ground</td></tr>
+                <tr><td>Works, then suddenly stops</td><td>Battery low, or a loose ground connection</td><td>Charge the battery, reseat the ground wire</td></tr>
+                <tr><td>Drives crooked</td><td>Wheels not aligned or motor speeds differ</td><td>Align wheels, trim the left and right speeds</td></tr>
+                <tr><td>Sensor reads a constant value</td><td>Trigger and echo pins swapped, or wired to a dead pin</td><td>Swap the signal wires and retest the sensor alone</td></tr>
+                <tr><td>Turns too late and bumps</td><td>Turn distance smaller than the reachable stop</td><td>Raise the threshold, or lower the speed</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 22.3 — Symptom, cause and fix. Read down the troubleshooting order before touching anything.</p>
+
+          <h3>Worked case 1: "The robot spins in circles"</h3>
+
+          <p>You power on. Straight away the robot spins on the spot like a top. It never goes forward. Do not panic and do not change the code yet. Follow the order.</p>
+
+          <p><strong>Power.</strong> The battery is full and the switch is on, because other parts clearly work. Next, <strong>connections.</strong> Look at the two motors. Are their wires in the right places? Now think about the symptom. A circle is the robot turning, not driving. That means one wheel pushes forward while the other pushes backward. Something reverses one side.</p>
+
+          <p>Run Stage 4, Test B again on each motor. Send "forward" to the left motor. Watch its wheel. Send "forward" to the right motor. Watch its wheel. You will probably find that, when both are told to go forward, one wheel actually spins the other way.</p>
+
+          <p><strong>Cause:</strong> one motor is reversed. This happens because the two motors are mounted mirror-image on the chassis, so a "forward" current turns them in opposite directions in space. <strong>Fix:</strong> there are two clean options. Option one, swap the two wires of that motor where they meet the driver. Option two, flip that motor's direction pin in the code. Pick one and only one, then retest. The robot should now drive straight.</p>
+
+          <p>Notice the shape of the reasoning. Symptom: circle. Clue: turning means opposite wheel directions. Test: prove each motor alone. Cause: one reversed. Fix: one reversal, in one place.</p>
+
+          <h3>Worked case 2: "The robot ignores the wall"</h3>
+
+          <p>Now a different fault. The robot drives straight into the wall as if the wall were invisible. The motors are fine, so skip straight to the subsystem: the sensor.</p>
+
+          <p>Open the serial monitor and watch the numbers. This is why we logged the distance in the code. Read what it prints while you slowly move your hand in front of the sensor.</p>
+
+          <p>Suppose the number stays near 999 no matter what. That is our "clear space" value, and it means the sensor is not returning an echo. Possible causes: the trigger and echo wires are swapped, the sensor is too close to the wall to measure, or a wire is loose. <strong>Fix:</strong> swap the two signal wires and retest. If the number now moves, you found it.</p>
+
+          <p>Suppose instead the number jumps around wildly, from 8 cm to 200 cm and back. Then the sensor is picking up noise, or the threshold is wrong. <strong>Cause:</strong> a noisy reading crosses the threshold by accident, so the robot thinks the path is clear. <strong>Fix:</strong> three small changes, one at a time. Move the sensor away from the motors and their wires, because spinning motors create electrical noise. Add a short delay so the reading settles. Then set the threshold a little higher, so a single odd reading does not fool it. Test after each change.</p>
+
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> In simple words</div>
+            <p>If the robot ignores the wall, look at the numbers first. A stuck number means the sensor is not working. A jumpy number means the sensor is confused by noise. The number tells you which problem you have.</p>
+          </div>
+
+          <h3>Worked case 3: "The robot resets when the motors start"</h3>
+
+          <p>The robot boots up, then the moment the wheels begin to turn, it restarts. The board's light flickers and it starts over. This is a <strong>brownout</strong>: the voltage dips so low that the board loses its mind.</p>
+
+          <p>Why does starting a motor cause this? A motor draws a big surge of current the instant it starts. If the motors and the board share one weak supply, that surge drags the voltage down for everyone. The board needs a steady voltage, so it resets.</p>
+
+          <p><strong>Fix:</strong> give the motors their own stronger path and keep the board on a clean supply. Make sure the two supplies share a common ground, or the control signals will not be understood. Often just using fresh, higher-capacity batteries, or a separate motor supply, removes the reset completely. This is exactly the power budgeting lesson from Chapter 12.</p>
+
+          <h3>Worked case 4: "It works, then it stops"</h3>
+
+          <p>The robot runs for a few minutes and then dies, but the switch is still on. This is one of the easiest faults to fix and one of the easiest to misread.</p>
+
+          <p>Two causes cover most cases. First, the battery is simply running low, and the voltage has fallen below what the board needs. Second, a ground wire is loose and only fails when the robot vibrates as it drives. <strong>Fix:</strong> charge or replace the battery and test again. If it still dies at the same moment, wiggle the ground wires while watching the board; a flicker confirms a loose connection. Reseat it.</p>
+
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> The debugging mindset</div>
+            <p>Every fault is a clue, not an insult. Say the symptom out loud. Form one guess. Test it. Change one thing. Repeat. This calm loop beats random changes every time.</p>
+          </div>
+
+          <h2>Keeping the improvement going</h2>
+
+          <p>You have a working robot. Do not stop here, because the finishes are where the learning deepens. Each upgrade below adds one new skill from the book. Table 22.4 is your roadmap.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Upgrade</th><th>New skill</th><th>What it unlocks</th><th>Book link</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Wheel encoders</td><td>Measuring real speed and distance</td><td>Driving a straight line, exact turns</td><td>Chapters 10, 15</td></tr>
+                <tr><td>Second distance sensor</td><td>Handling two senses at once</td><td>Better choices in corners</td><td>Chapter 10</td></tr>
+                <tr><td>PID speed control</td><td>Closing the loop on speed</td><td>Smooth, steady motion under load</td><td>Chapter 15</td></tr>
+                <tr><td>Line following</td><td>Reading a track and steering</td><td>A new behaviour, reusing the same loop</td><td>Chapters 10, 14</td></tr>
+                <tr><td>Bluetooth control</td><td>Sending commands wirelessly</td><td>Manual override and remote tuning</td><td>Chapters 11, 14</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 22.4 — Upgrade roadmap. Add one at a time, and test each one alone first.</p>
+
+          <p><strong>Encoders</strong> are small sensors that count how far a wheel turns. With encoders, the robot knows its own speed, so it can hold a straight line. <strong>PID control</strong> is a common way to hold a target: measure the error, then push a little harder or softer to correct it. You will meet it properly in Chapter 15. <strong>Line following</strong> swaps the rule: instead of avoiding walls, follow a dark line on the floor. The loop stays the same; only the decision changes.</p>
+
+          <h2>Your project write-up</h2>
+
+          <p>After it works, write it up. This is not busywork. A short write-up forces you to understand what you did, and it becomes a portfolio piece that shows future employers or teachers your real skills. Chapter 24 builds a full portfolio; this is its first page.</p>
+
+          <p>Fill in this template in your own words. Aim for one short paragraph per heading, plus the table.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Section</th><th>What to write</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Goal</td><td>One sentence: what the robot must do, with numbers.</td></tr>
+                <tr><td>Parts</td><td>The bill of materials, with the role of each part.</td></tr>
+                <tr><td>Design</td><td>A photo or sketch, plus a sentence on the layout and the wiring plan.</td></tr>
+                <tr><td>Tests</td><td>What you tested alone, and what the result of each test was.</td></tr>
+                <tr><td>Result</td><td>Did it meet the specification? Show the measured stop distance and runtime.</td></tr>
+                <tr><td>Problems</td><td>The faults you hit, and how you found each fix.</td></tr>
+                <tr><td>Lessons</td><td>Two or three things you would do differently next time.</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 22.5 — Project write-up template. Keep it honest; the problems section teaches the most.</p>
+
+          <h2>Common beginner mistakes across the whole build</h2>
+
+          <p>You have seen pitfalls stage by stage. Here are the ones that appear again and again across the whole project. Learn them now and skip weeks of frustration.</p>
+
+          <ul>
+            <li><strong>Wiring with the power on.</strong> This risks damage and burns. Power off, wire, then power on and check.</li>
+            <li><strong>Skipping the separate tests.</strong> Jumping straight to the full program means ten possible faults at once. Test alone first.</li>
+            <li><strong>Powering motors from the board pins.</strong> The pins are for signals, not heavy current. Use the motor driver and a separate motor supply.</li>
+            <li><strong>Forgetting the shared ground.</strong> Two circuits that do not share a ground cannot understand each other's signals.</li>
+            <li><strong>Long delays in the loop.</strong> A long delay blinds the robot. Keep pauses short so it keeps sensing.</li>
+            <li><strong>Magic numbers in the code.</strong> Unnamed numbers are impossible to tune. Name them at the top.</li>
+            <li><strong>Changing several things at once.</strong> You cannot tell which change fixed the problem, or which one broke something else.</li>
+            <li><strong>Testing on the floor first.</strong> Test with wheels off the ground, then move to the floor. A lurching robot can hurt fingers.</li>
+          </ul>
+
+          <h2>How professionals do it</h2>
+
+          <p>Your build follows the same steps a professional team follows, just at a smaller scale and slower pace. Seeing the professional version helps you grow into it.</p>
+
+          <p><strong>Test plans.</strong> Professionals write down the tests before they build, with a pass or fail number for each one. Our Stage 4 tests are a tiny test plan. A real one might have fifty rows.</p>
+
+          <p><strong>Staged integration.</strong> Just as you tested each part alone, professional teams bring subsystems together in small steps, checking after each join. They never connect everything and hope.</p>
+
+          <p><strong>Logging.</strong> You logged distance to the serial monitor. Professionals log many signals at once, with timestamps, so they can replay what happened when something fails in the field.</p>
+
+          <p><strong>Version control.</strong> Professionals keep every version of their code in a system such as Git, so they can see what changed and go back to a working version. Even for a hobby project, saving numbered copies of your <code>.ino</code> file is a good habit.</p>
+
+          <p><strong>Design reviews.</strong> Before building, a team presents the design and others look for problems. A friendly pair of eyes often catches a wiring error on paper, before it becomes smoke on the bench.</p>
+
+          <div class="callout note">
+            <div class="callout__head"><i class="bi bi-info-circle-fill"></i> Note</div>
+            <p>The gap between beginner and professional is not talent. It is discipline: test plans, staged integration, logging, version control and reviews. You can start using all five today on your small robot.</p>
+          </div>
+
+          <h2>Try it yourself</h2>
+
+          <p>These exercises extend the build. Do them in order; each one adds a small, testable idea. As always, change one thing, then test.</p>
+
+          <ol>
+            <li><strong>Measure your real stop distance.</strong> Put a tape measure on the floor. When the robot turns, note the distance to the wall. Compare it with the 20 cm target. Hint: if it is far off, your threshold or speed needs tuning.</li>
+            <li><strong>Add a reverse behaviour.</strong> When the wall is very close, back up a little before turning. Hint: add a <code>backward()</code> function and a shorter "too close" distance.</li>
+            <li><strong>Make turning random.</strong> Instead of always turning right, sometimes turn left. Hint: use <code>random(2)</code> to pick a side, so the robot escapes corners.</li>
+            <li><strong>Sweep the sensor.</strong> Mount the sensor on a small servo and look left and right before deciding. Hint: turn the servo, read, compare, then choose the clearer side.</li>
+            <li><strong>Trim for a straight line.</strong> If the robot curves, note which way and adjust that side's speed slightly. Hint: this is a first taste of closed-loop control from Chapter 15.</li>
+          </ol>
+
+          <h2>Going deeper (optional)</h2>
+
+          <p>If you enjoyed the build and want a taste of what comes next, think about why our simple rule sometimes fails. Our robot looks only straight ahead, and it decides on a single reading. In a corner, that reading may say "turn", so it turns, then faces a wall again, and turns again. It can get stuck.</p>
+
+          <p>A professional would say the robot is <strong>reactive</strong>: it responds to the world but keeps no memory or plan. The next step up is a <strong>state machine</strong>, where the robot has modes such as "driving", "turning" and "escaping", and a rule for moving between them. With a state machine, "escaping" can mean back up and turn longer, so the robot never gets trapped in the same corner twice.</p>
+
+          <p>You do not need this for the project. But naming the idea now means you will recognise it in Chapter 15, and in every real robot you meet afterwards.</p>
+
+          <section class="takeaways">
+            <h2><i class="bi bi-pin-angle-fill"></i> Key takeaways</h2>
+            <ul>
+              <li><i class="bi bi-check2-circle"></i> An obstacle-avoiding robot uses every idea in the book at once, and stays affordable.</li>
+              <li><i class="bi bi-check2-circle"></i> Write a specification with numbers before you buy any parts.</li>
+              <li><i class="bi bi-check2-circle"></i> Build in eight stages, and test each part alone before combining anything.</li>
+              <li><i class="bi bi-check2-circle"></i> Keep motor power separate from board power, and always share one ground.</li>
+              <li><i class="bi bi-check2-circle"></i> Use named constants and short delays so the robot stays easy to tune and quick to react.</li>
+              <li><i class="bi bi-check2-circle"></i> Debug from symptom to cause to fix, changing one thing at a time.</li>
+              <li><i class="bi bi-check2-circle"></i> Write up the build: it proves your skills and starts your portfolio.</li>
+            </ul>
+          </section>
+
+          <section class="quiz">
+            <div class="quiz__head"><i class="bi bi-patch-question-fill"></i> Check your understanding</div>
+            <details>
+              <summary><span class="q-num">Q1.</span><span>Why is an obstacle-avoiding robot a good first build?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> It uses almost every idea in the book at once — sensing, motors, power, code and control — and it stays affordable.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q2.</span><span>What does "autonomous" mean in this project?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> The robot senses and decides by itself. You switch it on and step back; you do not drive it with a controller.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q3.</span><span>Why must the turn distance be larger than the distance covered in one loop?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> The robot needs time to react. If it travels further while thinking than the turn distance, it will hit the wall before it can turn.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q4.</span><span>Why test each part alone before connecting everything?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> When one part runs alone, any problem must belong to it. Connected together, a fault could be in many places at once.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q5.</span><span>What is the correct troubleshooting order a professional uses?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Power first, then connections, then one subsystem, then code — changing only one thing before testing again.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q6.</span><span>Why does the robot sometimes reset the moment the motors start?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> A brownout. The motors draw a big surge of current and drag the voltage down, so the board loses power and restarts. The fix is a separate, stronger motor supply sharing only a common ground.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q7.</span><span>Why do we use named constants like <code>TURN_CM</code> instead of writing 20 everywhere?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Named constants make the code read clearly and let you tune the robot in one place, instead of hunting for a number buried in the code.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q8.</span><span>Why should you write a project write-up after it works?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> It forces you to understand what you did, records the faults and fixes, and becomes a portfolio piece that shows real skills to teachers or employers.</div>
+            </details>
+          </section>
+
+        </article>
+
+        <nav class="pager" id="pager" aria-label="Chapter navigation"></nav>
+      </div>
+    </main>
+  </div>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/book.js"></script>
+</body>
+</html>

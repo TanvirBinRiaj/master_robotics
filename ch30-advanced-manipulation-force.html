@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>try{var __t=localStorage.getItem("mr-theme");if(__t==="dark"||__t==="light")document.documentElement.setAttribute("data-theme",__t);}catch(e){}</script>
+  <title>Chapter 30: Advanced Manipulation and Force Control — Master Robotics</title>
+  <meta name="description" content="Learn gentle robot touch: impedance and force control, MoveIt 2 planning, contact-rich tasks, and how learning policies turn demos into real grasps.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/prose.css">
+</head>
+<body data-file="ch30-advanced-manipulation-force.html">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="topbar" id="topbar"></header>
+  <div class="progress-bar" id="progressBar"></div>
+
+  <div class="layout">
+    <div class="sidebar__backdrop" id="navBackdrop"></div>
+    <nav class="sidebar" id="sidebar" aria-label="Book contents"></nav>
+
+    <main class="main" id="main">
+      <div class="container">
+
+        <header class="chapter-head">
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="index.html">Home</a>
+            <i class="bi bi-chevron-right"></i>
+            <a href="index.html#advanced">Part 7 &middot; Advanced Foundations</a>
+            <i class="bi bi-chevron-right"></i>
+            <span>Chapter 30</span>
+          </nav>
+          <span class="chapter-kicker"><i class="bi bi-diagram-3"></i> Part 7 &middot; Advanced Foundations</span>
+          <h1>Chapter 30: Advanced Manipulation and Force Control</h1>
+          <p class="lede">You will compare force control modes in plain words, follow the MoveIt 2 planning path, and grasp how robots learn contact-rich tasks.</p>
+          <div class="chapter-meta">
+            <span><i class="bi bi-clock"></i> ~25 min read</span>
+            <span><i class="bi bi-bar-chart"></i> Advanced</span>
+            <span><i class="bi bi-list-check"></i> Chapter 30 of 30</span>
+          </div>
+          <div class="goals">
+            <h2>What you will learn</h2>
+            <ul>
+              <li><i class="bi bi-check-circle-fill"></i> Explain impedance vs admittance vs hybrid force control.</li>
+              <li><i class="bi bi-check-circle-fill"></i> Describe the MoveIt 2 and OMPL planning pipeline.</li>
+              <li><i class="bi bi-check-circle-fill"></i> Explain contact-rich tasks and VLA ideas.</li>
+            </ul>
+          </div>
+        </header>
+
+        <article class="article">
+
+          <p class="lead">Watch someone slide a key into a lock in the dark. They do not stare at the exact position. They push gently, feel the walls of the lock, and let the key find its way.</p>
+
+          <p>Most beginner robots cannot do this. They only know positions. They drive to exact points. If the point is wrong by one millimeter, they push hard into the wall. Something bends or breaks.</p>
+
+          <p>This chapter teaches robots how to touch. You will learn three ways to control force. You will plan arm motions with modern tools. You will see how learning turns many demos into smooth grasps. By the end, your robots will push, slide, and feel, not just point.</p>
+
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> Plain English first</div>
+            <p><strong>Force control</strong> means the robot cares about push, not just place. <strong>Impedance</strong> means the arm acts like a soft spring. <strong>Admittance</strong> means the arm listens to push and moves away. Both keep contact gentle.</p>
+          </div>
+
+          <h2>Why position control breaks on contact</h2>
+
+          <p>Position control tells each joint exactly where to go. It works well in free air. The arm draws smooth paths. Nothing pushes back. <a href="ch20-path-planning.html">Chapter 20</a> shows how those paths are planned.</p>
+
+          <p>Contact changes the game. The table pushes back on the hand. A stiff position controller fights that push. It pours in more force to reach its exact target. Forces spike fast. A peg jams. A glass cracks. A motor burns out.</p>
+
+          <h3>Feel first, then push</h3>
+
+          <p>People solve this with feel. You hold an egg firmly enough to lift it, softly enough to keep it whole. Your fingers sense force and adjust in tiny steps. Robots need the same loop: sense force, adjust motion.</p>
+
+          <p>The sensor for this job is a <strong>force-torque sensor</strong>. It sits at the wrist and reports push and twist in all directions. Lighter robots use motor current as a rough force guess. Current sensing is cheap but noisy. A real sensor is cleaner and faster.</p>
+
+          <p>Once the robot can feel, it needs a policy for touch. That policy is the control mode. The next section compares the three big ones.</p>
+
+          <div class="callout note">
+            <div class="callout__head"><i class="bi bi-info-circle-fill"></i> Note</div>
+            <p>Stiff is not always bad. Welding and fast pick-and-place want stiff position control. Force control earns its place only where the robot touches something: assembly, polishing, opening doors, holding hands.</p>
+          </div>
+
+          <h2>Three ways to touch: impedance, admittance, hybrid</h2>
+
+          <p><strong>Impedance control</strong> makes the arm behave like a spring with a damper. Push the hand away from its target, and it pushes back softly. The spring pulls it home. The damper stops wobble. You set both: spring stiffness and damping.</p>
+
+          <p>Think of holding a dog leash with a bungee cord. The dog can wander a little. The cord pulls it back gently. No sharp jerks. That is impedance: soft, springy, forgiving.</p>
+
+          <p><strong>Admittance control</strong> works the other way round. It measures the push first. Then it moves the target away from the push. Push the hand, and the target slides with your hand. The arm feels light, like power steering in a car.</p>
+
+          <p>Admittance shines on heavy machines. A big industrial arm cannot feel soft by nature. Its gears resist motion. Admittance fixes this in software: the sensor feels your hand, and the motors carry the weight. Nurses use such arms to guide heavy scanners over patients with one finger.</p>
+
+          <p>The price of admittance is sensing. It needs a clean force signal every millisecond. A noisy sensor makes the arm drift or buzz. Teams add filters that smooth noise without adding delay. Too much filter brings lag, and lag brings wobble. Tuning the filter is half the job.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Mode</th><th>Rule in plain words</th><th>Best for</th></tr></thead>
+              <tbody>
+                <tr><td>Impedance</td><td>Arm acts like a tunable spring and damper</td><td>Peg-in-hole, polishing, wiping, walking feet</td></tr>
+                <tr><td>Admittance</td><td>Arm moves its target away from felt force</td><td>Heavy arms, hand-guiding, stiff industrial robots</td></tr>
+                <tr><td>Hybrid / UIC</td><td>Force rules some directions, position rules the rest</td><td>Sliding along a wall, screwing, grinding edges</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>Hybrid: split the directions</h3>
+
+          <p><strong>Hybrid control</strong> splits directions. Along the wall, position rules: slide forward. Into the wall, force rules: push with exactly 5 newtons. Each direction gets the boss it needs.</p>
+
+          <p><strong>Unified Impedance Control (UIC)</strong> is a modern cousin. It blends both behaviors in every direction with weights. One dial per direction sets how springy or yielding the arm feels. It is popular in research on wiping and polishing.</p>
+
+          <p>Picking is simple at first. Fast light arms use impedance. Heavy stiff arms use admittance. Sliding tasks use hybrid. Start there, then tune by feel, as <a href="ch21-manipulation.html">Chapter 21</a> did for basic grasping.</p>
+
+          <h3>Tuning without tears</h3>
+
+          <p>Start every new task with low stiffness and slow speed. Set K to half your first guess. Set speed to 5 mm per second. Run ten trials and watch the peak force. If peaks stay low, raise K a little for speed. If peaks spike, lower K or fix the start pose first.</p>
+
+          <p>Damping follows a simple rule of thumb. Double D when you see bounce after contact. Halve D when motion feels stuck in honey. Change one dial at a time and write down each result. Two dials changed together teach you nothing, because you cannot tell which one helped.</p>
+
+          <p>Keep a small table of winning values per task and per object. Wood wants different K than rubber. A suction cup wants different D than two fingers. Your table becomes team knowledge. The next task starts from numbers, not from zero.</p>
+
+          <h2>The spring formula that runs it all</h2>
+
+          <p>Nearly every gentle-touch controller uses one formula. It says: force equals spring push plus damper push. Here it is with names.</p>
+
+          <div class="formula"><span class="label">Impedance law</span> F = K &times; x + D &times; v</div>
+
+          <p>Read it piece by piece. <strong>F</strong> is the force the arm applies. <strong>x</strong> is how far the hand sits from its target. <strong>v</strong> is how fast that error grows. <strong>K</strong> is stiffness, like the spring in a mattress. <strong>D</strong> is damping, like honey slowing a spoon.</p>
+
+          <p>Big K means a stiff arm that snaps back hard. Small K means a soft arm that yields. Big D means calm motion with no bounce. Small D means lively motion that may wobble. Tuning means picking K and D for the task.</p>
+
+          <p>A peg-in-hole task wants soft sideways K, so the peg slides into place. It wants medium forward K, so insertion still moves. It wants enough D to kill buzz. Those three picks turn a jam into a smooth slide.</p>
+
+          <h2>MoveIt 2 and the OMPL planning pipeline</h2>
+
+          <p><strong>MoveIt 2</strong> is the standard arm-planning toolkit in ROS 2. You give it a goal like "put the hand here". It returns a safe joint path. It also drives the arm along that path and watches for collisions.</p>
+
+          <p>Think of planning a road trip. You pick the destination. The map app finds roads. It avoids lakes. Then it reads out each turn. MoveIt 2 is that map app for robot arms.</p>
+
+          <h3>The pipeline step by step</h3>
+
+          <p>Follow one goal through the pipeline. Each step has a clear input and output.</p>
+
+          <ol>
+            <li>Set the goal pose: position plus gripper angle of the hand target.</li>
+            <li>Load the scene: table, walls, and objects the arm must not hit.</li>
+            <li>Ask <strong>OMPL</strong> for a path: it grows random trees of motions until start meets goal.</li>
+            <li>Smooth the path with <strong>TrajOpt</strong> or time scaling so motion is quick but gentle.</li>
+            <li>Check the path against the collision scene, joint limits, and speed limits.</li>
+            <li>Run the path on the arm while a monitor watches force and stops on surprise contact.</li>
+          </ol>
+
+          <p><strong>OMPL</strong> means the Open Motion Planning Library. It plans by smart guessing. It throws out hundreds of random arm poses. It keeps the safe ones. It links them into a road from start to goal. Random sounds sloppy, but the math proves the road appears if one exists.</p>
+
+          <p><strong>TrajOpt</strong> polishes that rough road. It bends the path shorter and smoother while keeping clear of obstacles. Think of ironing a wrinkled shirt. Same shirt, fewer creases.</p>
+
+          <h3>What can go wrong in planning</h3>
+
+          <p>Planning fails in three classic ways. First, the goal sits inside an obstacle, like a hand target inside the table. No safe road exists, and OMPL searches until its timer runs out. Fix the goal pose, not the planner.</p>
+
+          <p>Second, the scene is stale. Someone moved a box, but the old box still blocks the map. The arm then avoids a ghost and may hit the real box. Refresh the scene from the camera before every plan. Third, the path is safe but wild. It swings the elbow wide near a wall. Add a cost that keeps joints near their middle, and the wild swings calm down.</p>
+
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> Tip</div>
+            <p>Plan in free air with MoveIt 2, then switch to force control for the last centimeters of contact. Planners are bad at touch. Force loops are bad at long travel. Each tool owns the phase it does best.</p>
+          </div>
+
+          <h2>Force and touch close the loop</h2>
+
+          <p>A wrist sensor reports total push. That is enough for pegs and polishers. But hands need more detail. <strong>Tactile sensors</strong> sit on the fingertips. They report pressure maps, like tiny touch screens. They feel slip, edges, and texture.</p>
+
+          <p>Slip is the killer signal. A grasp looks fine on camera while the cup slowly slides. A tactile sensor feels that slide in milliseconds. The hand then squeezes a little more. That tiny extra squeeze saves the cup.</p>
+
+          <p>Tactile maps also guide placement. Rolling a fingertip along a lid edge tells the robot where the rim runs. Pressing a cloth flat tells it where wrinkles hide. Vision sees the shape from far away. Touch confirms the shape up close. Teams that fuse both win the hard tasks.</p>
+
+          <p>Cheap touch is coming. Camera-based fingertip sensors watch a soft gel dent from inside with a tiny lens. They cost little and report rich maps. Their weakness is speed: image processing adds delay. For fast slip reflexes, a simple fast pressure cell still beats a clever slow camera.</p>
+
+          <h3>Two hands and clever fingers</h3>
+
+          <p><strong>Bimanual</strong> means two arms work as a team. One holds the box. The other opens the lid. The hard part is shared force: both arms must agree on how hard to pull. Teams solve this with one arm as leader and one as follower in force.</p>
+
+          <p><strong>Dexterous hands</strong> have many small joints, like human fingers. They can roll a pen or tie a knot. But each extra joint adds planning pain. Most teams mix simple firm grasps for lifting with finger tricks only where needed.</p>
+
+          <p>Bimanual tasks need a shared clock. Both arms must agree when the lift starts. Teams send one start signal to both controllers. They also set a force window: if the pull differs too much between arms, both stop. A box held by two arms is a closed chain, and closed chains break wrists when arms disagree.</p>
+
+          <p>Start bimanual work with soft foam objects. Foam forgives timing errors and force fights. Move to wood only after fifty clean foam runs. The scars on your foam blocks are free lessons. Scars on real parts cost money.</p>
+
+          <h3>How grasps fail</h3>
+
+          <p>Grasp failures fall into four families. Learn them and you can fix most drops. First, bad aim: the hand misses the handle by a centimeter. Fix with better vision or a wider approach.</p>
+
+          <p>Second, bad force: too soft drops the object, too hard crushes it. Fix with force limits per object. Third, slip during motion: fast turns fling the load. Fix with slower paths and tactile watch. Fourth, wrong contact: the finger holds a slippery edge instead of a flat face. Fix by choosing grasp points on flat, dry, central spots.</p>
+
+          <h2>Worked example: compliant peg-in-hole</h2>
+
+          <p>Let us solve a classic task. A 20 mm peg must slide into a 20.2 mm hole. The gap is only 0.1 mm per side. Pure position control jams almost every time. Impedance control succeeds.</p>
+
+          <h3>Step 1: plan the free-air path</h3>
+
+          <p>Use MoveIt 2 to bring the peg above the hole. Stop 5 mm short of contact. This part uses stiff position control for speed. No touch happens yet, so stiffness is safe.</p>
+
+          <h3>Step 2: draw the spring you want</h3>
+
+          <p>The figure below shows the idea. The hand hangs from a virtual spring. Soft sideways springs let the hole walls guide the peg home.</p>
+
+          <figure class="figure">
+            <div class="figure__box">
+              <svg viewBox="0 0 460 190" width="100%" role="img" aria-label="Impedance spring diagram: hand held by virtual spring and damper">
+                <rect x="150" y="10" width="160" height="18" rx="4" fill="#1c2230"/>
+                <text x="230" y="23" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#ffffff">target pose</text>
+                <polyline points="200,28 215,40 200,52 215,64 200,76 215,88 200,100" fill="none" stroke="#2d5bff" stroke-width="2.5"/>
+                <line x1="245" y1="28" x2="245" y2="100" stroke="#0f9d78" stroke-width="2.5"/>
+                <line x1="235" y1="45" x2="255" y2="45" stroke="#0f9d78" stroke-width="2"/>
+                <line x1="235" y1="62" x2="255" y2="62" stroke="#0f9d78" stroke-width="2"/>
+                <line x1="235" y1="79" x2="255" y2="79" stroke="#0f9d78" stroke-width="2"/>
+                <rect x="185" y="100" width="90" height="40" rx="8" fill="#e8eeff" stroke="#2d5bff" stroke-width="2"/>
+                <text x="230" y="125" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#1c2230">hand + peg</text>
+                <rect x="120" y="140" width="80" height="40" rx="4" fill="#f3f4f6" stroke="#7b849b" stroke-width="2"/>
+                <rect x="260" y="140" width="80" height="40" rx="4" fill="#f3f4f6" stroke="#7b849b" stroke-width="2"/>
+                <rect x="200" y="140" width="60" height="26" rx="3" fill="#e8eeff" stroke="#2d5bff" stroke-width="2"/>
+                <text x="172" y="100" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#2d5bff">K spring</text>
+                <text x="278" y="100" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#0f9d78">D damper</text>
+                <text x="230" y="182" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#7b849b">hole walls guide the soft peg home</text>
+              </svg>
+            </div>
+            <figcaption>Figure 1. The hand hangs from a virtual spring (K) and damper (D); soft sideways stiffness lets the hole center the peg.</figcaption>
+          </figure>
+
+          <h3>Step 3: tune K and D</h3>
+
+          <p>Set sideways K soft, about 200 N/m, so the walls can steer the peg. Set forward K medium, about 500 N/m, so insertion keeps moving. Set D near 2 times the square root of K times mass, which kills wobble without freezing motion.</p>
+
+          <p>Push down slowly at 5 mm per second. Watch the force. Sideways force should stay under 5 N. If it spikes, K is too stiff or the start pose is too far off. Lower K or re-center, then try again.</p>
+
+          <div class="callout warn">
+            <div class="callout__head"><i class="bi bi-exclamation-triangle-fill"></i> Warning</div>
+            <p>Never start contact moves at full speed. Begin at 5 mm per second with low K. Raise speed only after ten clean runs in a row. Fast first tries wedge the peg and bend the wrist sensor.</p>
+          </div>
+
+          <h2>Learning touch: diffusion policies and VLA</h2>
+
+          <p>Some tasks resist hand-written rules. Folding cloth is one. Picking mixed fruit is another. Too many shapes, too much slip. For these, teams record human demos and train a <strong>policy</strong>: a program that maps what the robot sees to what its hand should do.</p>
+
+          <p><strong>Diffusion policies</strong> are a popular kind. They start from noisy random motions. Then they clean the noise step by step until a smooth action path appears. Like remembering a dance move: blurry at first, sharp after practice. They handle many valid ways to grasp one object.</p>
+
+          <h3>VLA: vision, language, action</h3>
+
+          <p>A <strong>VLA model</strong> reads a camera image plus a sentence, then writes arm actions. You say "pick up the red cup". The model finds red, finds cup, and moves. One model can serve hundreds of commands without new code per task.</p>
+
+          <p>VLA models are big and slow on their own. So teams shrink them for the robot. They export to <strong>ONNX</strong>, a shared model format that runs almost anywhere. Then they compile with <strong>TensorRT</strong>, which tunes the math for NVIDIA chips. The result runs tens of times per second on the robot itself. For robotics career paths built on these skills, see the <a href="index.html">book home</a>.</p>
+
+          <p>Language brings a new failure family: wrong-object grasps. The model hears "red cup" and grabs red wrapping instead. Fix this with pointed training data: many red things that are not cups, many cups that are not red. Test wording tricks too. If "grab the mug" works but "fetch the mug" fails, your language cover is too thin.</p>
+
+          <p>Diffusion and VLA do not replace force control. They sit above it. The learned policy picks where to move each tenth of a second. The impedance loop below turns those picks into gentle pushes. Brains dream, springs touch. Keep both layers, and each covers the weakness of the other.</p>
+
+          <div class="code">
+            <div class="code__bar">
+              <span class="code__dots"><span></span><span></span><span></span></span>
+              <span class="code__lang">Python</span>
+              <button class="code__copy" type="button"><i class="bi bi-clipboard"></i> Copy</button>
+            </div>
+            <pre><code># ROS 2 + MoveIt 2 style pseudo-code: plan, then touch gently
+from moveit import MoveGroup  # pseudo-module for teaching
+
+arm = MoveGroup("panda_arm")
+arm.set_goal_pose(x=0.45, y=0.00, z=0.25)  # hover 5 mm above hole
+path = arm.plan_with_ompl()               # collision-free road
+arm.execute(path)                         # stiff motion in free air
+
+arm.set_impedance(K_xy=200.0, K_z=500.0, D=20.0)  # soft sideways
+arm.move_down(speed=0.005, max_force=5.0)         # 5 mm/s, stop if push &gt; 5 N
+print("insert done, force =", arm.read_force())</code></pre>
+          </div>
+
+          <p>Read the code in order. First the arm plans with OMPL and moves stiffly. Then it turns soft with low K. Then it slides down slowly with a force cap. If push passes 5 N, motion halts. Plan hard, touch soft: that is the whole pattern.</p>
+
+          <h3>From laptop model to robot motion</h3>
+
+          <p>Deployment has four gates. First, collect varied demos: many objects, many lights, many start poses. One hundred demos is a floor, not a ceiling. Second, train off the robot on a fast machine and score success on held-out scenes, not on training scenes.</p>
+
+          <p>Third, convert the winner to ONNX and test that its outputs match the training model bit for bit. Fourth, compile with TensorRT for the exact chip on the robot and measure timing. A policy that needs 200 ms per step cannot close a slip reflex. If it is too slow, shrink the model or run it at a lower rate above a fast force guard.</p>
+
+          <h2>Common mistakes</h2>
+
+          <p><strong>Mistake 1: force control everywhere.</strong> Long travel in soft mode drifts and wastes time. Plan stiff in free air. Switch to soft only for the last centimeters.</p>
+
+          <p><strong>Mistake 2: stiffness too high at first touch.</strong> The peg wedges, the sensor screams, the mount bends. Start soft at 5 mm per second. Stiffen only after clean runs.</p>
+
+          <p><strong>Mistake 3: ignoring the scene in MoveIt 2.</strong> Forgetting the table box means the planner dives through it. Always load every obstacle before you plan. Unknown terms are defined in the <a href="glossary.html">glossary</a>.</p>
+
+          <p><strong>Mistake 4: training a policy on ten demos.</strong> Ten demos teach ten tricks. Real shelves need hundreds of varied demos: angles, lights, clutter. Few demos give a shy policy that freezes on new scenes.</p>
+
+          <p><strong>Mistake 5: no force cap on learned policies.</strong> A neural net can command wild pushes. Always wrap policies in a low-level force and speed guard. Learning picks the move, but physics sets the limit.</p>
+
+          <h2>How professionals do it</h2>
+
+          <p>Professional teams layer three controllers. MoveIt 2 owns travel. Impedance owns contact. A tactile reflex owns emergencies like slip. Each layer can stop the one above it. Safety always wins over progress.</p>
+
+          <p>They log every touch. Force traces from each insertion go into a database. When failures spike, they read the traces first. A rising sideways force means a worn fixture or a shifted table, not a bad policy.</p>
+
+          <p>They deploy learned models like software releases. The ONNX file gets a version number. TensorRT engines are built per chip type. New models run in shadow mode beside the old one before they touch real parts. Only winners ship.</p>
+
+          <h2>Try it yourself</h2>
+
+          <ol>
+            <li><strong>Easy: feel the spring.</strong> Push a table with one finger, soft then hard. Note how soft touch slides and hard touch sticks. Hint: your finger stiffness is your K, your calm is your D.</li>
+            <li><strong>Medium: pick K on paper.</strong> A 1 kg hand sits 2 cm off target. With K = 200 N/m, what force results? Hint: F = K times x, so 200 times 0.02.</li>
+            <li><strong>Harder: plan a path.</strong> Install MoveIt 2 for a Panda arm, add a table box to the scene, and plan between two poses above it. Hint: if planning dives through the table, your scene box is missing.</li>
+            <li><strong>Project: soft insertion.</strong> Add a wrist force cap of 5 N to a peg task, or fake one with a kitchen scale and a slow hand push. Record force at three speeds. Hint: slower speed with soft K gives the lowest peak force.</li>
+          </ol>
+
+          <section class="takeaways">
+            <h2><i class="bi bi-pin-angle-fill"></i> Key takeaways</h2>
+            <ul>
+              <li><i class="bi bi-check2-circle"></i> Position control fights contact; force control yields to it.</li>
+              <li><i class="bi bi-check2-circle"></i> Impedance acts like a spring, admittance like power steering.</li>
+              <li><i class="bi bi-check2-circle"></i> F = K times x + D times v is the one formula to remember.</li>
+              <li><i class="bi bi-check2-circle"></i> MoveIt 2 plus OMPL turns a goal pose into a safe path.</li>
+              <li><i class="bi bi-check2-circle"></i> Contact-rich tasks need feel, patience, and small steps.</li>
+              <li><i class="bi bi-check2-circle"></i> Learning policies copy human touch from many demos.</li>
+            </ul>
+          </section>
+
+          <section class="quiz">
+            <div class="quiz__head"><i class="bi bi-patch-question-fill"></i> Check your understanding</div>
+            <details>
+              <summary><span class="q-num">Q1.</span><span>Why does stiff position control break parts on contact?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>It fights the push.</strong> It adds more force to reach an exact point, so forces spike and parts jam or crack.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q2.</span><span>What is impedance control in one line?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>The arm acts like a tunable spring and damper.</strong> It yields to push and springs back softly.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q3.</span><span>What does each letter in F = K x + D v mean?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Force = stiffness times error + damping times speed.</strong> K sets springiness, D calms wobble.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q4.</span><span>When would you pick hybrid control?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>When directions differ.</strong> Position rules along the wall while force rules into the wall.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q5.</span><span>What does OMPL do inside MoveIt 2?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>It finds a collision-free path.</strong> It samples random motions until one connects start to goal safely.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q6.</span><span>What is a VLA policy?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>A model that reads vision and language and writes actions.</strong> You say "pick the red cup" and it moves the arm.</div>
+            </details>
+          </section>
+        </article>
+
+        <nav class="pager" id="pager" aria-label="Chapter navigation"></nav>
+      </div>
+    </main>
+  </div>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/book.js"></script>
+</body>
+</html>

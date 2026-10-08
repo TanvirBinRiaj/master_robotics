@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>try{var __t=localStorage.getItem("mr-theme");if(__t==="dark"||__t==="light")document.documentElement.setAttribute("data-theme",__t);}catch(e){}</script>
+  <title>Appendix B: Resources and Next Steps — Master Robotics</title>
+  <meta name="description" content="Where to go after this book: hardware kits, software tools, ROS, learning paths, communities and how to keep growing as a robotics engineer.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/prose.css">
+</head>
+<body data-file="resources.html">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="topbar" id="topbar"></header>
+  <div class="progress-bar" id="progressBar"></div>
+
+  <div class="layout">
+    <div class="sidebar__backdrop" id="navBackdrop"></div>
+    <nav class="sidebar" id="sidebar" aria-label="Book contents"></nav>
+
+    <main class="main" id="main">
+      <div class="container">
+
+        <header class="chapter-head">
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="index.html">Home</a>
+            <i class="bi bi-chevron-right"></i>
+            <a href="index.html#contents">Appendices</a>
+            <i class="bi bi-chevron-right"></i>
+            <span>Appendix B</span>
+          </nav>
+          <span class="chapter-kicker"><i class="bi bi-collection"></i> Appendix B</span>
+          <h1>Resources and Next Steps</h1>
+          <p class="lede">A book is a map, not the journey. This appendix points you to hardware, software, courses and communities so you can keep building after the last chapter.</p>
+          <div class="chapter-meta">
+            <span><i class="bi bi-clock"></i> Reference</span>
+            <span><i class="bi bi-bar-chart"></i> All levels</span>
+            <span><i class="bi bi-list-check"></i> Appendix B of B</span>
+          </div>
+        </header>
+
+        <article class="article">
+
+          <p class="lead">Prices change and websites move, so treat the numbers here as a guide, not a promise. Check the official pages for the latest details.</p>
+
+          <div class="callout note">
+            <div class="callout__head"><i class="bi bi-info-circle-fill"></i> One rule before you buy anything</div>
+            <p>Do not buy a big pile of parts at once. Buy the smallest kit that lets you finish the first project in Chapter 22. Finish it. Then buy more. This habit keeps you learning instead of drowning in boxes.</p>
+          </div>
+
+          <h2>Starter hardware kits</h2>
+
+          <p>For a true beginner, a single mixed kit is better than ten separate orders. These kits combine a board, a breadboard, sensors, motors and a guidebook.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Kit</th><th>What you get</th><th>Best for</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><strong>Arduino Starter Kit</strong></td>
+                  <td>Arduino Uno board, breadboard, sensors, an LED set, a DC motor, a servo, an H-bridge driver and a 170-page project book.</td>
+                  <td>Absolute beginners. No experience needed. The book walks you project by project.</td>
+                </tr>
+                <tr>
+                  <td><strong>SparkFun Inventor's Kit</strong></td>
+                  <td>An Arduino-compatible board, breadboard, sensors, a motor driver, gearmotors, an ultrasonic sensor and a case. Ends with an object-avoiding robot.</td>
+                  <td>Learners who want to reach a small working robot in one kit.</td>
+                </tr>
+                <tr>
+                  <td><strong>Raspberry Pi starter kit</strong></td>
+                  <td>A small full computer running Linux, plus power supply, case and storage.</td>
+                  <td>Projects with cameras, vision and heavier software. Better as a second step.</td>
+                </tr>
+                <tr>
+                  <td><strong>Micro:bit or similar board</strong></td>
+                  <td>A very cheap beginner board with lights, buttons and sensors built in.</td>
+                  <td>First taste of programming and sensing with almost no cost.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table B.1 — A good beginner kit has one board, one breadboard, a few sensors and at least one motor you can drive.</p>
+
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> What a starter kit must contain</div>
+            <p>Look for these four things: (1) an Arduino-compatible board or a Raspberry Pi, (2) a breadboard and jumper wires, (3) a mix of sensors including a distance sensor, and (4) a motor plus a motor driver. If a kit has these, you can build the project in Chapter 22.</p>
+          </div>
+
+          <h2>Software you will use</h2>
+
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Tool</th><th>What it does</th><th>When you need it</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Arduino IDE</strong></td><td>Write and upload programs to microcontroller boards.</td><td>From Chapter 14 onward.</td></tr>
+                <tr><td><strong>MicroPython / Thonny</strong></td><td>Run Python on small boards. Friendly for beginners.</td><td>When you prefer Python to C++.</td></tr>
+                <tr><td><strong>Python</strong></td><td>The main language for robot vision, learning and tools.</td><td>Chapters 17 and 19.</td></tr>
+                <tr><td><strong>ROS 2</strong></td><td>The shared toolbox for building larger robots from small programs.</td><td>Chapter 18 and beyond.</td></tr>
+                <tr><td><strong>Git and GitHub</strong></td><td>Track changes to your code and share projects.</td><td>From your first real project.</td></tr>
+                <tr><td><strong>FreeCAD or Fusion-style CAD</strong></td><td>Draw parts in 3D before you make them.</td><td>When you design your own chassis.</td></tr>
+                <tr><td><strong>A simulator (for example Gazebo)</strong></td><td>Test robot software without real hardware.</td><td>Chapter 18 onward.</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2>Learning paths after this book</h2>
+
+          <p>You now have the whole picture. Pick ONE direction and go deep. Trying to learn everything at once is the fastest way to learn nothing.</p>
+
+          <ol>
+            <li><strong>The builder path (mechanics).</strong> Learn 3D printing, CAD and servo control. Build arms and mobile bases. Strength needed: patience and hands-on testing.</li>
+            <li><strong>The electronics path.</strong> Learn circuits, PCB design and power. Build your own boards. Strength needed: care and precision.</li>
+            <li><strong>The software path.</strong> Learn Python, control theory and ROS 2. Make robots behave well. Strength needed: logical thinking and debugging.</li>
+            <li><strong>The intelligence path.</strong> Learn machine learning and computer vision. Teach robots to see and decide. Strength needed: maths and curiosity.</li>
+            <li><strong>The full-stack path.</strong> Learn a little of all four. This is what most product engineers do. Strength needed: broad interest and good organisation.</li>
+          </ol>
+
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> In simple words</div>
+            <p>Pick one path. Spend three months on it. Finish one project. Then decide your next path. Depth beats breadth when you are starting.</p>
+          </div>
+
+          <h2>Communities and people</h2>
+
+          <p>No engineer works alone. When you get stuck, ask. Most robotics people remember being beginners and are happy to help.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Where</th><th>What it is good for</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Official forums and docs</strong></td><td>The Arduino forums, the ROS documentation and the Raspberry Pi forums. Search first; your question has likely been asked.</td></tr>
+                <tr><td><strong>GitHub</strong></td><td>Real robot code. Reading other people's projects teaches faster than any tutorial.</td></tr>
+                <tr><td><strong>Local makerspaces and clubs</strong></td><td>Tools you do not own, and people a few steps ahead of you.</td></tr>
+                <tr><td><strong>Competitions</strong></td><td>Line-following, sumo, maze and robot-soccer events push you to finish and to debug under pressure.</td></tr>
+                <tr><td><strong>University robotics labs</strong></td><td>Many welcome keen helpers. Ask politely; offer to help with small tasks.</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2>Books to read next</h2>
+
+          <ul>
+            <li><strong>A gentle introduction to electronics</strong> — anything that teaches voltage, current and components through projects. Read it with a breadboard beside you.</li>
+            <li><strong>A control systems primer</strong> — to go deeper on feedback and PID after Chapter 15.</li>
+            <li><strong>A linear algebra primer</strong> — vectors and matrices are the language of robotics maths. You do not need it to start, but it unlocks Chapters 16 to 20.</li>
+            <li><strong>A robotics textbook</strong> — once you are comfortable, a standard university text will make far more sense than it would today.</li>
+          </ul>
+
+          <div class="callout warn">
+            <div class="callout__head"><i class="bi bi-exclamation-triangle-fill"></i> Avoid this trap</div>
+            <p>Buying courses and books feels like progress, but it is not. Watching is not building. For every hour you spend reading, spend at least an hour with your hands on real parts.</p>
+          </div>
+
+          <h2>Advanced path: after Part 7</h2>
+
+          <ul>
+            <li><strong>Modern Robotics (Lynch and Park)</strong> — the standard text for kinematics, dynamics and motion planning. Read after Chapters 16 and 25.</li>
+            <li><strong>Convex Optimization (Boyd and Vandenberghe, free online)</strong> — the maths behind every QP solver in Chapter 26. Chapters 4 and 5 alone unlock MPC.</li>
+            <li><strong>Probabilistic Robotics (Thrun, Burgard and Fox)</strong> — filters, mapping and SLAM depth behind Chapters 20 and 28.</li>
+            <li><strong>Underactuated Robotics (Tedrake, free online)</strong> — dynamics-first control for walkers and arms. Pairs with Chapter 26.</li>
+            <li><strong>Open-source stacks to study</strong> — ethercat_driver_ros2 (CiA 402 + ros2_control), MuJoCo Playground, Isaac Lab tutorials, Drake Trajectory Optimization examples, GTSAM factor-graph examples.</li>
+          </ul>
+
+          <h2>A 12-month plan you can start today</h2>
+
+          <ol>
+            <li><strong>Months 1-2:</strong> Read this book once. Build the Chapter 22 robot. Follow each safety rule.</li>
+            <li><strong>Months 3-4:</strong> Pick one path. Complete one course or book on it. Keep a written engineering notebook.</li>
+            <li><strong>Months 5-6:</strong> Build a second project that is a little harder. Put it on GitHub with photos and a short write-up.</li>
+            <li><strong>Months 7-9:</strong> Enter a competition or set yourself a difficult solo goal. Learn ROS 2 basics.</li>
+            <li><strong>Months 10-12:</strong> Build one project you are proud of. Write it up clearly. Start applying for internships or junior roles, or teaching beginners.</li>
+          </ol>
+
+          <p>Twelve months of steady work, one hour a day, will take you further than you expect. The engineers you admire were once exactly where you are now. They simply kept going.</p>
+
+          <section class="takeaways">
+            <h2><i class="bi bi-pin-angle-fill"></i> Key takeaways</h2>
+            <ul>
+              <li><i class="bi bi-check2-circle"></i> Buy the smallest kit that finishes the next project, not the biggest you can afford.</li>
+              <li><i class="bi bi-check2-circle"></i> Learn Arduino for control and Python for vision and intelligence.</li>
+              <li><i class="bi bi-check2-circle"></i> Choose ONE deep path before trying to master all of robotics.</li>
+              <li><i class="bi bi-check2-circle"></i> Communities, competitions and real projects teach fastest.</li>
+              <li><i class="bi bi-check2-circle"></i> Building beats watching. Always finish a project before starting the next.</li>
+            </ul>
+          </section>
+
+        </article>
+
+        <nav class="pager" id="pager" aria-label="Chapter navigation"></nav>
+      </div>
+    </main>
+  </div>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/book.js"></script>
+</body>
+</html>

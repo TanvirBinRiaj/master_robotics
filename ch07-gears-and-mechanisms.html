@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>try{var __t=localStorage.getItem("mr-theme");if(__t==="dark"||__t==="light")document.documentElement.setAttribute("data-theme",__t);}catch(e){}</script>
+  <title>Chapter 7: Gears, Belts and Mechanisms — Master Robotics</title>
+  <meta name="description" content="A plain-English guide to gear ratio, gears, belts, pulleys, chains and screws. Learn how mechanisms trade speed for torque and how to pick one to lift, push or turn a load.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/prose.css">
+</head>
+<body data-file="ch07-gears-and-mechanisms.html">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="topbar" id="topbar"></header>
+  <div class="progress-bar" id="progressBar"></div>
+
+  <div class="layout">
+    <div class="sidebar__backdrop" id="navBackdrop"></div>
+    <nav class="sidebar" id="sidebar" aria-label="Book contents"></nav>
+
+    <main class="main" id="main">
+      <div class="container">
+
+        <header class="chapter-head">
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="index.html">Home</a>
+            <i class="bi bi-chevron-right"></i>
+            <a href="index.html#mechanics">Part 2 &middot; Mechanics and Motion</a>
+            <i class="bi bi-chevron-right"></i>
+            <span>Chapter 7</span>
+          </nav>
+          <span class="chapter-kicker"><i class="bi bi-gear-wide-connected"></i> Part 2 &middot; Mechanics and Motion</span>
+          <h1>Gears, Belts and Mechanisms</h1>
+          <p class="lede">A motor spins fast but weak, while a robot joint needs to move slow but strong. In this chapter you will learn how gears, belts and screws change that speed into strength — and how to pick the right one for your job.</p>
+          <div class="chapter-meta">
+            <span><i class="bi bi-clock"></i> ~23 min read</span>
+            <span><i class="bi bi-bar-chart"></i> Beginner</span>
+            <span><i class="bi bi-list-check"></i> Chapter 7 of 30</span>
+          </div>
+          <div class="goals">
+            <h2>What you will learn</h2>
+            <ul>
+              <li><i class="bi bi-check-circle-fill"></i> Explain gear ratio without heavy maths</li>
+              <li><i class="bi bi-check-circle-fill"></i> Name common power-transmission parts</li>
+              <li><i class="bi bi-check-circle-fill"></i> Pick a mechanism to lift, push or turn a load</li>
+            </ul>
+          </div>
+        </header>
+
+        <article class="article">
+
+          <p class="lead">Imagine a small electric motor on your desk. You switch it on. It spins so quickly that you can barely see the shaft. You pinch the shaft between your fingers, and it stops easily. It has plenty of speed, but almost no turning strength. Now watch a real robot arm lift a heavy box slowly and smoothly. Same kind of motor inside. So how did a fast, weak spin become a slow, strong lift? The answer is a mechanism.</p>
+
+          <h2>Why motors need mechanisms</h2>
+
+          <p>A <strong>motor</strong> turns electricity into spinning motion. Chapter 6 showed that motors come in different types. Almost all of them share one habit: they like to spin quickly. A small hobby motor may spin at 6,000 to 15,000 turns per minute. That is very fast.</p>
+
+          <p>Fast is good for a fan or a wheel. Fast is bad for a robot joint. A robot gripper must close gently. A robot elbow must hold a weight without shaking. These jobs need slow, controlled, powerful motion.</p>
+
+          <p>The strength of a turning force is called <strong>torque</strong>. Think of a stiff jar lid. A weak hand cannot open it. A strong hand with a wide grip can. Torque is that turning strength, measured in newton-metres (N&middot;m).</p>
+
+          <p>Here is the key trade you must remember. Speed and torque can be exchanged, like money at a bank. A <strong>mechanism</strong> is a set of parts that moves energy from one place to another. Good mechanisms swap speed for torque. They can also swap torque for speed, when you want to go faster instead.</p>
+
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> The one rule to remember</div>
+            <p>A mechanism trades speed for torque. If the output turns slower than the input, it turns with more force. If the output turns faster, it turns with less force. Energy is not free; you always give up one to gain the other.</p>
+          </div>
+
+          <p>The rest of this chapter is about the parts that do this trading: gears, belts, pulleys, chains and screws. By the end, you will be able to look at a job and say, "I need this mechanism, with this ratio."</p>
+
+          <h2>Gear ratio: the big idea</h2>
+
+          <p>A <strong>gear</strong> is a wheel with teeth around its edge. When two gears sit next to each other, their teeth lock together. Turn one gear, and it pushes the other one around. We call the touching point the <strong>mesh</strong>.</p>
+
+          <p>Imagine two gears of different sizes. The small one has few teeth. The big one has many teeth. Each time the small gear turns once, it moves only its own number of teeth past the mesh. The big gear must move the same number of teeth to keep up, so it turns less than a full circle. That is the whole trick.</p>
+
+          <h3>Counting teeth gives you the ratio</h3>
+
+          <p>The <strong>gear ratio</strong> tells you how many times the input must turn to turn the output once. You find it by counting teeth. The gear that the motor turns is the <strong>driving gear</strong>. The gear that does the work is the <strong>driven gear</strong>.</p>
+
+          <div class="formula"><span class="label">Gear ratio</span> ratio = driven teeth &divide; driving teeth</div>
+
+          <p>If the driving gear has 10 teeth and the driven gear has 40 teeth, the ratio is 40 &divide; 10 = 4. We write that as 4:1 and say "four to one". The output turns once for every four turns of the input.</p>
+
+          <h3>How the ratio changes speed and torque</h3>
+
+          <p>Once you know the ratio, two simple rules give you the output numbers. They are opposites of each other, which is exactly the trade we talked about.</p>
+
+          <div class="formula"><span class="label">Output speed</span> output speed = input speed &divide; ratio</div>
+
+          <div class="formula"><span class="label">Output torque</span> output torque = input torque &times; ratio</div>
+
+          <p>A ratio bigger than 1 slows the output down and makes it stronger. This is called <strong>speed reduction</strong>, and it is what most robot joints need. A ratio smaller than 1 speeds the output up and makes it weaker. This is called <strong>overdrive</strong>. Overdrive is useful for things like a fan or a spinning sensor.</p>
+
+          <h3>Worked calculation 1: a speed-reduction gearbox</h3>
+
+          <p>A motor spins at 3,000 rpm (turns per minute). It makes 0.05 N&middot;m of torque. We connect a driving gear with 12 teeth to a driven gear with 60 teeth.</p>
+
+          <ol>
+            <li>Find the ratio: 60 &divide; 12 = 5. So the ratio is 5:1.</li>
+            <li>Find the output speed: 3,000 &divide; 5 = 600 rpm. The output is five times slower.</li>
+            <li>Find the output torque: 0.05 &times; 5 = 0.25 N&middot;m. The output is five times stronger.</li>
+          </ol>
+
+          <p>The motor gave up speed and gained torque. In real life the gearbox wastes a little energy as heat, so the true torque is a bit less. We will talk about that loss later in this chapter.</p>
+
+          <h3>Worked calculation 2: an overdrive</h3>
+
+          <p>Now reverse it. A driving gear has 40 teeth and the driven gear has 20 teeth. The input spins at 120 rpm with 0.4 N&middot;m of torque.</p>
+
+          <ol>
+            <li>Find the ratio: 20 &divide; 40 = 0.5. So the ratio is 0.5:1.</li>
+            <li>Find the output speed: 120 &divide; 0.5 = 240 rpm. The output is twice as fast.</li>
+            <li>Find the output torque: 0.4 &times; 0.5 = 0.2 N&middot;m. The output is twice as weak.</li>
+          </ol>
+
+          <p>Notice the pattern. A small ratio under 1 makes things faster and weaker. A large ratio over 1 makes things slower and stronger. You now understand the heart of every gearbox.</p>
+
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> In simple words</div>
+            <p>Big gear driven by a small gear means "slow and strong". Small gear driven by a big gear means "fast and weak". Count the teeth to know which way it goes.</p>
+          </div>
+
+          <figure class="figure">
+            <div class="figure__box">
+              <svg viewBox="0 0 640 260" width="100%" role="img" aria-label="A small driving gear with 12 teeth meshing with a larger driven gear with 36 teeth, showing slow strong output">
+                <circle cx="150" cy="130" r="52" fill="#e8eeff" stroke="#2d5bff" stroke-width="2"></circle>
+                <g stroke="#2d5bff" stroke-width="4">
+                  <line x1="150" y1="72" x2="150" y2="58"></line>
+                  <line x1="202" y1="94" x2="214" y2="86"></line>
+                  <line x1="208" y1="150" x2="221" y2="154"></line>
+                  <line x1="176" y1="182" x2="182" y2="194"></line>
+                  <line x1="124" y1="182" x2="118" y2="194"></line>
+                  <line x1="92" y1="150" x2="79" y2="154"></line>
+                  <line x1="98" y1="94" x2="86" y2="86"></line>
+                </g>
+                <circle cx="150" cy="130" r="8" fill="#1c2230"></circle>
+                <text x="150" y="228" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#2d5bff">12 teeth (driving)</text>
+                <text x="150" y="246" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#4a5266">motor side</text>
+
+                <circle cx="380" cy="130" r="110" fill="#e2f6ef" stroke="#0f9d78" stroke-width="2"></circle>
+                <g stroke="#0f9d78" stroke-width="4">
+                  <line x1="380" y1="20" x2="380" y2="6"></line>
+                  <line x1="474" y1="52" x2="485" y2="44"></line>
+                  <line x1="490" y1="130" x2="504" y2="130"></line>
+                  <line x1="474" y1="208" x2="485" y2="216"></line>
+                  <line x1="380" y1="240" x2="380" y2="254"></line>
+                  <line x1="286" y1="208" x2="275" y2="216"></line>
+                  <line x1="270" y1="130" x2="256" y2="130"></line>
+                  <line x1="286" y1="52" x2="275" y2="44"></line>
+                </g>
+                <circle cx="380" cy="130" r="10" fill="#1c2230"></circle>
+                <text x="380" y="126" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#0f9d78">36 teeth</text>
+                <text x="380" y="144" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#0f9d78">(driven)</text>
+
+                <text x="120" y="26" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#7b849b">input: fast</text>
+                <text x="560" y="122" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#7b849b">output:</text>
+                <text x="560" y="140" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#7b849b">slow, strong</text>
+              </svg>
+            </div>
+            <figcaption>Figure 7.1 — Two meshed gears. The small driving gear has 12 teeth; the large driven gear has 36 teeth. The ratio is 36 &divide; 12 = 3, so the output turns three times slower and three times stronger than the input.</figcaption>
+          </figure>
+
+          <h2>Gear trains: stacking your advantage</h2>
+
+          <p>One pair of gears is called a <strong>simple gear pair</strong>. Often one pair is not enough. A robot joint may need a ratio of 100:1, and no sensible pair of gears gives that. The fix is to stack several pairs in a line. This stack is called a <strong>gear train</strong>.</p>
+
+          <p>When you stack stages, you do not add the ratios. You multiply them. Two stages of 5:1 give 5 &times; 5 = 25:1. Three stages of 5:1 give 5 &times; 5 &times; 5 = 125:1. This is how small hobby gearboxes reach ratios like 200:1 inside a case the size of your thumb.</p>
+
+          <div class="formula"><span class="label">Gear train ratio</span> total ratio = ratio&sub1; &times; ratio&sub2; &times; ratio&sub3; ...</div>
+
+          <p>Look closely at a real gear train. The gear in the middle is turned by one gear and turns another. It is both driven and driving at the same time. Engineers call it an <strong>idler</strong> when it only passes motion along. An idler changes the direction of rotation but does not change the ratio.</p>
+
+          <h3>Compound gears</h3>
+
+          <p>A <strong>compound gear</strong> is two gears joined on one shaft, so they must turn together. The first gear is driven by the previous stage. The second gear drives the next stage. Compound gears are how you pack a big ratio into a short space.</p>
+
+          <p>Here is a small trap. When a middle gear is an idler, it does not change the ratio. But a compound gear does, because its two halves have different tooth counts and both act as their own stage. Write down every stage and multiply, one by one. That habit will save you from a wrong answer.</p>
+
+          <h3>Worked calculation 3: a two-stage gear train</h3>
+
+          <p>Suppose stage one has 10 and 30 teeth, and stage two has 12 and 48 teeth.</p>
+
+          <ol>
+            <li>Stage one ratio: 30 &divide; 10 = 3.</li>
+            <li>Stage two ratio: 48 &divide; 12 = 4.</li>
+            <li>Total ratio: 3 &times; 4 = 12:1.</li>
+            <li>If the motor spins at 2,400 rpm, the output speed is 2,400 &divide; 12 = 200 rpm.</li>
+          </ol>
+
+          <p>Two small pairs of gears gave a 12:1 reduction. That is the power of stacking stages.</p>
+
+          <div class="callout warn">
+            <div class="callout__head"><i class="bi bi-exclamation-triangle-fill"></i> Watch out</div>
+            <p>Many starter kits label a gearbox "100:1" but mean "approximately". Plastic gears, friction and small errors make the real ratio drift. For a robot leg or a steering system, always trust a measured test, not just the label.</p>
+          </div>
+
+          <h3>Direction of rotation</h3>
+
+          <p>Meshed gears turn in opposite directions. If the driving gear turns clockwise, the driven gear turns anticlockwise. Each extra pair flips the direction again. So a two-pair train ends up turning the same way as the motor. A three-pair train turns the opposite way. Keep this in mind, or your robot will drive backwards.</p>
+
+          <h2>A tour of gear types</h2>
+
+          <p>Not all gears look like flat wheels. Each shape is built for a certain job. Table 7.1 gives the six types you will meet most often, with a plain description and one robot use for each.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Gear type</th><th>What it looks like</th><th>Good for</th><th>Robot use</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Spur gear</td><td>Flat wheel with straight teeth</td><td>Simple, cheap, high efficiency</td><td>Starter gearboxes and toy robots</td></tr>
+                <tr><td>Helical gear</td><td>Teeth cut at a slight angle</td><td>Quiet, smooth, strong</td><td>Robot arm joint gearboxes</td></tr>
+                <tr><td>Bevel gear</td><td>Teeth on a cone shape</td><td>Turning motion through 90&deg;</td><td>Drive wheels on a skid-steer base</td></tr>
+                <tr><td>Worm gear</td><td>A screw meshing with a wheel</td><td>Huge ratio in one stage; holds a load</td><td>Pan-tilt camera mount that stays put</td></tr>
+                <tr><td>Rack and pinion</td><td>A gear rolling along a straight bar</td><td>Turning spin into straight travel</td><td>Linear slide on a 3D printer or gantry</td></tr>
+                <tr><td>Planetary gear</td><td>Small gears orbiting a centre gear</td><td>Big ratio in a compact round case</td><td>Wheel hub gearbox and drone propeller drive</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 7.1 — Six common gear types and where you will see each one.</p>
+
+          <h3>Spur and helical gears</h3>
+          <p>A <strong>spur gear</strong> has straight teeth. It is the simplest and cheapest kind, and it wastes the least energy. Two spur gears are noisy, though, because their whole tooth hits at once. A <strong>helical gear</strong> has teeth cut on a slant, so each tooth slides in gently. Helical gears run quietly and carry more load, which is why robot arms use them. The slanted teeth also push sideways, so the shaft needs a bearing to hold it.</p>
+
+          <h3>Bevel and worm gears</h3>
+          <p>A <strong>bevel gear</strong> looks like a cone with teeth. Two bevel gears meet at 90&deg; and pass motion around a corner. A <strong>worm gear</strong> is a screw that turns a special wheel. One turn of the screw advances the wheel by a single tooth, so you get a very large ratio from one small pair. A worm gear can also hold its position when the motor is off, which is why a camera mount does not flop down. Its weakness is friction; we cover that soon.</p>
+
+          <h3>Rack and pinion, and planetary gears</h3>
+          <p>A <strong>rack and pinion</strong> is a gear riding along a straight toothed bar. Turn the pinion, and the rack slides in a straight line. This is the simplest way to turn rotation into clean linear motion. A <strong>planetary gear</strong> set has a sun gear in the middle, several planet gears around it, and a ring gear outside. It packs a large ratio into a round case and shares the load across several teeth, so it is strong and compact.</p>
+
+          <h2>Belts, pulleys, chains and sprockets</h2>
+
+          <p>Gears must touch, so their shafts must sit close together. Sometimes your motor is far from the joint it must drive. That is when you use a <strong>belt</strong> and <strong>pulleys</strong>. A <strong>pulley</strong> is a wheel with a groove. A belt loops around two or more pulleys and carries motion across distance.</p>
+
+          <p>The ratio works just like gears, but you use diameters instead of teeth.</p>
+
+          <div class="formula"><span class="label">Belt ratio</span> ratio = driven pulley diameter &divide; driving pulley diameter</div>
+
+          <p>If the driving pulley is 20 mm across and the driven pulley is 60 mm, the ratio is 60 &divide; 20 = 3. The output turns three times slower and three times stronger. The same speed-and-torque rules from gears apply here.</p>
+
+          <h3>Slip or no slip</h3>
+
+          <p>A plain flat belt or V-belt grips by friction. This is smooth and quiet, and it forgives a small misalignment between the two shafts. The downside is <strong>slip</strong>: if the load is too heavy, the belt slides and the output stops, even while the motor keeps spinning. Slip is sometimes a feature. In a robot that might jam, a belt that slips is a cheap safety clutch that protects the motor.</p>
+
+          <p>A <strong>timing belt</strong> has teeth on its inner face that fit matching grooves in the pulley. It cannot slip. This makes it perfect for robots that must move to an exact position, such as a 3D printer or a camera slider. Timing belts are quiet, light and need no oil. The trade is that they must be tensioned correctly and the two shafts must be well aligned.</p>
+
+          <figure class="figure">
+            <div class="figure__box">
+              <svg viewBox="0 0 640 260" width="100%" role="img" aria-label="A small driving pulley connected by a belt to a larger driven pulley, showing distance transmission and reduction">
+                <path d="M120 88 L520 46" stroke="#7b849b" stroke-width="3" fill="none"></path>
+                <path d="M120 172 L520 214" stroke="#7b849b" stroke-width="3" fill="none"></path>
+                <circle cx="120" cy="130" r="42" fill="#e8eeff" stroke="#2d5bff" stroke-width="2"></circle>
+                <path d="M120 88 A42 42 0 0 1 120 172" fill="none" stroke="#2d5bff" stroke-width="3"></path>
+                <circle cx="120" cy="130" r="9" fill="#1c2230"></circle>
+                <circle cx="520" cy="130" r="84" fill="#e2f6ef" stroke="#0f9d78" stroke-width="2"></circle>
+                <path d="M520 46 A84 84 0 0 1 520 214" fill="none" stroke="#0f9d78" stroke-width="3"></path>
+                <circle cx="520" cy="130" r="12" fill="#1c2230"></circle>
+                <text x="120" y="132" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#2d5bff">20 mm</text>
+                <text x="120" y="240" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#4a5266">driving pulley</text>
+                <text x="520" y="132" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#0f9d78">60 mm</text>
+                <text x="520" y="248" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#4a5266">driven pulley</text>
+                <text x="320" y="20" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#7b849b">the belt carries motion across distance</text>
+              </svg>
+            </div>
+            <figcaption>Figure 7.2 — A belt and pulley drive. The belt carries motion from the small driving pulley to the large driven pulley. Diameters of 20 mm and 60 mm give a ratio of 3:1, so the output is slower and stronger.</figcaption>
+          </figure>
+
+          <h3>Chains and sprockets</h3>
+
+          <p>A <strong>chain</strong> and <strong>sprockets</strong> work like a timing belt but in metal. The sprocket is a toothed wheel; the chain is a loop of links that fits its teeth. Chains are stronger than belts and never slip. They are used on bicycles, and on robots for heavy tracks or tank drives. The ratio is found from the sprocket tooth counts, exactly like gears.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Part</th><th>Transmits by</th><th>Slip?</th><th>Best for</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Flat or V-belt</td><td>Friction</td><td>Yes, can slip</td><td>Quiet, forgiving transfer; overload safety</td></tr>
+                <tr><td>Timing belt</td><td>Teeth in grooves</td><td>No</td><td>Accurate position; printers and sliders</td></tr>
+                <tr><td>Chain and sprocket</td><td>Toothed links</td><td>No</td><td>Heavy loads; long life; tracks</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 7.2 — Belts and chains compared. Choose by how much accuracy and strength you need.</p>
+
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> Tip</div>
+            <p>Belts forgive a small misalignment; gears and chains do not. If your two shafts are not perfectly parallel, start with a belt. It will save you many hours of frustration.</p>
+          </div>
+
+          <h2>Lead screws and ball screws: turning into pushing</h2>
+
+          <p>Sometimes you do not want a wheel to spin. You want a part to slide in a straight line. A robot gantry must move left and right. A gripper must open and close. Two mechanisms do this job well: the <strong>lead screw</strong> and the <strong>ball screw</strong>.</p>
+
+          <p>A <strong>lead screw</strong> is a long threaded rod. A <strong>nut</strong> sits on the rod. When the rod turns, the nut travels along it, like a bolt moving along a screw. The turning motion becomes straight-line motion.</p>
+
+          <p>The distance the nut moves in one full turn is called the <strong>thread pitch</strong> or <strong>lead</strong>. A common lead screw has a pitch of 2 mm. So one turn of the rod moves the nut 2 mm. That is a very slow, very strong movement, like a built-in gearbox for straight-line jobs.</p>
+
+          <div class="formula"><span class="label">Lead screw travel</span> distance per turn = thread pitch (mm)</div>
+
+          <h3>Worked calculation 4: how far does the nut move?</h3>
+
+          <p>A lead screw has a pitch of 2 mm. The motor turns it at 300 rpm for 5 seconds.</p>
+
+          <ol>
+            <li>Distance per turn = 2 mm.</li>
+            <li>Turns in 5 seconds = 300 rpm &divide; 60 = 5 turns per second, then &times; 5 seconds = 25 turns.</li>
+            <li>Total travel = 25 &times; 2 mm = 50 mm.</li>
+          </ol>
+
+          <p>So the nut slides 50 mm in five seconds. Notice how slow that is. That slowness is exactly why the mechanism can push so hard. The motor trades its speed for a large pushing force.</p>
+
+          <h3>Lead screw vs ball screw</h3>
+
+          <p>A plain lead screw has the nut sliding directly on the threads. Friction is high, so it is strong but a little jerky and wastes energy. A <strong>ball screw</strong> puts tiny balls between the nut and the threads, like a bearing. The nut rolls instead of sliding. A ball screw is smoother, faster and much more efficient. It is also more expensive. Table 7.3 compares them.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Type</th><th>How it moves</th><th>Efficiency</th><th>Best for</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Lead screw</td><td>Nut slides on threads</td><td>Low (about 30-50%)</td><td>Cheap, slow, self-holding lifts</td></tr>
+                <tr><td>Ball screw</td><td>Balls roll between nut and thread</td><td>High (about 90%)</td><td>Fast, smooth, precise linear motion</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 7.3 — Lead screws are simple and self-holding; ball screws are smooth and efficient.</p>
+
+          <div class="callout note">
+            <div class="callout__head"><i class="bi bi-info-circle-fill"></i> Note</div>
+            <p>A plain lead screw often holds its position when the motor stops, because friction stops it sliding back. A ball screw is so smooth that gravity can pull the load back down. It usually needs a brake or a second motor to stay in place.</p>
+          </div>
+
+          <h2>Other mechanisms worth knowing</h2>
+
+          <p>Gears, belts and screws are the workhorses, but a few more clever shapes turn up again and again in robotics.</p>
+
+          <h3>Cams</h3>
+          <p>A <strong>cam</strong> is a shaped wheel that pushes a follower as it turns. A round cam does nothing; a bumpy or egg-shaped cam makes the follower rise and fall. Cams turn steady rotation into a repeated up-and-down pattern. A robot that must tap, stamp or pump at a fixed rhythm can use one cam instead of many motors.</p>
+
+          <h3>Linkages and the four-bar</h3>
+          <p>A <strong>linkage</strong> is a set of stiff bars joined by pivots. The most common is the <strong>four-bar linkage</strong>: four bars in a loop, like your knee bending. Push one bar, and the others move in a planned path. Linkages let you copy a complex motion with simple parts. A robot walker leg or a gripper finger often uses them.</p>
+
+          <h3>Crank and slider</h3>
+          <p>A <strong>crank-slider</strong> turns steady rotation into back-and-forth sliding motion. Your car engine uses it: the piston slides, the crank turns. In robotics it can drive a saw, a pump or a piston leg. It is the straight-line cousin of the cam.</p>
+
+          <h3>Universal joints and differentials</h3>
+          <p>A <strong>universal joint</strong> (or U-joint) lets one shaft drive another even when they meet at an angle. It is the bendy joint in a car's drive shaft. In robots it connects a motor to a joint that must swing. A <strong>differential</strong> is a clever gear set that lets two wheels turn at different speeds on one axle. When a robot turns a corner, the inside wheel travels a shorter path than the outside one. A differential lets both spin freely so the robot does not skid.</p>
+
+          <h2>Backlash and efficiency</h2>
+
+          <p>Two words separate a hobby gearbox from a professional one: <strong>backlash</strong> and <strong>efficiency</strong>. Understanding both will help you judge any mechanism.</p>
+
+          <h3>What backlash is</h3>
+
+          <p><strong>Backlash</strong> is the small free play between parts that should fit tightly. Turn the input a tiny amount and the output does not move yet, because the teeth have a little gap. This gap is on purpose. Without it, gears would jam when they warm up and swell. Backlash is like the small slack in a door hinge. A little is normal and helpful. Too much makes the robot wobble and lose accuracy.</p>
+
+          <p>In a robot arm, heavy backlash shows up as a shaking tip. The motor moved, but the joint lagged behind. A ratio reduces backlash as felt at the output, because the loose play is divided by the gear ratio. That is one more reason big ratios make joints feel steady.</p>
+
+          <div class="callout warn">
+            <div class="callout__head"><i class="bi bi-exclamation-triangle-fill"></i> Watch out</div>
+            <p>Cheap plastic gearboxes often have large backlash. If you build a robot arm with three of them in a row, the small errors add up, and the tip swings around. For accurate work, prefer lower-backlash gears or a belt with good tension.</p>
+          </div>
+
+          <h3>Why worm gears waste energy</h3>
+
+          <p><strong>Efficiency</strong> is how much of the input power comes out as useful motion. The rest is lost as heat. Most spur and helical gear pairs are 95% efficient or better. A worm gear is much worse, often only 30% to 70%. The screw slides hard against the wheel, so friction eats a large share of the power. The upside is that same friction holds the load in place. High friction that wastes energy in motion is exactly what stops the load from falling when the motor is off. You win safety and lose efficiency.</p>
+
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> Remember the trade twice</div>
+            <p>First you trade speed for torque. Then you trade efficiency for other gifts: worm gears lose power but hold loads; friction belts lose grip but protect motors; flexible plastic gears lose precision but cost little.</p>
+          </div>
+
+          <h2>How to choose a mechanism</h2>
+
+          <p>You now know the parts. The next skill is choosing. Users often freeze here, because many mechanisms can do the same job. A short checklist clears the fog. Start by deciding what kind of motion the job needs.</p>
+
+          <ol>
+            <li><strong>Lift.</strong> The load moves up against gravity (a robot arm, a scissor jack). You need high torque at low speed and often a self-holding mechanism.</li>
+            <li><strong>Push or pull.</strong> The load moves in a straight line on a flat plane (a gripper, a drawer, a gantry). You need linear motion: a screw, a rack, or a belt.</li>
+            <li><strong>Turn.</strong> The load spins (a wheel, a turntable, a steering joint). You need a rotating output driven by gears, belts or a direct motor.</li>
+          </ol>
+
+          <p>After motion type, ask four more questions. How heavy is the load? How fast must it move? How exact must the position be? And how much space and money do you have? Table 7.4 links each motion to a first-choice mechanism.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Job</th><th>First choice</th><th>Also good</th><th>Watch for</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Lift a weight slowly</td><td>Worm gear or lead screw</td><td>Planetary gearbox</td><td>Low efficiency, heat</td></tr>
+                <tr><td>Lift with smooth control</td><td>Harmonic or cycloidal drive</td><td>Helical gearbox + belt</td><td>Cost</td></tr>
+                <tr><td>Push a gripper jaw</td><td>Rack and pinion</td><td>Lead screw</td><td>Backlash at the jaw</td></tr>
+                <tr><td>Move a gantry exactly</td><td>Timing belt</td><td>Ball screw</td><td>Belt tension and stretch</td></tr>
+                <tr><td>Turn a wheel</td><td>Direct motor or spur gearbox</td><td>Chain and sprocket</td><td>Bearing support</td></tr>
+                <tr><td>Spin a turntable</td><td>Planetary gearbox</td><td>Bevel gears</td><td>Backlash wobble</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 7.4 — A quick starting point for choosing a mechanism. Always confirm with a real test.</p>
+
+          <h2>Worked example: lifting a small robot arm</h2>
+
+          <p>Let us solve one real problem from start to finish. This is the sort of thinking a professional uses every day.</p>
+
+          <p><strong>The problem.</strong> You are building a small robot arm. The arm is 200 mm long. At the tip it must lift a load of 1 kg. You want the arm to rise in about one second. You have a motor that spins at 6,000 rpm with 0.02 N&middot;m of torque, and you may add any mechanism you like.</p>
+
+          <p><strong>Step 1 - Find the torque the joint needs.</strong> A 1 kg load pushes down with a force of about 10 newtons (mass &times; gravity). The load sits 0.2 m from the joint. Torque needed = force &times; distance = 10 &times; 0.2 = 2 N&middot;m. To be safe, aim for double that, so 4 N&middot;m at the joint.</p>
+
+          <div class="formula"><span class="label">Torque needed</span> torque = force (N) &times; distance from pivot (m)</div>
+
+          <p><strong>Step 2 - Find the ratio.</strong> The motor gives 0.02 N&middot;m. We need 4 N&middot;m. Ratio = needed &divide; motor = 4 &divide; 0.02 = 200. So we need about a 200:1 reduction. No single gear pair reaches that. We will need a stacked solution.</p>
+
+          <p><strong>Step 3 - Choose the parts.</strong> A planetary gearmotor rated near 100:1 gives 100 &times; 0.02 = 2 N&middot;m. Then a timing belt from a 15 mm pulley to a 30 mm pulley adds a 2:1 reduction. Combined ratio = 100 &times; 2 = 200:1. Output torque = 0.02 &times; 200 = 4 N&middot;m. That meets our target.</p>
+
+          <p><strong>Step 4 - Check the speed.</strong> Output speed = 6,000 &divide; 200 = 30 rpm. That is half a turn per second. The arm rises slowly and smoothly, which is exactly what we wanted.</p>
+
+          <p><strong>Step 5 - Check the real world.</strong> Losses will cut the torque by maybe 15%. A safety factor of two already covers that. The timing belt also keeps the heavy gearmotor off the moving arm, which reduces the weight the joint must carry. Good choice.</p>
+
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> In simple words</div>
+            <p>The joint needed 200 times more strength than the motor had. A 100:1 gearbox plus a 2:1 belt gives 200:1. Now the arm lifts the load slowly and safely.</p>
+          </div>
+
+          <h2>Common beginner mistakes</h2>
+
+          <p>Every builder makes these errors once. Learn them now and skip the pain.</p>
+
+          <h3>1. Choosing the wrong ratio</h3>
+          <p>Most beginners pick a ratio that is too small. The motor spins hard but cannot move the load. It stalls, gets hot, and may burn out. Other times the ratio is too large, and the robot moves painfully slowly. Always calculate the torque and speed you need before you buy a gearbox. The worked example above is the template.</p>
+
+          <h3>2. Printed gears that are too weak</h3>
+          <p>3D-printed plastic gears are cheap and easy, but layer lines make them weak. A small tooth can snap off under load. Print gears thicker than you think you need, and add a fillet at the base of each tooth. For real force, use metal gears or a belt instead.</p>
+
+          <h3>3. A belt that is too loose or too tight</h3>
+          <p>A loose timing belt skips teeth, so the robot loses position. A tight belt stretches, wears the bearings and wastes power. The belt should feel firm but let you push it about 5 mm with one finger. Set tension once, then check it again after a week.</p>
+
+          <h3>4. Ignoring backlash</h3>
+          <p>Beginners are surprised when a new arm shakes. Often the cause is backlash in cheap gears. The motor moves, but the joint lags. Reduce it by using fewer stages, better gears, or a tensioned belt. On a robot arm, one wobbly joint spoils the whole tip position.</p>
+
+          <h3>5. No bearing support</h3>
+          <p>A shaft held only by the motor is like a tree in a storm. Lateral loads bend it, and the gear teeth wear fast. Add a <strong>bearing</strong> at the far end of any loaded shaft. A bearing is a ring of rolling balls that lets the shaft spin freely while holding it steady. It is one of the cheapest upgrades with the biggest payoff.</p>
+
+          <div class="callout danger">
+            <div class="callout__head"><i class="bi bi-shield-exclamation"></i> Avoid this</div>
+            <p>Never let a hot, stalled motor sit and buzz. A motor that cannot move its load draws huge current and can overheat in seconds. If your robot buzzes instead of moving, your ratio is too small or your load is too heavy. Stop, rethink, and add reduction.</p>
+          </div>
+
+          <h2>How professionals do it</h2>
+
+          <p>At industrial scale, the parts change and the numbers get tight. Here is what a robotics engineer cares about that a beginner rarely meets.</p>
+
+          <h3>Harmonic and cycloidal drives</h3>
+          <p>A <strong>harmonic drive</strong> uses a flexible metal cup that bends as it turns. It gives large ratios (often 50:1 to 160:1) in a very light, very flat package. It is famous for near-zero backlash, so it is used in robot arms that must be precise. A <strong>cycloidal drive</strong> uses a wavy disc and pins. It is extremely strong, compact and long-lasting, and it is common in the joints of industrial and humanoid robots plus in the wheels of mobile robots.</p>
+
+          <h3>Precision gearboxes and backlash specs</h3>
+          <p>A professional never says "low backlash" and stops there. A datasheet states it in arc-minutes. One arc-minute is one sixtieth of a degree of play at the output. A good precision gearbox may be under 3 arc-minutes; a cheap one may be 30 or more. Engineers pick a number that matches the job. A welding robot needs tight numbers; a delivery robot does not.</p>
+
+          <h3>Lubrication</h3>
+          <p>Gears need grease or oil. It reduces friction, carries heat away and keeps wear down. Professionals match the lubricant to the load and speed, and they re-apply it on a schedule. A dry gearbox runs hot and wears out fast. This is one maintenance point robot owners must never forget.</p>
+
+          <h3>Efficiency and heat</h3>
+          <p>Engineers add up the losses of every stage. Five spur stages at 97% each keep about 86% of the power. A worm gear at 50% loses half as heat, so the gearbox must shed that heat or it cooks itself. At professional scale, efficiency is a design number, not a guess.</p>
+
+          <div class="callout note">
+            <div class="callout__head"><i class="bi bi-info-circle-fill"></i> Note</div>
+            <p>You do not need harmonic drives to start. But knowing the terms will help you read datasheets and grow into them as your projects demand more precision.</p>
+          </div>
+
+          <h2>Try it yourself</h2>
+
+          <p>Reading about mechanisms is not enough. Build these in order, from easy to harder. Each one teaches a core idea.</p>
+
+          <ol>
+            <li><strong>Count a real gearbox.</strong> Open an old printer or toy and count the teeth on two meshed gears. Write down the ratio. <em>Hint:</em> mark one tooth with a pen so you do not lose your place.</li>
+            <li><strong>Predict, then measure, a belt.</strong> Fit a small and a large pulley with a rubber band. Turn the small pulley 10 times and count the big one. <em>Hint:</em> the ratio should match the diameters. Try a timing belt and feel how it cannot slip.</li>
+            <li><strong>Find the pitch of a screw.</strong> Take a bolt and a nut. Turn the nut one full circle and measure how far it moves. <em>Hint:</em> use a ruler against the ruler mark on the bolt. That number is the lead.</li>
+            <li><strong>Build a four-bar linkage.</strong> Cut four cardboard strips and join them with split pins. Move one bar and watch the path of the others. <em>Hint:</em> change one bar's length and watch the path change.</li>
+            <li><strong>Design your own lift.</strong> Choose a load mass and a lever length, then calculate the joint torque. Pick a ratio and name the two mechanisms you would use. <em>Hint:</em> follow the five steps from the worked example.</li>
+          </ol>
+
+          <h2>Going deeper (optional)</h2>
+
+          <p>If you want one advanced idea to carry away, make it this: a robot's mechanism and its control loop are one system. Backlash, belt stretch and gear friction are not just hardware worries. They appear as errors that the controller must sense and correct. Better mechanisms make the software's job easier; smarter software can compensate for imperfect mechanisms. The best robot designers think about both at the same time. You will see this join between mechanics and control in Part 4.</p>
+
+          <section class="takeaways">
+            <h2><i class="bi bi-pin-angle-fill"></i> Key takeaways</h2>
+            <ul>
+              <li><i class="bi bi-check2-circle"></i> A mechanism trades speed for torque, so a fast motor can drive a slow, strong joint.</li>
+              <li><i class="bi bi-check2-circle"></i> Gear ratio = driven teeth &divide; driving teeth. Output speed divides by the ratio; output torque multiplies by it.</li>
+              <li><i class="bi bi-check2-circle"></i> Gear trains multiply their stage ratios together, so small gearboxes reach very large ratios.</li>
+              <li><i class="bi bi-check2-circle"></i> Belts and pulleys carry motion across distance; timing belts cannot slip, friction belts can.</li>
+              <li><i class="bi bi-check2-circle"></i> Lead screws and ball screws turn rotation into straight-line motion.</li>
+              <li><i class="bi bi-check2-circle"></i> Backlash is small play between parts; worm gears lose more energy to friction than most other gears.</li>
+              <li><i class="bi bi-check2-circle"></i> Choose a mechanism by asking: lift, push or turn — then find the ratio that job needs.</li>
+            </ul>
+          </section>
+
+          <section class="quiz">
+            <div class="quiz__head"><i class="bi bi-patch-question-fill"></i> Check your understanding</div>
+            <details>
+              <summary><span class="q-num">Q1.</span><span>A motor spins fast but has little torque. What does a mechanism do to help?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> It trades speed for torque. The output turns slower but with more force, which is what most robot joints need.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q2.</span><span>A gearbox has a 10-tooth driving gear and a 50-tooth driven gear. What is the ratio, and what happens to speed and torque?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Ratio = 50 &divide; 10 = 5:1. Output speed is 5 times slower and output torque is 5 times stronger.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q3.</span><span>Why use a belt instead of gears?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> A belt carries motion across distance when the motor and the joint are far apart. It is also quieter and tolerates small misalignment.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q4.</span><span>Stage one is 4:1 and stage two is 6:1. What is the total ratio?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Multiply the stages: 4 &times; 6 = 24:1. In a gear train you multiply the stage ratios, never add them.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q5.</span><span>A lead screw has a pitch of 4 mm. How far does the nut move in 30 turns?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> 30 &times; 4 mm = 120 mm. Each turn moves the nut by one pitch.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q6.</span><span>What is backlash, and is a tiny amount good or bad?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Backlash is the small free play between parts. A tiny amount is good because it stops gears jamming when they warm up. Too much makes a robot shaky and inaccurate.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q7.</span><span>Why does a worm gear lose more energy than a spur gear?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> The screw slides hard against the wheel, so friction wastes power as heat. The upside is that the same friction holds the load in place when the motor is off.</div>
+            </details>
+          </section>
+
+        </article>
+
+        <nav class="pager" id="pager" aria-label="Chapter navigation"></nav>
+      </div>
+    </main>
+  </div>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/book.js"></script>
+</body>
+</html>

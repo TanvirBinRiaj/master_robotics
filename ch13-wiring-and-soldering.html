@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>try{var __t=localStorage.getItem("mr-theme");if(__t==="dark"||__t==="light")document.documentElement.setAttribute("data-theme",__t);}catch(e){}</script>
+  <title>Chapter 13: Wiring, Soldering and Connections — Master Robotics</title>
+  <meta name="description" content="Learn to join parts so your robot works every time. Plain-English guide to wire, connectors, crimping, clean solder joints, strain relief and finding bad connections with a multimeter.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/prose.css">
+</head>
+<body data-file="ch13-wiring-and-soldering.html">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="topbar" id="topbar"></header>
+  <div class="progress-bar" id="progressBar"></div>
+
+  <div class="layout">
+    <div class="sidebar__backdrop" id="navBackdrop"></div>
+    <nav class="sidebar" id="sidebar" aria-label="Book contents"></nav>
+
+    <main class="main" id="main">
+      <div class="container">
+
+        <header class="chapter-head">
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="index.html">Home</a>
+            <i class="bi bi-chevron-right"></i>
+            <a href="index.html#electronics">Part 3 &middot; Electronics and Power</a>
+            <i class="bi bi-chevron-right"></i>
+            <span>Chapter 13</span>
+          </nav>
+          <span class="chapter-kicker"><i class="bi bi-cpu"></i> Part 3 &middot; Electronics and Power</span>
+          <h1>Wiring, Soldering and Connections</h1>
+          <p class="lede">Electronics only work when the electricity can travel from part to part. In this chapter you will learn how to join wires and parts so your robot works the first time — and every time after that.</p>
+          <div class="chapter-meta">
+            <span><i class="bi bi-clock"></i> ~20 min read</span>
+            <span><i class="bi bi-bar-chart"></i> Beginner</span>
+            <span><i class="bi bi-list-check"></i> Chapter 13 of 30</span>
+          </div>
+          <div class="goals">
+            <h2>What you will learn</h2>
+            <ul>
+              <li><i class="bi bi-check-circle-fill"></i> Make a clean solder joint.</li>
+              <li><i class="bi bi-check-circle-fill"></i> Use the right wire and connector.</li>
+              <li><i class="bi bi-check-circle-fill"></i> Find a bad connection with a multimeter.</li>
+            </ul>
+          </div>
+        </header>
+
+        <article class="article">
+
+          <p class="lead">You spend a whole evening connecting your robot. You switch it on. Nothing happens. You wiggle a wire and suddenly it works. You put the cover back on and it dies again. This is the most common story in robotics — and this chapter is how you make sure it never happens to you.</p>
+
+          <p>Parts get the praise. Motors spin, boards blink, batteries store energy. But none of them do anything unless the electricity can flow between them. That flow depends on <strong>connections</strong>: the places where one wire meets another wire, or a wire meets a part.</p>
+
+          <p>A connection that works once is easy. A connection that works after a bump, a vibration, a hot motor and a hundred hours of use is a skill. That skill — wiring, soldering and connectors — is what this chapter teaches.</p>
+
+          <h2>Why connections fail more often than parts</h2>
+
+          <p>Here is the strange truth of electronics: the parts you buy are usually reliable. A motor is built in a factory to tight rules. A battery cell is tested. But the moment you join them together yourself, you become the weakest link in the chain.</p>
+
+          <p>Think of a chain of people passing buckets of water. If one person has a loose grip, water spills — no matter how strong everyone else is. In your robot, the "loose grip" is a bad connection.</p>
+
+          <p>Bad connections fail in quiet, sneaky ways:</p>
+
+          <ul>
+            <li>A <strong>loose wire</strong> touches only sometimes. The robot works until it is bumped.</li>
+            <li>A <strong>cold solder joint</strong> looks joined but has a thin, fragile electrical path.</li>
+            <li>A <strong>broken strand</strong> inside a cable carries current until it flexes, then stops.</li>
+            <li>A <strong>dirty or oxidised</strong> contact adds resistance and heat.</li>
+            <li>A <strong>reversed</strong> connector sends power the wrong way and can destroy a part.</li>
+          </ul>
+
+          <p>Experienced builders have a saying: <em>most robot faults are wiring faults</em>. When a robot behaves strangely, the first thing to suspect is not the code or the sensor. It is the wires between them.</p>
+
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> The key idea</div>
+            <p>When something stops working, check the connections before you blame the parts. Wiring faults are the number one cause of beginner robot problems. You will practise the full method in Chapter 22, when you debug a real problem from symptom to fix.</p>
+          </div>
+
+          <p>You can read the whole method of tracking down faults in <a href="ch22-first-robot-project.html">Chapter 22: Your First Robot Project</a>. This chapter gives you the foundation it depends on: connections you can trust in the first place.</p>
+
+          <h2>Wire basics</h2>
+
+          <p>A wire is the simplest part in your whole robot, and one of the most important. Let us look at what is inside it.</p>
+
+          <h3>Conductor and insulation</h3>
+
+          <p>Every wire has two parts. The <strong>conductor</strong> is the metal inside that carries electricity. It is almost always copper, because copper carries electricity very well. The <strong>insulation</strong> is the plastic coat around the conductor. It stops the electricity from jumping to other wires or to your finger.</p>
+
+          <p>So a wire is like a drinking straw with juice inside. The juice is the electricity. The straw wall keeps it in the right place. Strip the plastic back and the bare copper is where the electricity can leave.</p>
+
+          <h3>Solid wire and stranded wire</h3>
+
+          <p>Look closely at two wires. One has a single thick copper rod inside. The other has many thin copper threads bundled together. These are called <strong>solid</strong> and <strong>stranded</strong> wire.</p>
+
+          <p>Solid wire is a single stiff rod. Stranded wire is a bundle of many thin threads. For robots that move, use stranded wire. Here is why.</p>
+
+          <ul>
+            <li><strong>Stranded wire bends easily</strong> and survives being flexed again and again. Solid wire cracks after enough bending.</li>
+            <li><strong>Stranded wire resists vibration.</strong> Motors shake. A robot on wheels shakes a lot. Thin threads share the load and last.</li>
+            <li><strong>Stranded wire is flexible for routing.</strong> You can curve it tightly around corners without it snapping.</li>
+            <li>Solid wire is good for fixed things, like the wiring inside a wall in a building, where it never moves.</li>
+          </ul>
+
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> In simple words</div>
+            <p>Solid wire is one stiff rod. Stranded wire is many thin threads. Moving robots shake, so use stranded wire — it bends and survives. Save solid wire for things that never move.</p>
+          </div>
+
+          <h3>Wire gauge (AWG) made simple</h3>
+
+          <p>Wires come in different thicknesses. The thickness is measured by a system called <strong>AWG</strong>, which stands for American Wire Gauge. AWG is a number like 22, 18 or 12.</p>
+
+          <p>Here is the one thing you must remember, because it feels backwards: <strong>a bigger AWG number means a thinner wire</strong>. AWG 30 is hair-thin. AWG 10 is thick. The number describes how many times the wire was drawn through smaller holes, so higher number equals smaller wire.</p>
+
+          <p>Thicker wire carries more current and has less resistance. Thinner wire is lighter and easier to bend but heats up if you push too much current through it. So wire choice is really a question of current.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>AWG</th><th>Thickness</th><th>Safe current (rough)</th><th>Typical use in a robot</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>26</td><td>Very thin</td><td>~0.5 A</td><td>Signal wires, sensor cables, servo signal</td></tr>
+                <tr><td>22</td><td>Thin</td><td>~1.5 A</td><td>Small sensors, LEDs, logic power</td></tr>
+                <tr><td>18</td><td>Medium</td><td>~3 A</td><td>Small motor power, short battery leads</td></tr>
+                <tr><td>16</td><td>Medium-thick</td><td>~5 A</td><td>Mid-size motors, main battery wiring</td></tr>
+                <tr><td>14</td><td>Thick</td><td>~8 A</td><td>Larger motors, shared power rails</td></tr>
+                <tr><td>12</td><td>Very thick</td><td>~12 A</td><td>High-current drive systems, big batteries</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 13.1 — Rough current capacity for common wire sizes. Always leave a safety margin: pick a wire that can carry at least 1.5 times your expected current.</p>
+
+          <div class="callout warn">
+            <div class="callout__head"><i class="bi bi-exclamation-triangle-fill"></i> Watch out</div>
+            <p>These numbers are for a single wire in open air. If wires are bundled together, or inside a hot enclosure, they must be thicker. Heat is the real enemy. A wire that is too thin gets warm, then hot, then the insulation melts.</p>
+          </div>
+
+          <h3>Voltage drop: why long thin cables lose power</h3>
+
+          <p>Every wire resists the flow of electricity a little. That resistance eats a small amount of the voltage. The result is called <strong>voltage drop</strong>: the voltage at the motor is lower than the voltage at the battery.</p>
+
+          <p>A useful formula links these ideas. It is based on Ohm's law, which you met earlier:</p>
+
+          <div class="formula"><span class="label">Voltage drop along a wire</span> V<sub>drop</sub> = 2 &times; L &times; R<sub>per&nbsp;m</sub> &times; I</div>
+
+          <p>Here <em>L</em> is the one-way length of the cable in metres. We multiply by 2 because the current must travel out to the part and back again. <em>R<sub>per&nbsp;m</sub></em> is the resistance of that wire per metre, and <em>I</em> is the current in amps.</p>
+
+          <p>Let us work a real example. Suppose your motor is 1.5 m from the battery, you use AWG 22 wire (about 0.053 ohm per metre), and the motor pulls 2 A.</p>
+
+          <div class="formula"><span class="label">Worked example</span> V<sub>drop</sub> = 2 &times; 1.5 m &times; 0.053 &Omega;/m &times; 2 A = 0.318 V</div>
+
+          <p>That is about 0.3 V lost in the wire. From a 6 V battery, the motor only sees about 5.7 V. That is a 5 percent loss — small but real. Now imagine you used long, thin AWG 26 wire at high current. The drop grows quickly, the wire heats, and the motor gets weak and unreliable.</p>
+
+          <p>The lesson is simple. Keep motor wires short and thick. Keep long, thin wire for signals, where almost no current flows and voltage drop barely matters.</p>
+
+          <h3>Choosing wire for motors and for signals</h3>
+
+          <p>Robots have two kinds of connection, and they want different wires.</p>
+
+          <ul>
+            <li><strong>Power wires</strong> carry large current to motors, drivers and batteries. Use thicker stranded wire (AWG 18 or lower) and keep runs short. These wires can get warm, so size them up.</li>
+            <li><strong>Signal wires</strong> carry tiny currents — sensor readings, logic levels, data. Use thin stranded wire (AWG 22 to 26). Voltage drop is not a problem because the current is tiny.</li>
+          </ul>
+
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> Tip</div>
+            <p>When in doubt for a motor, go one size thicker. Thick wire costs a little more and weighs a little more. It almost never causes a fault. Thin wire does.</p>
+          </div>
+
+          <h2>Colour conventions and labelling</h2>
+
+          <p>Colour is a language. When everyone agrees what each colour means, a bundle of wires stops being a mystery. The most important rule is very old and very strong.</p>
+
+          <ul>
+            <li><strong>Red</strong> means positive. It is the live, powered side, usually labelled V+ or +V.</li>
+            <li><strong>Black</strong> means negative, also called ground or GND. It is the return path for the current.</li>
+            <li><strong>Other colours</strong> — yellow, blue, green, white — are used for signals, so they are not confused with power.</li>
+          </ul>
+
+          <div class="callout danger">
+            <div class="callout__head"><i class="bi bi-shield-exclamation"></i> Danger</div>
+            <p>Never mix up red and black. Reversed power can destroy a board or a sensor in a fraction of a second. Before you connect anything, trace the red wire from the battery to the board and the black wire back again.</p>
+          </div>
+
+          <p>Colour is a helpful habit, but it is not enough on its own. Wires inside a cable are hidden, and cheap cables break the rules. The professional answer is <strong>labelling</strong>: put a small tag on the cable at <em>both</em> ends, near each connector.</p>
+
+          <h3>The cost of a mystery wire</h3>
+
+          <p>Imagine a robot with twenty wires, none labelled. You unplug a few to move the board. Now you must put them back. Which black wire goes where? Several of them look identical. You guess. You are wrong. You spend an hour, and you risk damaging a part.</p>
+
+          <p>Now imagine the same robot with tiny labels: <code>MOTOR-L+</code>, <code>MOTOR-L-</code>, <code>SONAR-5V</code>, <code>SONAR-GND</code>. Putting the board back takes two minutes with no guessing.</p>
+
+          <p>Labelling feels like extra work on the day you build. It saves hours every time you must repair, upgrade or explain your robot. Professionals label by default. Beginners learn to label after their first mystery.</p>
+
+          <div class="callout note">
+            <div class="callout__head"><i class="bi bi-info-circle-fill"></i> Note</div>
+            <p>A cheap label maker, a roll of masking tape and a pen, or small printed heat-shrink sleeves all work. What matters is that the label is readable and sits at both ends of every cable.</p>
+          </div>
+
+          <h2>Terminals and connectors</h2>
+
+          <p>Most wires do not end in a bare tip. They end in a <strong>terminal</strong> or a <strong>connector</strong>. A terminal is where a wire screws down to a part. A connector is a plug that lets you unplug the wire again. Both are about one thing: making a reliable place where electricity can cross from one piece to the next.</p>
+
+          <h3>Why use connectors instead of soldering everything</h3>
+
+          <p>You could solder every wire directly to every board. Many beginners do. Then the first time a part fails, they must cut wires and resolder in a tight space — or throw the whole thing away.</p>
+
+          <p>A <strong>connector</strong> changes that. It lets you unplug one part, swap in a new one, and plug it back. This property is called <strong>serviceability</strong>: how easy it is to repair and upgrade. Professionals design for serviceability from the start.</p>
+
+          <p>So the rule of thumb is: solder where the connection is permanent, and use a connector where you might one day separate the parts. Motors, batteries and sensor modules usually get connectors. Tiny on-board joints get solder.</p>
+
+          <p>Table 13.2 lists the connector types you will meet most often and when to use each one.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Connector</th><th>Best for</th><th>Notes</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Screw terminal</td><td>Thick power wires, quick bench tests</td><td>Reusable, no tools to join, but screws can loosen with vibration</td></tr>
+                <tr><td>JST (e.g. JST-XH, JST-PH)</td><td>Battery packs, small motor and sensor leads</td><td>Small, keyed so they only fit one way; needs a crimping tool</td></tr>
+                <tr><td>Dupont / jumper</td><td>Breadboard to board, prototyping</td><td>Very common, pins push on; not reliable for vibration</td></tr>
+                <tr><td>Barrel jack</td><td>Wall power adapters, fixed supplies</td><td>Easy to plug, but can pop out; check polarity carefully</td></tr>
+                <tr><td>XT60 / XT30</td><td>High-current batteries (drones, big drive systems)</td><td>Gold-plated, keyed, handles high current; solder the wire into the plug</td></tr>
+                <tr><td>Anderson (Powerpole)</td><td>Battery packs, modular power</td><td>Strong, genderless, easy to connect and disconnect</td></tr>
+                <tr><td>USB</td><td>Power and data to boards and computers</td><td>Standard, everywhere; not for high motor current</td></tr>
+                <tr><td>Header pins</td><td>Connecting boards and shields together</td><td>Cheap and flexible; can come loose, so secure them</td></tr>
+                <tr><td>Crimp terminal</td><td>Wire to a screw post or stud</td><td>Ring, spade or fork shape; soldered or crimped onto the wire end</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 13.2 — Common connectors and when to reach for each one. Most failures come from a connector that can wiggle; choose one that locks in place.</p>
+
+          <figure class="figure">
+            <div class="figure__box">
+              <svg viewBox="0 0 640 260" width="100%" role="img" aria-label="A wiring colour map showing red positive, black ground, and yellow, blue and green signal wires from a battery and board to a motor driver">
+                <rect x="30" y="30" width="150" height="90" rx="10" fill="#fdecec" stroke="#c0392b" stroke-width="2"></rect>
+                <text x="105" y="62" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#c0392b">Battery</text>
+                <text x="105" y="84" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#4a5266">red = +7.4 V</text>
+                <text x="105" y="102" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#4a5266">black = GND</text>
+
+                <rect x="245" y="30" width="150" height="90" rx="10" fill="#e8eeff" stroke="#2d5bff" stroke-width="2"></rect>
+                <text x="320" y="62" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#2d5bff">Controller</text>
+                <text x="320" y="84" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#4a5266">logic and signals</text>
+
+                <rect x="460" y="30" width="150" height="90" rx="10" fill="#e2f6ef" stroke="#0f9d78" stroke-width="2"></rect>
+                <text x="535" y="62" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#0f9d78">Motor driver</text>
+                <text x="535" y="84" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#4a5266">power out to motors</text>
+
+                <line x1="180" y1="60" x2="245" y2="60" stroke="#c0392b" stroke-width="3"></line>
+                <line x1="180" y1="90" x2="245" y2="90" stroke="#1c2230" stroke-width="3"></line>
+
+                <line x1="395" y1="55" x2="460" y2="55" stroke="#d9a600" stroke-width="3"></line>
+                <line x1="395" y1="75" x2="460" y2="75" stroke="#2d5bff" stroke-width="3"></line>
+                <line x1="395" y1="95" x2="460" y2="95" stroke="#0f9d78" stroke-width="3"></line>
+
+                <line x1="320" y1="120" x2="320" y2="150" stroke="#7b849b" stroke-width="2" stroke-dasharray="5 5"></line>
+                <text x="320" y="172" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#7b849b">label both ends of every cable</text>
+
+                <text x="150" y="205" font-family="Inter, sans-serif" font-size="12" fill="#c0392b">red = positive</text>
+                <text x="150" y="225" font-family="Inter, sans-serif" font-size="12" fill="#1c2230">black = ground</text>
+                <text x="150" y="245" font-family="Inter, sans-serif" font-size="12" fill="#7b849b">yellow / blue / green = signals</text>
+                <text x="360" y="205" font-family="Inter, sans-serif" font-size="12" fill="#1c2230">MOTOR-L+</text>
+                <text x="360" y="225" font-family="Inter, sans-serif" font-size="12" fill="#1c2230">MOTOR-L-</text>
+                <text x="360" y="245" font-family="Inter, sans-serif" font-size="12" fill="#1c2230">PWM-1 &nbsp; SONAR-5V</text>
+              </svg>
+            </div>
+            <figcaption>Figure 13.1 — A simple colour map. Red carries positive power, black carries ground back, and the other colours carry signals. Label both ends so the map survives when wires are unplugged.</figcaption>
+          </figure>
+
+          <h2>Crimping</h2>
+
+          <p><strong>Crimping</strong> is the act of squashing a metal sleeve around the bare end of a wire so the metal grips the copper tightly. The metal sleeve is part of the connector. Once crimped, the wire and connector are one solid piece.</p>
+
+          <p>Many beginners ask why they should not just solder the wire into the connector. It is a fair question, and the answer matters.</p>
+
+          <h3>Why a good crimp beats solder for stranded wire</h3>
+
+          <ul>
+            <li><strong>Solder wicks up the strands.</strong> Heat pulls solder up inside the wire, past the joint, turning a flexible bundle into a stiff, brittle rod. That stiff spot then cracks when the wire bends.</li>
+            <li><strong>A crimp stays flexible.</strong> The strands remain separate behind the crimp, so the cable can bend naturally without breaking.</li>
+            <li><strong>A crimp makes two connections.</strong> A proper crimp has a tight barrel grip on the copper and a second grip on the insulation. This is called the <strong>strain relief</strong> grip, and it stops the wire pulling on the copper.</li>
+            <li><strong>A crimp is faster and repeatable.</strong> With the right tool, every joint looks the same and holds the same.</li>
+          </ul>
+
+          <div class="callout note">
+            <div class="callout__head"><i class="bi bi-info-circle-fill"></i> Note</div>
+            <p>A bad crimp is worse than solder. If the tool is wrong or the wire is too thin for the sleeve, the joint is weak and high-resistance. The quality of the crimp depends on the quality of the tool and the correct matching parts.</p>
+          </div>
+
+          <h3>How to make a good crimp</h3>
+
+          <ol>
+            <li><strong>Strip the right amount.</strong> Remove just enough insulation so the bare copper fills the crimp barrel but does not stick out past it. Check the connector's recommended strip length.</li>
+            <li><strong>Do not twist the strands.</strong> Keep the bundle neat. Twisting can push strands out of the barrel.</li>
+            <li><strong>Insert the wire fully.</strong> Slide the copper all the way into the barrel until you feel it stop.</li>
+            <li><strong>Use the correct die and size.</strong> Match the crimping tool's slot to the connector. Wrong slot equals weak crimp.</li>
+            <li><strong>Squeeze fully.</strong> Close the tool all the way in one firm motion. Most ratchet tools release only when the crimp is complete.</li>
+            <li><strong>Look and pull.</strong> Check that the insulation grip holds the plastic and the wire grip holds the copper. Then do the pull test.</li>
+          </ol>
+
+          <h3>Checking a crimp: the pull test</h3>
+
+          <p>Never trust a crimp just because it looks fine. Test it. Hold the connector in one hand and gently but firmly pull the wire with the other. A good crimp holds. A bad one slides out or stretches. For small signal wires, a steady tug of a few newtons is enough. The joint should not move.</p>
+
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> Tip</div>
+            <p>Do the pull test before you install the wire in the robot, not after. It is far easier to redo a crimp at the bench than inside a crowded frame.</p>
+          </div>
+
+          <h2>Soldering</h2>
+
+          <p>Soldering is the other great way to join wires and parts. Where crimping presses metal together, <strong>soldering</strong> melts a metal alloy called <strong>solder</strong> so it flows over both surfaces and freezes into a solid electrical bridge.</p>
+
+          <p>Think of it like gluing two pieces of wood, except the glue is metal and it also carries electricity. The solder does not just sit on top. It bonds to the copper and becomes part of the path.</p>
+
+          <h3>The tools you need</h3>
+
+          <ul>
+            <li><strong>Soldering iron.</strong> A hand tool with a hot metal tip. A temperature-controlled iron is far better than a fixed cheap one.</li>
+            <li><strong>Solder.</strong> The metal wire you melt. It comes in a thin coil, often with a flux core inside.</li>
+            <li><strong>Flux.</strong> A chemical helper that cleans the metal so solder flows smoothly. Some solder already contains it; extra flux gel or pen helps.</li>
+            <li><strong>Tip cleaner and sponge.</strong> To wipe the tip clean between joints. A brass-wool cleaner is common.</li>
+            <li><strong>Helping hands.</strong> A stand with clips to hold the parts steady so your hands are free.</li>
+            <li><strong>Heat mat.</strong> A fire-resistant surface to protect your table and catch hot bits.</li>
+          </ul>
+
+          <div class="callout danger">
+            <div class="callout__head"><i class="bi bi-shield-exclamation"></i> Danger</div>
+            <p>A soldering iron tip reaches 300 to 400 &deg;C. It will burn skin instantly and can start a fire. Always work on a heat mat, keep the iron in its stand, never leave it alone, and let it cool before you put it away. Solder fumes are not good to breathe — work in a ventilated area.</p>
+          </div>
+
+          <h3>Temperature and tip care</h3>
+
+          <p>For most hobby work, set the iron between <strong>320 and 350 &deg;C</strong> for leaded solder and a little higher, around <strong>350 to 370 &deg;C</strong>, for lead-free solder. Too cool and the solder will not flow, giving a lumpy cold joint. Too hot and you burn the flux and lift copper pads off the board.</p>
+
+          <p>Your iron tip must be <strong>tinned</strong>: coated with a thin layer of shiny solder. A tinned tip transfers heat well. A black, oxidised tip transfers heat poorly and makes every joint hard. Wipe the tip on the cleaner, add a little fresh solder, and keep that shine all session.</p>
+
+          <h3>Leaded vs lead-free solder</h3>
+
+          <p><strong>Leaded solder</strong> contains lead. It melts at a lower temperature, flows easily and gives shiny joints. It is the beginner's friend for practice, but lead is toxic, so wash your hands and never eat at the bench.</p>
+
+          <p><strong>Lead-free solder</strong> is safer for health and the environment, and it is now the standard in professional products. It melts hotter and often leaves a duller joint, so it is a little harder to master. Many learners practise with leaded solder, then move to lead-free for real work.</p>
+
+          <h2>How to make a good solder joint</h2>
+
+          <p>This is the core skill of the chapter. Read every step, then practise it many times. The secret is heat. A good joint is made when both parts are hot enough that the solder melts <em>on them</em>, not on the iron.</p>
+
+          <ol>
+            <li><strong>Prepare the parts.</strong> Strip the wire cleanly and let the bare copper show. If the copper looks dull or dark, wipe it with fine sandpaper or a little flux. Dirty metal rejects solder. Picture a strip of clean, bright copper.</li>
+            <li><strong>Secure the work.</strong> Clip the wire and the part into helping hands or hold them so they cannot move. A joint that wiggles while cooling turns into a cracked, dull blob.</li>
+            <li><strong>Tin the iron tip.</strong> Wipe the tip and add a tiny dab of solder so it glows silver. This tiny bit of solder does not go into the joint — it just helps heat flow from the iron.</li>
+            <li><strong>Heat the joint, not the solder.</strong> Touch the iron to the point where the wire meets the pad. Hold it there for a moment. Picture the heat spreading into both the copper wire and the pad.</li>
+            <li><strong>Feed in the solder.</strong> Bring the solder wire to the heated joint, not to the iron tip. The solder should melt and flow around the joint on its own. If it balls up on the tip, you are heating the wrong place.</li>
+            <li><strong>Let it flow, then remove solder first.</strong> When a smooth shiny cone forms, pull the solder away, then lift the iron. Removing the solder first stops a spike from forming.</li>
+            <li><strong>Let it cool without moving.</strong> Hold everything still for two or three seconds. A joint disturbed while cooling looks dull and grainy, and it is weak.</li>
+            <li><strong>Inspect it.</strong> Look for a shiny, smooth, cone-shaped joint that hugs both parts. If it is dull, lumpy or ball-shaped, reheat and redo it. A joint that looks wrong probably is wrong.</li>
+          </ol>
+
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> In simple words</div>
+            <p>Heat the two parts until they are hot. Then touch the solder to the parts, not to the iron. It melts and flows like water into the join. Take the solder away, then the iron. Hold still until it sets. Shiny and smooth means good.</p>
+          </div>
+
+          <figure class="figure">
+            <div class="figure__box">
+              <svg viewBox="0 0 640 260" width="100%" role="img" aria-label="Side by side comparison of a good solder joint and several bad solder joints">
+                <text x="150" y="26" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#0f9d78">GOOD</text>
+                <rect x="70" y="40" width="160" height="90" rx="8" fill="none" stroke="#0f9d78" stroke-width="2"></rect>
+                <line x1="150" y1="40" x2="150" y2="90" stroke="#c98a3a" stroke-width="5"></line>
+                <ellipse cx="150" cy="100" rx="26" ry="14" fill="#c9cdd6" stroke="#8d93a3" stroke-width="1.5"></ellipse>
+                <text x="150" y="150" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#4a5266">shiny, smooth cone;</text>
+                <text x="150" y="166" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#4a5266">hugs wire and pad</text>
+
+                <text x="340" y="26" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#c0392b">BAD</text>
+                <rect x="260" y="40" width="160" height="90" rx="8" fill="none" stroke="#c0392b" stroke-width="2"></rect>
+                <line x1="340" y1="40" x2="340" y2="88" stroke="#c98a3a" stroke-width="5"></line>
+                <circle cx="340" cy="102" r="20" fill="#8d93a3" stroke="#6b7180" stroke-width="1.5"></circle>
+                <text x="340" y="150" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#4a5266">dull, round blob —</text>
+                <text x="340" y="166" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#4a5266">cold joint, not bonded</text>
+
+                <text x="530" y="26" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#7a4ddb">BAD</text>
+                <rect x="450" y="40" width="160" height="90" rx="8" fill="none" stroke="#7a4ddb" stroke-width="2"></rect>
+                <line x1="530" y1="40" x2="530" y2="88" stroke="#c98a3a" stroke-width="5"></line>
+                <ellipse cx="530" cy="100" rx="40" ry="16" fill="#c9cdd6" stroke="#8d93a3" stroke-width="1.5"></ellipse>
+                <text x="530" y="150" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#4a5266">too much solder —</text>
+                <text x="530" y="166" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#4a5266">hides a poor bond</text>
+
+                <text x="320" y="215" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#1c2230">A good joint is smooth and shiny.</text>
+                <text x="320" y="238" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#7b849b">A bad joint is dull, blobby, or covered in bumps.</text>
+              </svg>
+            </div>
+            <figcaption>Figure 13.2 — Good and bad solder joints. The good joint is a smooth, shiny cone that hugs both the wire and the pad. The bad ones are dull blobs that hide weak or missing bonds.</figcaption>
+          </figure>
+
+          <h2>Recognising good and bad joints</h2>
+
+          <p>Your eyes are your first test tool. Before you ever reach for a multimeter, look at the joint. Table 13.3 shows the defects you will meet and how to fix each one.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Defect</th><th>What it looks like</th><th>Why it happens</th><th>How to fix it</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Cold joint</td><td>Dull, grainy, blobby surface</td><td>Joint not hot enough, or moved while cooling</td><td>Add flux, reheat until it flows shiny, hold still</td></tr>
+                <tr><td>Too much solder</td><td>Large round ball hiding the joint</td><td>Fed too much solder, or iron too cool</td><td>Remove excess with wick, reheat lightly</td></tr>
+                <tr><td>Too little solder</td><td>Thin, weak-looking, gap at the pad</td><td>Not enough solder, or iron pulled away too early</td><td>Add a small amount of fresh solder and reheat</td></tr>
+                <tr><td>Bridged joint</td><td>Solder joins two pads that should be apart</td><td>Too much solder flowing across the gap</td><td>Remove the bridge with wick or a sucker</td></tr>
+                <tr><td>Lifted pad</td><td>Copper pad peeling off the board</td><td>Iron held too long or too hot</td><td>Careful rework, or move the wire to another point</td></tr>
+                <tr><td>Disturbed joint</td><td>Frosted, cracked, grainy</td><td>Parts moved before the solder set</td><td>Reheat fully and keep the work still</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 13.3 — Common solder defects, their causes and their fixes. Learn to spot these at a glance.</p>
+
+          <h3>Desoldering and rework</h3>
+
+          <p>Everyone makes a bad joint. The skill is not never failing — it is fixing it cleanly. Two tools do most of the work.</p>
+
+          <ul>
+            <li>A <strong>solder sucker</strong> is a spring-loaded pump. You melt the solder, then press the button and it sucks the liquid metal away. Great for removing a blob.</li>
+            <li><strong>Solder wick</strong> is a flat braid of fine copper. You lay it over the joint, press the hot iron on top, and the braid soaks up the solder like a paper towel. Great for clearing a bridge or a pad.</li>
+          </ul>
+
+          <p>The general rework method is: add a little fresh solder and flux to the old joint first, because old solder flows better when you add new. Then remove it with sucker or wick. Clean the area, and solder again properly.</p>
+
+          <h2>Heat-shrink and insulation</h2>
+
+          <p>After the joint is made, it is not finished. A bare solder joint is fragile and exposed. It can touch another wire, corrode, or break if it bends.</p>
+
+          <p><strong>Heat-shrink</strong> is a plastic tube that shrinks tightly around a joint when you warm it. Slide it onto the wire <em>before</em> you solder — this is the mistake everyone makes once. After soldering, slide it over the joint and warm it with a heat gun or the side of the iron. It shrinks, grips and seals.</p>
+
+          <div class="callout warn">
+            <div class="callout__head"><i class="bi bi-exclamation-triangle-fill"></i> Watch out</div>
+            <p>Never leave an exposed wire or a bare joint. Exposed copper can short against a metal frame. A joint with no heat-shrink can bend back and forth at the solder line until it cracks. Cover and support every joint.</p>
+          </div>
+
+          <p>Electrical tape is a weak substitute. It unwinds in heat, gets sticky, and does not grip like heat-shrink. Keep tape for emergencies and use heat-shrink as the real answer.</p>
+
+          <h2>Strain relief and routing</h2>
+
+          <p>A solder joint is strong at pulling and weak at bending. If a cable pulls on the joint, or flexes right at the solder line, the joint will fail. The cure has two parts: <strong>strain relief</strong> and smart <strong>routing</strong>.</p>
+
+          <p>Strain relief means holding the cable so that any pulling force lands on the holder, not on the electrical joint. A cable tie, a clamp or a blob of hot glue just behind the connector does the job. The wire can be tugged; the joint sits safely.</p>
+
+          <p>Routing is the path the cable takes through the robot. Route like a professional:</p>
+
+          <ul>
+            <li><strong>Use cable ties</strong> to bundle and anchor wires every few centimetres.</li>
+            <li><strong>Add a service loop.</strong> Leave a small extra loop of slack so a part can move or be removed without pulling the wires tight.</li>
+            <li><strong>Keep wires away from moving parts.</strong> A cable near a wheel, gear or hinge will be caught and cut.</li>
+            <li><strong>Keep wires away from heat.</strong> Motors, drivers and resistors get hot and can melt insulation.</li>
+            <li><strong>Separate power and signal wires</strong> where you can, to reduce electrical noise.</li>
+            <li><strong>Use spiral wrap or braid</strong> to bundle many wires into one protected cable.</li>
+          </ul>
+
+          <div class="callout note">
+            <div class="callout__head"><i class="bi bi-info-circle-fill"></i> Note</div>
+            <p>Good routing is not just tidy — it is functional. A neat harness is easy to inspect, easy to repair, and far less likely to snag or short. Tidiness is a real engineering value, not decoration.</p>
+          </div>
+
+          <h2>Continuity testing with a multimeter</h2>
+
+          <p>A <strong>multimeter</strong> is a small handheld tool that measures electricity. One of its modes is <strong>continuity</strong>. In this mode, the meter sends a tiny current through two probes and beeps if the path between them is complete.</p>
+
+          <p>Think of continuity as asking a simple question: "Is there a connected path from point A to point B?" If there is, the meter beeps. If not, it stays silent.</p>
+
+          <h3>Setting up the meter</h3>
+
+          <ol>
+            <li><strong>Turn the dial to continuity.</strong> It is the symbol that looks like a sound wave or a diode with a speaker. Many meters beep when you touch the two probes together.</li>
+            <li><strong>Touch the probes together.</strong> The meter should beep. That beep proves the meter works. If it does not, check the battery and the probe leads.</li>
+            <li><strong>Make sure the circuit is off.</strong> Remove power before testing. Continuity testing on a live circuit can give false readings and damage the meter.</li>
+            <li><strong>Touch the probe tips to the two points</strong> you want to check. Press firmly so you contact the metal, not the insulation.</li>
+          </ol>
+
+          <h3>Three jobs continuity does</h3>
+
+          <p><strong>Check a wire.</strong> Touch one probe to each end of the same wire. A beep means the wire carries through. Silence means it is broken inside — a <strong>broken strand</strong> or a break hidden under the insulation.</p>
+
+          <p><strong>Find a broken connection.</strong> When a signal does not reach the board, trace the path point by point. Test from the sensor to its connector, then the connector to the board. The first silent test is the broken link.</p>
+
+          <p><strong>Find a short.</strong> A <strong>short</strong> is an unwanted connection, usually between positive and ground, or between two signals. Test between the two points that should <em>not</em> be joined. A beep where there should be silence reveals the short.</p>
+
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> Tip</div>
+            <p>Continuity tells you a path exists, but it does not tell you the quality of that path. A joint can beep yet still have high resistance that fails under real current. Test continuity first, then check voltage under load, as the worked example shows.</p>
+          </div>
+
+          <h3>Voltage testing: the partner of continuity</h3>
+
+          <p>Switch the meter to <strong>DC voltage</strong>. Touch the black probe to ground and the red probe to the point you want to measure. Read the number.</p>
+
+          <ul>
+            <li>A good power point reads close to the expected voltage.</li>
+            <li>A point that reads much lower than expected, or reads the full supply that suddenly collapses, points to a bad connection or high resistance.</li>
+          </ul>
+
+          <p>Together, continuity and voltage find almost every wiring fault. Continuity proves the path exists. Voltage proves the path can carry real current.</p>
+
+          <h2>A worked example: the robot that randomly stops</h2>
+
+          <p>Let us use everything we have learned. Here is a real, common problem, solved step by step.</p>
+
+          <p><strong>The symptom:</strong> Your wheeled robot drives fine on the bench. On the floor, it randomly stops for a moment, then starts again. The controller light stays on the whole time. The motors cut out together.</p>
+
+          <p><strong>Step 1 — Think about what is shared.</strong> The board keeps running, so its power is fine. Both motors stop at once, so the fault is in something they share. The shared things are the motor power supply, the motor driver, and the ground wire between them. Write these down before you touch anything.</p>
+
+          <p><strong>Step 2 — Rule out the easy causes.</strong> Is the robot running into something? No, it stops in open floor. Is the code faulty? The bench test ran for ten minutes without a stop, so the code is probably fine. That points back to a physical connection.</p>
+
+          <p><strong>Step 3 — Check continuity of the ground.</strong> Switch off and unplug the battery. Put the meter in continuity mode. Touch one probe to the battery negative terminal and the other to the motor driver ground pin. The wire beeps, so it is connected <em>right now</em>. But remember: continuity on the bench does not prove it is solid when vibrating.</p>
+
+          <p><strong>Step 4 — Wiggle while testing.</strong> This is the key move. Keep both probes on the two ground points and gently flex the ground wire along its length and at each joint. Watch the beep. On a small flex near the connector, the beep stutters and disappears.</p>
+
+          <p><strong>Step 5 — Find the exact spot.</strong> The stutter means the path breaks when moved. Inspect that connector. The crimp is loose and the wire slides slightly. It is a classic bad crimp, invisible when still, open when shaken.</p>
+
+          <p><strong>Step 6 — Confirm with voltage.</strong> Reconnect the battery. Set the meter to DC volts. Hold the black probe on the driver ground and the red on the driver power input. Watch the reading while you tap the ground wire. The voltage jumps around as the connection opens and closes. That is the fault caught in the act.</p>
+
+          <p><strong>Step 7 — Fix it properly.</strong> Do not just push the wire back. Remove the bad crimp, strip fresh copper, and crimp on a new connector with the correct tool. Add strain relief with a cable tie behind the connector so the wire cannot pull on it again.</p>
+
+          <p><strong>Step 8 — Test again.</strong> Do the wiggling continuity test once more while the robot is still. Then run it on the floor for a long time. The random stops are gone because the intermittent connection is gone.</p>
+
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> The key lesson</div>
+            <p>Random faults are almost always intermittent connections. The trick is to test <em>while moving the wire</em>, because a fault that hides when still is exactly the fault that shows when the robot shakes.</p>
+          </div>
+
+          <h2>Common mistakes beginners make</h2>
+
+          <p>These are the traps that catch almost every new builder. Knowing them in advance saves you real pain.</p>
+
+          <ul>
+            <li><strong>Cold joints.</strong> Heating the solder instead of the joint gives a dull, weak connection. Always heat the two metal parts first.</li>
+            <li><strong>Too much solder.</strong> A big shiny ball looks impressive but hides a poor bond. A small smooth cone is stronger and conducts better.</li>
+            <li><strong>No strain relief.</strong> A wire that pulls straight on a solder joint will break. Clamp the cable so the joint takes no force.</li>
+            <li><strong>Wrong gauge for motors.</strong> Thin signal wire on a motor heats up and drops voltage. Use thick wire for power.</li>
+            <li><strong>Mixing up polarity.</strong> Reversed red and black can destroy a board instantly. Trace polarity before every first power-up.</li>
+            <li><strong>Tinning stranded wire that then breaks.</strong> Solder wicks up the strands and makes a stiff, brittle spot that snaps when flexed. Crimp instead, or keep the tinned section short and supported.</li>
+            <li><strong>Forgetting heat-shrink before soldering.</strong> Finish the joint, then realise the tube is still on the bench. Slide it on first, every time.</li>
+            <li><strong>No labels.</strong> A bundle of unlabelled wires turns every repair into a puzzle. Label both ends as you build.</li>
+          </ul>
+
+          <h2>How professionals do it</h2>
+
+          <p>At industrial scale, connecting wires becomes a discipline of its own, with standards and documents. The ideas are the same ones you just learned, taken to a higher level of consistency.</p>
+
+          <ul>
+            <li><strong>Crimping standards.</strong> Factories use calibrated crimp tools and published pull-strength specs. A joint is accepted or rejected by measurement, not by opinion.</li>
+            <li><strong>Wiring harnesses.</strong> Instead of loose wires, engineers design a <strong>harness</strong>: a pre-built set of cables cut to exact length, bundled and terminated, often made on a board in the exact shape it will sit in the robot.</li>
+            <li><strong>Ferrules.</strong> For screw terminals, stranded wire gets a <strong>ferrule</strong>: a small metal sleeve crimped on the end. It stops strands spreading, protects them, and makes a clean connection under the screw.</li>
+            <li><strong>Wire labelling systems.</strong> Every wire gets a unique code, printed on heat-shrink sleeves or tags, matching a wiring diagram. Anyone can trace any wire from the drawing.</li>
+            <li><strong>IPC-style solder standards.</strong> There are written standards for what a good joint must look like. Inspectors check wetting angle, fillet shape and coverage against pictures.</li>
+            <li><strong>Connector mating cycles.</strong> Every connector is rated for a number of connect-disconnect cycles. A part rated for 30 cycles is not meant to be unplugged daily. Professionals match the connector to how often it will be serviced.</li>
+          </ul>
+
+          <p>The theme is consistency. A beginner makes one good joint. A professional makes a thousand identical good joints and can prove each one meets the standard.</p>
+
+          <h2>Try it yourself</h2>
+
+          <p>Wiring is a hand skill. You cannot learn it by reading alone. Do these exercises in order, and keep every board and wire you make.</p>
+
+          <ol>
+            <li><strong>Make and inspect 10 practice joints.</strong> Solder ten joints on spare wire or a scrap board. Inspect each with a magnifier and grade it good or bad against Table 13.3. Hint: expect your first joints to be cold. Reheat them until they shine.</li>
+            <li><strong>Strip and crimp five connectors.</strong> Practice stripping the correct length and crimping on five connectors. Do a pull test on each one. Hint: if a crimp pulls apart, the wire was probably not pushed fully into the barrel.</li>
+            <li><strong>Continuity-hunt a hidden break.</strong> Take a length of cable with one broken strand hidden inside. Use continuity and wiggling to find the break. Hint: flex it as you test, just like the worked example.</li>
+            <li><strong>Label a small harness.</strong> Build a three-wire harness for a motor, using red, black and one signal colour. Label both ends. Hint: write the labels before you solder, not after.</li>
+            <li><strong>Make a joint fail on purpose.</strong> Solder a wire, then pull and bend it until it breaks. Look at exactly where it failed. Hint: it almost always breaks right where the solder ends, which is why strain relief matters.</li>
+          </ol>
+
+          <h2>Going deeper (optional)</h2>
+
+          <p>If you want one advanced idea to carry forward, it is this: <strong>resistance is the hidden enemy of every connection</strong>. A perfect joint has almost zero resistance. A poor joint has a little resistance that turns current into heat.</p>
+
+          <p>Professionals measure this directly. Some multimeters measure resistance in ohms, and you can measure across a suspect joint. A good joint reads close to zero. A joint reading a few ohms is already failing. You can also feel it: a warm connector after a few minutes of running is a connector losing power as heat.</p>
+
+          <div class="formula"><span class="label">Power lost as heat in a bad joint</span> P = I&sup2; &times; R</div>
+
+          <p>Here P is wasted power in watts, I is current in amps, and R is the joint resistance in ohms. Notice the current is squared, so doubling the current makes four times the heat. A joint that is fine with a small motor can cook with a big one. This is why professional harnesses are sized for the worst case, not the average day.</p>
+
+          <section class="takeaways">
+            <h2><i class="bi bi-pin-angle-fill"></i> Key takeaways</h2>
+            <ul>
+              <li><i class="bi bi-check2-circle"></i> Most robot faults are wiring faults. Check connections before blaming parts.</li>
+              <li><i class="bi bi-check2-circle"></i> Use stranded wire on a moving robot; it survives bending and vibration.</li>
+              <li><i class="bi bi-check2-circle"></i> A bigger AWG number is a thinner wire. Thin wire suits signals; thick wire suits motors.</li>
+              <li><i class="bi bi-check2-circle"></i> Red is positive, black is ground, other colours are signals. Label both ends of every cable.</li>
+              <li><i class="bi bi-check2-circle"></i> Long thin power wires lose voltage. Keep motor wires short and thick.</li>
+            </ul>
+          </section>
+
+          <section class="quiz">
+            <div class="quiz__head"><i class="bi bi-patch-question-fill"></i> Check your understanding</div>
+            <details>
+              <summary><span class="q-num">Q1.</span><span>Why do more robot faults come from wiring than from parts?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Parts are made and tested in factories with tight rules. Connections are made by hand, so they are the weakest link. Loose, cold or broken connections fail quietly and often.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q2.</span><span>Which is better for a moving robot, solid or stranded wire, and why?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Stranded wire. It bends easily without cracking and survives vibration, while solid wire snaps after enough flexing.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q3.</span><span>Which is thicker, AWG 26 or AWG 12?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> AWG 12 is much thicker. A bigger AWG number means a thinner wire.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q4.</span><span>Why does colour convention say red is positive and black is ground?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> It is a shared language. When everyone uses the same colours, a bundle of wires is easy to read and reversed connections are less likely.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q5.</span><span>A 2 m one-way cable has 0.05 &Omega; per metre and carries 3 A. What is the voltage drop?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> V = 2 &times; 2 &times; 0.05 &times; 3 = 0.6 V. The part sees 0.6 V less than the supply.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q6.</span><span>Why is a good crimp often better than solder for a stranded wire?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Solder wicks up the strands and makes a stiff, brittle spot that cracks when the wire bends. A good crimp stays flexible and grips both the copper and the insulation, acting as strain relief.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q7.</span><span>You solder a joint and it looks dull and grainy. What went wrong and how do you fix it?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> It is a cold joint, usually because the joint was not hot enough or it moved while cooling. Add flux, reheat until the solder flows shiny, and hold it still until it sets.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q8.</span><span>During a continuity test the beep stutters when you flex the wire. What does that tell you?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> The connection is intermittent — it breaks when moved. That is the classic sign of a loose crimp or broken strand, and exactly the kind of fault that makes a robot stop randomly.</div>
+            </details>
+          </section>
+
+        </article>
+
+        <nav class="pager" id="pager" aria-label="Chapter navigation"></nav>
+      </div>
+    </main>
+  </div>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/book.js"></script>
+</body>
+</html>

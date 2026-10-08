@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>try{var __t=localStorage.getItem("mr-theme");if(__t==="dark"||__t==="light")document.documentElement.setAttribute("data-theme",__t);}catch(e){}</script>
+  <title>Chapter 27: Production Software for Robotics — Master Robotics</title>
+  <meta name="description" content="A plain-English guide to production robot software: modern C++, Eigen, CMake, Docker, real-time Linux, ROS 2 and ros2_control with an EtherCAT joint example.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/prose.css">
+</head>
+<body data-file="ch27-production-software-robotics.html">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="topbar" id="topbar"></header>
+  <div class="progress-bar" id="progressBar"></div>
+
+  <div class="layout">
+    <div class="sidebar__backdrop" id="navBackdrop"></div>
+    <nav class="sidebar" id="sidebar" aria-label="Book contents"></nav>
+
+    <main class="main" id="main">
+      <div class="container">
+
+        <header class="chapter-head">
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="index.html">Home</a>
+            <i class="bi bi-chevron-right"></i>
+            <a href="index.html#advanced">Part 7 &middot; Advanced Foundations</a>
+            <i class="bi bi-chevron-right"></i>
+            <span>Chapter 27</span>
+          </nav>
+          <span class="chapter-kicker"><i class="bi bi-diagram-3"></i> Part 7 &middot; Advanced Foundations</span>
+          <h1>Production Software for Robotics</h1>
+          <p class="lede">Demo code makes one robot move once. Production code makes many robots move every day. By the end, you will explain modern C++ and math libraries in plain words, set up a ROS 2 node with ros2_control, and describe real-time Linux, Docker, CI and testing.</p>
+          <div class="chapter-meta">
+            <span><i class="bi bi-clock"></i> ~32 min read</span>
+            <span><i class="bi bi-bar-chart"></i> Advanced</span>
+            <span><i class="bi bi-list-check"></i> Chapter 27 of 30</span>
+          </div>
+          <div class="goals">
+            <h2>What you will learn</h2>
+            <ul>
+              <li><i class="bi bi-check-circle-fill"></i> Explain modern C++, Eigen and build tools in plain words.</li>
+              <li><i class="bi bi-check-circle-fill"></i> Set up a ROS 2 node with the ros2_control idea.</li>
+              <li><i class="bi bi-check-circle-fill"></i> Describe real-time Linux, Docker and CI, and testing.</li>
+            </ul>
+          </div>
+        </header>
+
+        <article class="article">
+
+          <p class="lead">Imagine two robots. The first one moves on your desk. It waves when you press a key. Everyone claps. The second one works in a warehouse. It moves boxes for ten hours a day, six days a week. Nobody claps, because it just works. This chapter is about the second kind of robot.</p>
+
+          <p>The desk demo and the warehouse robot often run the same math. The difference is the software around the math. The demo runs once, while you watch. The warehouse robot runs thousands of times, while nobody watches. A small bug that you never see in a demo becomes a daily crash in a warehouse.</p>
+
+          <p><strong>Production software</strong> means code that is ready for real daily work. It starts the same way every time. It checks its own health. It logs what it does. New team members can build it with one command. When something breaks, you can find the cause in minutes, not days.</p>
+
+          <p>This chapter gives you that full picture. You will meet the C++ features that professionals use every day. You will meet the math libraries behind robot arms and maps. You will learn how teams build, ship and test code. And you will bring up a real motor joint with ROS 2, step by step.</p>
+
+          <h2>Why demo code breaks on real robots</h2>
+
+          <p>A demo script assumes a perfect world. It assumes the camera is always plugged in. It assumes the network never drops. It assumes nobody else touches the files. Real robots live in a messy world, and the mess always arrives.</p>
+
+          <p>Think of a food cart versus a restaurant kitchen. The cart serves one dish, cooked by one person, for a few hours. The restaurant serves fifty dishes, cooked by ten people, every single day. The restaurant needs recipes, cleaning lists, delivery plans and health checks. Production software is the restaurant version of your demo cart.</p>
+
+          <h3>The five enemies of demo code</h3>
+
+          <p>First, <strong>time</strong>. A demo runs for two minutes. A product runs for months. Small leaks of memory or disk space grow until the robot freezes at 2 a.m. Second, <strong>change</strong>. Five people edit the same code. Without rules, they break each other's work daily.</p>
+
+          <p>Third, <strong>hardware differences</strong>. Your laptop is fast. The robot computer is slow and runs a different Linux version. Code that works on your desk fails on the robot. Fourth, <strong>timing</strong>. A demo tolerates a late answer. A motor controller does not. A late command can shake or damage a real arm.</p>
+
+          <p>Fifth, <strong>silence</strong>. When a demo fails, you are watching. You see the error on screen. When a warehouse robot fails at night, nobody is watching. The robot must record what happened so you can replay the failure the next morning.</p>
+
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> The key idea</div>
+            <p>Production software answers five questions before they become emergencies: Will it run for months? Can a team change it safely? Will it build on any machine? Will it answer on time? Will it explain itself when it fails?</p>
+          </div>
+
+          <h3>What production adds, in one picture</h3>
+
+          <p>You already learned the basics of programming your robot in <a href="ch14-programming-your-robot.html">Chapter 14</a>. That chapter taught you to write code that works. This chapter adds the layers that keep code working at scale: safe language habits, tested math libraries, repeatable builds, on-time execution and honest testing.</p>
+
+          <figure class="figure">
+            <div class="figure__box">
+              <svg viewBox="0 0 560 240" width="100%" role="img" aria-label="Software stack diagram with five layers from hardware to user code">
+                <rect x="90" y="14" width="380" height="34" rx="8" fill="#e8eeff" stroke="#2d5bff"/>
+                <text x="280" y="36" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#1c2230">Your code: nodes, controllers, skills</text>
+                <rect x="90" y="56" width="380" height="34" rx="8" fill="#e2f5ec" stroke="#0f9d78"/>
+                <text x="280" y="78" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#1c2230">Middleware: ROS 2, ros2_control, DDS</text>
+                <rect x="90" y="98" width="380" height="34" rx="8" fill="#e8eeff" stroke="#2d5bff"/>
+                <text x="280" y="120" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#1c2230">Libraries: Eigen, Pinocchio, Ceres, GTSAM</text>
+                <rect x="90" y="140" width="380" height="34" rx="8" fill="#eef0f4" stroke="#7b849b"/>
+                <text x="280" y="162" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#1c2230">Platform: real-time Linux, Docker, CI</text>
+                <rect x="90" y="182" width="380" height="34" rx="8" fill="#eef0f4" stroke="#7b849b"/>
+                <text x="280" y="204" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#1c2230">Hardware: motors, EtherCAT, CANopen, sensors</text>
+                <text x="490" y="36" font-family="Inter, sans-serif" font-size="12" fill="#7b849b">you write</text>
+                <text x="490" y="120" font-family="Inter, sans-serif" font-size="12" fill="#7b849b">you reuse</text>
+                <text x="490" y="204" font-family="Inter, sans-serif" font-size="12" fill="#7b849b">you buy</text>
+              </svg>
+            </div>
+            <figcaption>Figure 1. The production software stack. You write the top layer. You reuse the middle layers. You buy the bottom layer.</figcaption>
+          </figure>
+
+          <p>A useful rule follows from this picture. <strong>Write as little as possible.</strong> Every line you write is a line you must test and maintain. Every reused library is a line that thousands of other users already tested for you. Professionals are lazy in exactly this smart way.</p>
+
+          <h2>Modern C++ without fear</h2>
+
+          <p>Most serious robot software is written in <strong>C++</strong>. C++ is a language that runs very fast and talks directly to hardware. Its bad name comes from old books. Modern C++ is smaller, safer and friendlier than the C++ of twenty years ago. You only need a few ideas to read and write it well.</p>
+
+          <p>If you are new to C++, start with <a href="ch14-programming-your-robot.html">Chapter 14</a> first. That chapter builds your coding base. Here we add the three habits that separate production C++ from classroom C++.</p>
+
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> In simple words</div>
+            <p>C++ gives you full control of the machine. Modern C++ adds guardrails: owners clean up after themselves, templates stamp out safe copies, and the compiler catches mistakes before the robot moves.</p>
+          </div>
+
+          <h3>RAII: owners clean up after themselves</h3>
+
+          <p><strong>RAII</strong> is a strange name for a simple habit. It means: the object that takes a resource also frees it. Open a motor port inside an object, and the object's ending closes the port. No separate cleanup call to forget.</p>
+
+          <p>Think of borrowing library books with a responsible friend. Your friend returns every book she borrows, automatically, on her way out. You never pay a late fee. In C++, the "friend" is the object's <strong>destructor</strong>, a small function that runs when the object ends.</p>
+
+          <p>The everyday tool for this is the <strong>smart pointer</strong>. A smart pointer is like a normal pointer, but it remembers to free the memory. Use <code>std::unique_ptr</code> when exactly one owner exists, like one driver owning one motor handle. Use <code>std::shared_ptr</code> when several parts share one object, like several nodes sharing one map. Never write raw <code>new</code> and <code>delete</code> in new code.</p>
+
+          <h3>Templates: one safe stamp, many uses</h3>
+
+          <p>A <strong>template</strong> is a recipe the compiler stamps out for each type you need. You write one safe list class. The compiler makes a list of numbers, a list of poses, a list of motor states. Each stamped copy is checked for errors at build time.</p>
+
+          <p>Think of a cookie cutter. You design the star shape once. Then you stamp stars from any dough: plain, chocolate or ginger. The shape stays correct every time. Templates give you the same deal: design the logic once, reuse it for every data type, with full error checking.</p>
+
+          <p>You already use templates whenever you write <code>std::vector&lt;double&gt;</code>. That is a stamped list of decimal numbers. Robotics libraries use them everywhere: an Eigen matrix of floats, a vector of joint names, an optional sensor reading that may be missing.</p>
+
+          <h3>The short list that covers 90 percent</h3>
+
+          <p>You do not need the whole language. Learn these well and you can read almost any robot codebase. Use <code>const</code> on anything you do not change. Use <code>auto</code> to let the compiler name long types. Pass big objects by <code>const</code> reference instead of copying them. Prefer <code>std::array</code> and <code>std::vector</code> over raw arrays. Handle errors with return values or exceptions, never with silence.</p>
+
+          <p>Finally, learn to read compiler errors without panic. The error points at the first line you should check. Read that line slowly. Fix one error and rebuild. Half the remaining errors often vanish, because they were echoes of the first one.</p>
+
+          <h2>Math toolboxes you should reuse</h2>
+
+          <p>Robots live in geometry. Arms rotate joints. Cameras project light. Maps fuse noisy sensors. The math behind this is well known, and excellent libraries already implement it. Your job is to pick the right toolbox, not to rewrite the math.</p>
+
+          <h3>Eigen: fast vectors and matrices</h3>
+
+          <p><strong>Eigen</strong> is the standard C++ library for vectors and matrices. A vector holds a position or a speed. A matrix holds a rotation or a change of frame. Eigen multiplies them fast, using your processor's special math instructions.</p>
+
+          <p>Think of Eigen as a pocket calculator that never makes arithmetic slips. You write <code>pose = rotation * point + offset</code>. Eigen checks the sizes match and runs the loop at full speed. Almost every robotics project depends on it, directly or through other libraries.</p>
+
+          <p>Two rules keep Eigen friendly. First, keep matrix sizes fixed when you know them, like a 3 by 3 rotation. Fixed sizes run fastest. Second, never access elements one by one in a hot loop if a whole-matrix operation exists. One line of matrix math beats twenty lines of manual loops in both speed and clarity.</p>
+
+          <h3>Pinocchio: the robot body calculator</h3>
+
+          <p><strong>Pinocchio</strong> computes how a robot body moves. Give it your arm model and the joint angles. It returns where the hand is, how fast each link moves, and which torques gravity demands. It answers the kinematics and dynamics questions from your mechanics chapters in microseconds.</p>
+
+          <p>Picture a physiotherapist who knows every bone in your body. You say "my shoulder turned this much", and she tells you exactly where your hand now sits. Pinocchio is that expert for your robot. It reads the standard model file and does the heavy algebra for you.</p>
+
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> Tip</div>
+            <p>Describe your robot once in a URDF model file, then reuse it everywhere: Pinocchio for dynamics, RViz for viewing, Gazebo for simulation. One model, many tools, zero repeated numbers.</p>
+          </div>
+
+          <h3>Ceres and GTSAM: solvers that agree with noisy data</h3>
+
+          <p>Sensors lie a little. GPS drifts. Cameras blur. Encoders quantize. <strong>Ceres</strong> and <strong>GTSAM</strong> find the answer that best agrees with many imperfect measurements. Ceres is a general <strong>nonlinear least-squares solver</strong>: it adjusts unknown values until the total error is as small as possible. Think of tuning guitar strings until every string sounds right at once.</p>
+
+          <p><strong>GTSAM</strong> specializes in robot maps and trajectories. It stores measurements as a <strong>factor graph</strong>, a web of clues linking poses and landmarks. Then it solves the whole web at once. If you read about smoothing and mapping in <a href="ch18-ros.html">Chapter 18</a>, GTSAM is the engine that often powers those ideas in real products.</p>
+
+          <p>The plain-words summary: Eigen does the arithmetic, Pinocchio knows the body, Ceres and GTSAM settle arguments between noisy sensors. Learn what each one is for, and reach for it instead of writing your own solver.</p>
+
+          <h2>From code to robot: builds, containers and CI</h2>
+
+          <p>Code on your screen is not yet a program. A <strong>build</strong> turns text files into a running program. A build tool tracks which files changed and rebuilds only what is needed. Without one, you will compile the wrong files and chase ghosts for hours.</p>
+
+          <h3>CMake: the standard recipe book</h3>
+
+          <p><strong>CMake</strong> is the standard build tool for C++ robotics. You write a short recipe called <code>CMakeLists.txt</code>. The recipe lists your source files, your libraries and your settings. CMake then generates the exact build commands for your machine.</p>
+
+          <p>Think of CMake as a recipe card. The card says "cake needs flour, eggs and 30 minutes at 180 degrees". Any kitchen can follow it. Your <code>CMakeLists.txt</code> says "this node needs Eigen, Pinocchio and C++ 17". Any computer can follow it.</p>
+
+          <div class="code">
+            <div class="code__bar">
+              <span class="code__dots"><span></span><span></span><span></span></span>
+              <span class="code__lang">CMake</span>
+              <button class="code__copy" type="button"><i class="bi bi-clipboard"></i> Copy</button>
+            </div>
+            <pre><code>cmake_minimum_required(VERSION 3.22)
+project(arm_driver)
+
+set(CMAKE_CXX_STANDARD 17)
+
+find_package(Eigen3 REQUIRED)
+find_package(pinocchio REQUIRED)
+
+add_executable(joint_driver src/joint_driver.cpp)
+target_link_libraries(joint_driver Eigen3::Eigen pinocchio::pinocchio)
+
+enable_testing()
+add_test(NAME joint_limits COMMAND joint_driver --self-test)</code></pre>
+          </div>
+
+          <p>Read it line by line. The first lines name the project and pick the language version. The <code>find_package</code> lines locate your libraries. The <code>add_executable</code> line builds your program. The last lines register a small self-test. Short, readable, repeatable on any machine.</p>
+
+          <h3>Bazel, Docker and CI: scale the recipe</h3>
+
+          <p><strong>Bazel</strong> is a stricter build tool used by large teams. It tracks every input file exactly, so builds are identical on every machine. It shines when your project has hundreds of parts and several languages. For a small team, CMake is enough. For a company with fifty engineers, Bazel pays off.</p>
+
+          <p><strong>Docker</strong> solves "works on my laptop". A Docker <strong>image</strong> is a sealed box holding your OS, libraries and settings. Your code runs inside the same box on your laptop, on the robot and on the test server. A <strong>Dockerfile</strong> is the recipe that builds the box.</p>
+
+          <div class="code">
+            <div class="code__bar">
+              <span class="code__dots"><span></span><span></span><span></span></span>
+              <span class="code__lang">Dockerfile</span>
+              <button class="code__copy" type="button"><i class="bi bi-clipboard"></i> Copy</button>
+            </div>
+            <pre><code>FROM ros:jazzy-ros-base
+RUN apt-get update &amp;&amp; apt-get install -y \
+    libeigen3-dev \
+    ros-jazzy-ros2-control \
+    &amp;&amp; rm -rf /var/lib/apt/lists
+COPY ./arm_driver /ws/src/arm_driver
+WORKDIR /ws
+RUN . /opt/ros/jazzy/setup.sh &amp;&amp; colcon build</code></pre>
+          </div>
+
+          <p><strong>CI</strong>, or continuous integration, is a robot that checks every change. Each time you push code, a server builds it, runs the tests and reports green or red. Red means "do not merge yet". This one habit catches most team breakages before they reach any robot.</p>
+
+          <div class="callout note">
+            <div class="callout__head"><i class="bi bi-info-circle-fill"></i> Note</div>
+            <p>Cross-compilation builds robot programs on your fast laptop for the robot's slower processor, for example ARM chips. Docker makes this safe: the sealed box holds the robot's toolchain, so the output runs on the robot even though it was built on your desk.</p>
+          </div>
+
+          <h3>How the pieces fit: a numbered routine</h3>
+
+          <ol>
+            <li>Write code and a <code>CMakeLists.txt</code> recipe on your laptop, and build it locally first.</li>
+            <li>Push your change. The CI server rebuilds it in a clean Docker box and runs all tests.</li>
+            <li>When CI is green, the same Docker image is copied to the robot, so the robot runs exactly what was tested.</li>
+            <li>The robot logs its runs. If something fails, you replay the log on your laptop in the same image.</li>
+          </ol>
+
+          <p>Notice the promise: laptop, server and robot all run the same sealed box. "But it worked on my machine" stops being an excuse, because every machine is the same machine.</p>
+
+          <h2>On-time software: real-time Linux and fast buses</h2>
+
+          <p>Some software may answer late. A web page that loads in two seconds instead of one only annoys you. A motor command that arrives two milliseconds late can shake an arm, overheat a driver or ruin a grasp. <strong>Real-time</strong> software promises answers before a deadline, every single time.</p>
+
+          <h3>Why normal Linux is sometimes late</h3>
+
+          <p>Normal Linux is fair, not punctual. It shares the processor between all programs. Your control loop may wait while the system updates files or draws a window. Usually the wait is tiny. Sometimes it is tens of milliseconds. At a 1 kHz control rate, you only have one millisecond. One surprise wait means one missed command.</p>
+
+          <p>Think of a bus that leaves whenever the driver finishes coffee. Most days it leaves nearly on time. Some days it leaves very late. Passengers with flexible plans do not care. A surgeon catching a connecting flight cares a lot. Motor control is the surgeon.</p>
+
+          <h3>PREEMPT_RT, Xenomai and QNX</h3>
+
+          <p><strong>PREEMPT_RT</strong> is a set of patches that makes Linux punctual. It lets your control task interrupt almost anything else. Worst-case delays drop from milliseconds to tens of microseconds. Most ROS 2 real-time robots run a PREEMPT_RT kernel, because it keeps the familiar Linux tools while adding punctuality.</p>
+
+          <p><strong>Xenomai</strong> goes further. It runs a tiny, extra-punctual core beside Linux for the most critical tasks. <strong>QNX</strong> is a separate commercial operating system built for punctuality from the ground up, common in cars and medical devices. Simple rule: start with PREEMPT_RT, and move to Xenomai or QNX only when measurements prove you must.</p>
+
+          <div class="callout warn">
+            <div class="callout__head"><i class="bi bi-exclamation-triangle-fill"></i> Warning</div>
+            <p>Real-time is about the worst case, not the average. A loop that averages 0.2 ms but sometimes takes 5 ms is not real-time. Always measure the maximum delay over thousands of cycles, never the average over ten.</p>
+          </div>
+
+          <h3>Budget your latency like money</h3>
+
+          <p>Every control cycle spends time in stages: read sensors, compute commands, send commands. The sum must fit inside the cycle. Write the budget down before you write code, and measure each stage after.</p>
+
+          <div class="formula"><span class="label">Latency budget</span> T<sub>cycle</sub> &ge; T<sub>sense</sub> + T<sub>compute</sub> + T<sub>send</sub> + T<sub>margin</sub></div>
+
+          <p>Example: a 1 kHz loop gives T<sub>cycle</sub> = 1.0 ms. You measure sensing 0.15 ms, computing 0.25 ms and sending 0.20 ms. The sum is 0.60 ms, leaving a margin of 0.40 ms. That margin absorbs surprises. If the sum ever exceeds 1.0 ms, you must simplify the math, speed the bus or slow the loop, in that order.</p>
+
+          <h3>EtherCAT and CANopen: the motor highways</h3>
+
+          <p>Fast loops need fast wires. <strong>EtherCAT</strong> links many motor drives in one chain with microsecond timing. One message travels through every drive, each one reading and writing on the fly. <strong>CANopen</strong> is an older, simpler bus, still common on mobile robots and grippers.</p>
+
+          <p>Motor drives follow the <strong>CiA 402</strong> standard, a shared dictionary of modes and states. The four modes you will use most are:</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Mode</th><th>Name</th><th>You send each cycle</th></tr></thead>
+              <tbody>
+                <tr><td>8</td><td>Cyclic synchronous position</td><td>Target angle</td></tr>
+                <tr><td>9</td><td>Cyclic synchronous velocity</td><td>Target speed</td></tr>
+                <tr><td>10</td><td>Cyclic synchronous torque</td><td>Target turning force</td></tr>
+                <tr><td>6</td><td>Homing</td><td>Start signal, drive finds zero itself</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2>ROS 2 in production: nodes, TF2, launch and DDS</h2>
+
+          <p>You met the core ROS idea in <a href="ch18-ros.html">Chapter 18</a>: small programs called <strong>nodes</strong> that talk through named channels. <strong>ROS 2</strong> is the modern version, built for products instead of labs. This section covers the four production pieces: distributions, frames, launch and message tuning.</p>
+
+          <h3>Humble and Jazzy: pick a long-life version</h3>
+
+          <p>ROS 2 releases come and go, but <strong>LTS</strong> releases live for five years. <strong>Humble</strong> and <strong>Jazzy</strong> are the two LTS versions you will meet most. Pick one for your whole fleet and freeze it in your Dockerfile. Mixed versions on different robots cause strange, silent message mismatches.</p>
+
+          <p>Think of it like truck tires. Any round tire rolls, but a fleet that standardizes on one tire size carries one spare, trains one procedure and never guesses. One ROS 2 version across all robots gives you the same calm.</p>
+
+          <h3>TF2: every sensor agrees where things are</h3>
+
+          <p><strong>TF2</strong> tracks the positions of all robot frames over time: base, arm links, camera, gripper. Each node publishes its own piece, and TF2 stitches them into one tree. When your camera sees a box, TF2 tells the arm exactly where that box sits relative to the gripper.</p>
+
+          <p>The classic beginner bug is a broken or looping frame tree. Keep one root, usually <code>map</code> or <code>odom</code>, with no cycles. Print the tree with <code>ros2 run tf2_tools view_frames</code> whenever a pose looks wrong. Nine times out of ten, the math is fine and the tree is broken.</p>
+
+          <h3>Launch files and DDS tuning</h3>
+
+          <p>A <strong>launch file</strong> starts your whole system with one command: drivers, controllers, perception and logging, each with its parameters. Without launch files, starting the robot means typing ten commands in the right order and hoping you remember step seven. With them, one file is the whole startup procedure, checked into version control like any code.</p>
+
+          <p>Under the messages sits <strong>DDS</strong>, the delivery service that carries data between nodes. Default settings favor reliability over speed. For fast control topics, switch to best-effort delivery with a small queue, so a late message is dropped instead of piling up. For maps and plans, keep reliable delivery with a deeper queue. Tune per topic, not globally.</p>
+
+          <div class="code">
+            <div class="code__bar">
+              <span class="code__dots"><span></span><span></span><span></span></span>
+              <span class="code__lang">Python</span>
+              <button class="code__copy" type="button"><i class="bi bi-clipboard"></i> Copy</button>
+            </div>
+            <pre><code>import rclpy
+from rclpy.node import Node
+from rclpy.qos import QoSProfile, QoSReliabilityPolicy, QoSHistoryPolicy
+from sensor_msgs.msg import JointState
+
+class JointMonitor(Node):
+    def __init__(self):
+        super().__init__('joint_monitor')
+        # Fast control data: drop late messages, keep only the newest.
+        qos = QoSProfile(
+            reliability=QoSReliabilityPolicy.BEST_EFFORT,
+            history=QoSHistoryPolicy.KEEP_LAST,
+            depth=1)
+        self.sub = self.create_subscription(
+            JointState, 'joint_states', self.on_state, qos)
+        self.get_logger().info('Joint monitor started.')
+
+    def on_state(self, msg):
+        pos = msg.position[0] if msg.position else 0.0
+        self.get_logger().info(f'Joint 0 at {pos:.3f} rad.')
+
+rclpy.init()
+node = JointMonitor()
+rclpy.spin(node)</code></pre>
+          </div>
+
+          <p>This small <strong>ROS 2 node</strong> watches one joint. It subscribes to the standard <code>joint_states</code> channel with a fast best-effort policy. The newest message always wins. Old messages are dropped, never queued. That is exactly what a live display or safety watcher wants.</p>
+
+          <h3>ros2_control: one doorway to every motor</h3>
+
+          <p><strong>ros2_control</strong> is the standard doorway between ROS 2 and real motors. Your control algorithm talks to a generic joint handle: "move joint 2 to 0.5 radians". A hardware plugin translates that wish into EtherCAT or CANopen messages for your specific drive. Swap the drive brand, and your algorithm never notices.</p>
+
+          <p>Picture a universal travel plug. Your laptop charger stays the same in every country. Only the small adapter changes. ros2_control is the wall socket standard. The hardware plugin is the country adapter. Your controller is the charger that never changes.</p>
+
+          <ol>
+            <li><strong>Hardware interface</strong> reads sensors and writes commands through the bus driver, every cycle, on time.</li>
+            <li><strong>Controller</strong> computes the next command from the joint state, for example a position loop with limits.</li>
+            <li><strong>Resource manager</strong> makes sure only one controller drives each joint at a time, so two commands never fight.</li>
+            <li><strong>Your nodes</strong> send goals and watch states through standard topics, never touching the bus directly.</li>
+          </ol>
+
+          <p>The concrete driver you will meet below is <strong>ethercat_driver_ros2</strong>. It connects ros2_control to EtherCAT drives speaking CiA 402. Modes 8, 9 and 10 stream position, velocity or torque targets each cycle. Mode 6 homes the axis first. The worked example walks you through homing, then streaming, on one joint.</p>
+
+          <h2>Testing: trust, but check four ways</h2>
+
+          <p>Testing asks one question: does the code do what we claim? Production teams check at four levels, from cheap to precious. Each level catches bugs the cheaper levels cannot see.</p>
+
+          <h3>The four levels</h3>
+
+          <p><strong>Unit tests</strong> check one tiny function alone. Does the angle wrapper turn 370 degrees into 10? Fast, dozens per second, run on every change. <strong>Integration tests</strong> check parts working together. Does the planner's path survive the controller's limits? Slower, run before every merge.</p>
+
+          <p><strong>HIL tests</strong>, or hardware-in-the-loop, plug in real electronics with a fake physical world. The real motor driver runs, but the "motor" is a simulator answering over the bus. This catches timing and wiring bugs without risking hardware. <strong>Deterministic replay</strong> records real sensor streams once, then replays them bit-for-bit on every build, so a bug fix never depends on luck.</p>
+
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> Tip</div>
+            <p>Record a short "golden log" of joint states and commands from your healthy robot. Replay it in CI every night. If tomorrow's code reacts differently to yesterday's data, you caught a regression before any customer did.</p>
+          </div>
+
+          <h3>A numbered testing routine</h3>
+
+          <ol>
+            <li>Run unit tests on every save, locally, in under a minute.</li>
+            <li>Run integration tests on every push, in Docker, before merging.</li>
+            <li>Run HIL tests nightly on one dedicated test bench with real drivers.</li>
+            <li>Replay golden logs after every fix, and store any new failure as a new replay.</li>
+          </ol>
+
+          <p>Each layer is slower and more truthful than the last. Unit tests catch typos in logic. Integration catches broken handshakes. HIL catches timing sins. Replay catches ghosts that only appear on Tuesdays. Together they let you sleep.</p>
+
+          <h2>Worked example: bring up one EtherCAT joint</h2>
+
+          <p>Time to put it all together. You have one motor drive on an EtherCAT chain, connected to a Linux computer with PREEMPT_RT. Goal: home the joint, then hold 0.5 radians with ros2_control. Every step shows its reason, so you can repeat it on your hardware.</p>
+
+          <p><strong>Step 1. Check the latency budget.</strong> Your loop runs at 1 kHz, so T<sub>cycle</sub> = 1.0 ms. You measure: sensing 0.15 ms, compute 0.20 ms, bus send 0.25 ms. Sum = 0.60 ms. Margin = 0.40 ms. Positive margin means the loop fits. If any stage measured above budget, you would fix it now, before touching motors.</p>
+
+          <p><strong>Step 2. Home the axis in mode 6.</strong> Set the CiA 402 mode to 6, homing. The drive moves slowly toward its zero sensor and stops. Read back the actual position. It should sit near zero and stay still. Never skip homing: without a known zero, every later command points at the wrong place.</p>
+
+          <p><strong>Step 3. Switch to mode 8 and claim the joint.</strong> Set mode 8, cyclic synchronous position. Start the ros2_control resource manager. It claims joint 0 so no other controller can fight you. The hardware interface now streams your target angle every millisecond through ethercat_driver_ros2.</p>
+
+          <p><strong>Step 4. Command 0.5 radians and watch.</strong> Publish the target on the controller's command topic. Watch <code>joint_states</code> with your monitor node. The position should rise smoothly to 0.5 and stay within 0.01 radians. Check the log for missed cycles: zero missed cycles means your PREEMPT_RT setup holds.</p>
+
+          <p><strong>Step 5. Save the proof.</strong> Record a ten-second golden log of commands and states. Add it to CI as a replay test. Write the measured stage times into your latency budget document. Tomorrow's changes must beat the same numbers. That is production: every success becomes tomorrow's automatic test.</p>
+
+          <h2>Common mistakes and how professionals do it</h2>
+
+          <h3>Common mistakes to avoid</h3>
+
+          <p><strong>Mistake 1: raw new and delete everywhere.</strong> Memory leaks for weeks, then the robot dies mid-shift. Fix: use <code>unique_ptr</code> by default and never write manual delete in new code.</p>
+
+          <p><strong>Mistake 2: blocking calls in the control loop.</strong> One file write or network wait inside the 1 kHz loop blows the whole budget. Fix: do heavy work in a slower thread and pass only small results to the fast loop.</p>
+
+          <p><strong>Mistake 3: unpinned library versions.</strong> "Latest" Eigen on your laptop differs from the robot's, and builds silently change. Fix: pin every version in your Dockerfile and CI file.</p>
+
+          <p><strong>Mistake 4: one global DDS setting.</strong> Reliable delivery on a 1 kHz topic piles up old messages until the robot reacts to ancient history. Fix: best-effort with depth 1 for fast topics, reliable for slow plans.</p>
+
+          <p><strong>Mistake 5: testing only in simulation.</strong> The simulator forgives your timing sins. Fix: run HIL on real drivers weekly, and measure worst-case latency, not average.</p>
+
+          <h3>How professionals do it</h3>
+
+          <p>Professionals separate the fast loop from everything else. The real-time thread does three things only: read, compute, write. Logging, networking and file saving happen in slower threads through lock-free queues. This separation is the single biggest difference between lab code and factory code.</p>
+
+          <p>They also review every change with a second pair of eyes. A short <strong>code review</strong> catches unclear names, missing tests and hidden assumptions. They keep a <strong>glossary</strong> of project terms, like the one in <a href="glossary.html">the book glossary</a>, so "joint 0" always means the same motor to everyone. And they read <a href="resources.html">the resources page</a> as a team, so the whole team learns the same tools.</p>
+
+          <p>Finally, they practice failure. They unplug a sensor on purpose. They kill a node mid-run. They check that the robot stops safely and the logs explain why. A team that rehearses failure stays calm when failure arrives uninvited.</p>
+
+          <h3>Going deeper (optional)</h3>
+
+          <p>Curious readers can study <strong>deterministic replay with time travel</strong>: record every DDS message with its timestamp, then replay the whole system faster or slower than real time. This turns a rare midnight bug into a movie you can pause, rewind and replay until the cause surrenders.</p>
+
+          <h2>Try it yourself</h2>
+
+          <ol>
+            <li><strong>Wrap a resource in RAII.</strong> Write a small class that opens a file in its constructor and closes it in its destructor. Throw an exception mid-use and confirm the file still closes. Hint: no explicit close call should appear in your test code.</li>
+            <li><strong>Build the CMake recipe.</strong> Copy the CMakeLists block into a tiny project with one Eigen matrix multiply. Build it in a Docker box. Hint: if Eigen is missing, add the dev package to the Dockerfile first.</li>
+            <li><strong>Measure your own jitter.</strong> Write a loop that sleeps 1 ms one thousand times and records the worst overshoot on normal Linux. Hint: print the maximum, not the average, and run a video in the background to make it worse.</li>
+            <li><strong>Run the monitor node.</strong> Start the Python joint monitor against a recorded or simulated <code>joint_states</code> topic. Switch QoS between reliable and best-effort and watch the delay change. Hint: best-effort with depth 1 always shows the newest value.</li>
+          </ol>
+
+          <section class="takeaways">
+            <h2><i class="bi bi-pin-angle-fill"></i> Key takeaways</h2>
+            <ul>
+              <li><i class="bi bi-check2-circle"></i> Production software runs daily with nobody watching, so it must build anywhere, answer on time and explain failures.</li>
+              <li><i class="bi bi-check2-circle"></i> RAII and smart pointers make owners clean up resources automatically.</li>
+              <li><i class="bi bi-check2-circle"></i> Reuse Eigen, Pinocchio, Ceres and GTSAM instead of writing your own math.</li>
+              <li><i class="bi bi-check2-circle"></i> Repeatable builds with Docker and CI beat "works on my laptop".</li>
+              <li><i class="bi bi-check2-circle"></i> Real-time Linux plus fast buses keep control loops on schedule.</li>
+              <li><i class="bi bi-check2-circle"></i> ROS 2 with ros2_control connects your code to real motors safely.</li>
+            </ul>
+          </section>
+
+          <section class="quiz">
+            <div class="quiz__head"><i class="bi bi-patch-question-fill"></i> Check your understanding</div>
+            <details>
+              <summary><span class="q-num">Q1.</span><span>What is the difference between demo code and production software?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Demo code runs once while you watch. Production software runs daily with nobody watching, so it builds anywhere, checks itself and records failures.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q2.</span><span>What does RAII guarantee, in one sentence?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> The object that takes a resource frees it automatically when it ends, so you cannot forget cleanup.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q3.</span><span>When do you use unique_ptr and when shared_ptr?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Use unique_ptr for exactly one owner, like one driver owning one motor handle. Use shared_ptr when several parts share one object, like nodes sharing a map.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q4.</span><span>Which library computes gravity torques for your arm: Eigen, Pinocchio, Ceres or Docker?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Pinocchio. Eigen does matrix arithmetic, Ceres settles noisy measurements, and Docker ships repeatable environments.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q5.</span><span>Why does a 1 kHz control loop fail on normal Linux but work on PREEMPT_RT?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Normal Linux can delay your program unpredictably. PREEMPT_RT bounds that delay, so the loop wakes up on time every millisecond.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q6.</span><span>Your joint must reach its target in cyclic synchronous position mode. Which CiA 402 mode number do you set?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Mode 8. Modes 9 and 10 are cyclic velocity and torque, and mode 6 is homing.</div>
+            </details>
+          </section>
+        </article>
+
+        <nav class="pager" id="pager" aria-label="Chapter navigation"></nav>
+      </div>
+    </main>
+  </div>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/book.js"></script>
+</body>
+</html>

@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>try{var __t=localStorage.getItem("mr-theme");if(__t==="dark"||__t==="light")document.documentElement.setAttribute("data-theme",__t);}catch(e){}</script>
+  <title>Chapter 29: Functional Safety and Certification — Master Robotics</title>
+  <meta name="description" content="Learn functional safety in plain words: PL and SIL levels, hazard analysis, a small FMEA, and how robots get certified before they work near people.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/prose.css">
+</head>
+<body data-file="ch29-functional-safety-certification.html">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="topbar" id="topbar"></header>
+  <div class="progress-bar" id="progressBar"></div>
+
+  <div class="layout">
+    <div class="sidebar__backdrop" id="navBackdrop"></div>
+    <nav class="sidebar" id="sidebar" aria-label="Book contents"></nav>
+
+    <main class="main" id="main">
+      <div class="container">
+
+        <header class="chapter-head">
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="index.html">Home</a>
+            <i class="bi bi-chevron-right"></i>
+            <a href="index.html#advanced">Part 7 &middot; Advanced Foundations</a>
+            <i class="bi bi-chevron-right"></i>
+            <span>Chapter 29</span>
+          </nav>
+          <span class="chapter-kicker"><i class="bi bi-diagram-3"></i> Part 7 &middot; Advanced Foundations</span>
+          <h1>Chapter 29: Functional Safety and Certification</h1>
+          <p class="lede">You will explain safety levels in plain words, run a small failure study, and describe how a robot earns its safety certificate.</p>
+          <div class="chapter-meta">
+            <span><i class="bi bi-clock"></i> ~25 min read</span>
+            <span><i class="bi bi-bar-chart"></i> Advanced</span>
+            <span><i class="bi bi-list-check"></i> Chapter 29 of 30</span>
+          </div>
+          <div class="goals">
+            <h2>What you will learn</h2>
+            <ul>
+              <li><i class="bi bi-check-circle-fill"></i> Explain functional safety, PL and SIL in plain words.</li>
+              <li><i class="bi bi-check-circle-fill"></i> Run a small FMEA and hazard analysis.</li>
+              <li><i class="bi bi-check-circle-fill"></i> Describe the certification path simply.</li>
+            </ul>
+          </div>
+        </header>
+
+        <article class="article">
+
+          <p class="lead">Picture a delivery robot rolling through a busy hospital corridor. It passes nurses, beds, and visitors. Everyone trusts it. Nobody watches it with fear.</p>
+
+          <p>That trust did not come from luck. It came from a long chain of safety work. Someone listed every way the robot could hurt a person. Someone built guards against each harm. Someone tested those guards. Then an outside checker confirmed the work.</p>
+
+          <p>This chapter teaches you that chain. You will learn the language of safety levels. You will run a small failure study with your own hands. You will see how a robot gets certified. By the end, safety rules will feel like common sense, not strange codes.</p>
+
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> Plain English first</div>
+            <p><strong>Functional safety</strong> means the robot stays safe even when a part breaks. A sensor can fail. A wire can cut. The robot must still protect people. That is the whole idea.</p>
+          </div>
+
+          <h2>Workshop safety is not functional safety</h2>
+
+          <p>Workshop safety is what you do with your hands. You wear glasses. You tie back long hair. You keep water away from power. These habits protect you while you build. They are important, and <a href="ch03-safety-first.html">Chapter 3</a> covers them well.</p>
+
+          <p>Functional safety is different. It lives inside the machine. It is a set of extra circuits and programs. Their only job is to catch failures. Think of a seat belt. You drive the car. The belt does nothing most days. But when a crash comes, the belt saves you.</p>
+
+          <h3>A safety function watches one danger</h3>
+
+          <p>A <strong>safety function</strong> is one guard against one danger. An emergency stop button is a safety function. A light curtain that halts a robot arm is another. A speed monitor that slows a mobile robot near people is a third.</p>
+
+          <p>Each safety function has three parts. A sensor sees the problem. Logic decides what to do. An actuator makes the safe action happen. Button, controller, brake. That is the full loop.</p>
+
+          <p>One robot can have many safety functions. A humanoid may have twenty or more. Each one gets studied on its own. Each one earns its own level. You never grade the whole robot with one number.</p>
+
+          <div class="callout note">
+            <div class="callout__head"><i class="bi bi-info-circle-fill"></i> Note</div>
+            <p>Safety functions run apart from normal control. If the main computer crashes, the safety path must still work. Teams often use a separate safety controller for this reason.</p>
+          </div>
+
+          <h3>Why normal testing is not enough</h3>
+
+          <p>You can test a robot for a month and see no failure. That proves little. A dangerous failure may hide for years. Then it strikes once, on a bad day.</p>
+
+          <p>Functional safety asks a harder question. It asks: when this part fails, what happens next? You must answer for every important part. That is why the field uses strict steps and papers. Memory alone cannot hold all the answers.</p>
+
+          <h2>Harm first: hazard analysis in plain words</h2>
+
+          <p>Every safety project starts with harm. A <strong>hazard</strong> is anything that can hurt a person or damage property. A fast arm near a face is a hazard. A heavy robot on a slope is a hazard. A hot battery is a hazard.</p>
+
+          <p><strong>Hazard analysis</strong> is the act of listing hazards one by one. You walk through the robot's whole life. You ask what can go wrong at each step. Building, testing, daily use, repair, shutdown. Nothing is skipped.</p>
+
+          <h3>Risk mixes harm and chance</h3>
+
+          <p><strong>Risk</strong> has two parts. The first part is severity: how bad is the harm? A bruise is low severity. A crushed hand is high. A death is the highest.</p>
+
+          <p>The second part is likelihood: how often could it happen? Rare means almost never. Often means daily. You mix the two parts together. Bad harm plus high chance means high risk. Small harm plus rare chance means low risk.</p>
+
+          <p>Then you judge each risk. High risks need strong guards. Low risks may need only a warning label. This judgment has a formal name: <strong>risk assessment</strong>. It is simply a careful table of harm, chance, and judgment.</p>
+
+          <h3>How to run a small hazard analysis</h3>
+
+          <p>Follow these steps in order. Work with one friend if you can. Two pairs of eyes catch more danger.</p>
+
+          <ol>
+            <li>Draw the robot and its work area on one page. Mark where people stand.</li>
+            <li>List every task: start, normal run, stop, charge, repair, transport.</li>
+            <li>For each task, ask: what moves, what is hot, what is heavy, what is sharp?</li>
+            <li>Write each hazard in one line: cause, then harm. Example: "Brake fails on slope, robot rolls into a person."</li>
+            <li>Score severity from 1 (small) to 4 (fatal) for each line.</li>
+            <li>Score exposure from 1 (rare) to 4 (always present) for each line.</li>
+            <li>Mark the highest scores as your top risks. These get safety functions first.</li>
+          </ol>
+
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> Tip</div>
+            <p>Describe harm with body words: cut, burn, crush, fall, shock. Vague words like "unsafe" hide the real danger. Clear words point at the right guard.</p>
+          </div>
+
+          <h2>PL a to e: the ISO 13849 ladder</h2>
+
+          <p><strong>ISO 13849</strong> is the main safety rule for machines. It gives each safety function a grade. The grade is called a <strong>Performance Level</strong>, or <strong>PL</strong>. The scale runs from PL a (weakest) to PL e (strongest).</p>
+
+          <p>Think of PL like a helmet rating. A toy helmet gets a low grade. A racing helmet gets the top grade. You pick the grade that matches the danger. Big danger needs a high PL.</p>
+
+          <p>You find the needed grade with a tool called a <strong>risk graph</strong>. It asks three simple questions. How bad is the harm? How often are people near the danger? Can the person escape in time? Your answers point at one letter from a to e. That letter has a name: <strong>PLr</strong>, the required Performance Level.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Level</th><th>Means in plain words</th><th>Typical use</th></tr></thead>
+              <tbody>
+                <tr><td>PL a</td><td>Basic guard, single part, no failure catching</td><td>Warning light, small stirrer guard</td></tr>
+                <tr><td>PL b</td><td>Like a, but parts are tested and proven</td><td>Door switch on a slow machine</td></tr>
+                <tr><td>PL c</td><td>Good parts plus some failure checks</td><td>Speed monitor on a mobile base</td></tr>
+                <tr><td>PL d</td><td>Strong design, catches most single failures</td><td>Robot arm e-stop, lidar slowdown zone</td></tr>
+                <tr><td>PL e</td><td>Top grade, double parts, catches almost all failures</td><td>Press brake control, surgical robot stop</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>Categories: how the guard is built</h3>
+
+          <p>PL also uses <strong>categories</strong>, numbered B, 1, 2, 3, 4. A category describes the shape of the guard. Category B is one simple channel. Category 1 uses proven parts. Category 2 tests itself on a timer. Category 3 uses two channels, so one failure still leaves protection. Category 4 is like 3 but catches failures even faster.</p>
+
+          <p>Think of crossing a river. Category B is one rope bridge. Category 3 is two bridges side by side. If one rope snaps, the other still holds you. High danger wants two bridges. That is why PL d and PL e almost always need two channels.</p>
+
+          <p>Higher categories cost more money and more work. So you do not use PL e everywhere. You match each function to its own PLr. The e-stop may need PL d. The status light may need only PL b.</p>
+
+          <h2>SIL, PFHd and what the numbers mean</h2>
+
+          <p><strong>IEC 61508</strong> is the parent rule for electrical safety systems. It grades safety functions with a <strong>Safety Integrity Level</strong>, or <strong>SIL</strong>. The scale runs SIL 1 (lowest) to SIL 4 (highest). Factory machines more often use ISO 13849 PL. Process plants and heavy equipment more often use SIL.</p>
+
+          <p>A sister rule, <strong>IEC 62061</strong>, brings SIL thinking into machines. It works much like ISO 13849 but speaks the SIL language. Driverless trucks add one more rule: <strong>ISO 3691-4</strong>. That rule covers trucks with no driver on board. It asks for brakes, speed guards, and person detection that match the truck's weight and speed.</p>
+
+          <div class="callout danger">
+            <div class="callout__head"><i class="bi bi-shield-exclamation"></i> Danger</div>
+            <p>Never invent your own PL or SIL number. An invented grade is a lie on paper. If harm follows, that paper will be read in court. Always derive the grade from a real risk assessment.</p>
+          </div>
+
+          <h3>Three plain words: MTTFd, DCavg, PFHd</h3>
+
+          <p>Behind each grade sit three plain ideas. <strong>MTTFd</strong> means the average time until a part fails dangerously. Long time is good. Think of a light bulb rated for ten years.</p>
+
+          <p><strong>DCavg</strong> means how many failures your checks catch. It is a percent. Ninety percent means nine of ten failures get caught. The tenth slips through.</p>
+
+          <p><strong>PFHd</strong> means the chance of a dangerous failure each hour. Small numbers are good. PL d needs a PFHd below one in a million hours. That is the math behind the letter.</p>
+
+          <div class="formula"><span class="label">Risk reduction idea</span> Risk left = First risk &times; PFHd &times; Hours near danger</div>
+
+          <p>Read the formula like this. You start with a first risk. Your safety function cuts it down by its PFHd. The hours people spend near the danger scale it back up. Better PFHd means less risk left. More exposure means more risk left.</p>
+
+          <p>You do not need to compute this by hand on real projects. Free tools like SISTEMA do the math for you. But you must grasp the idea. Strong parts plus good checks give a small PFHd. Small PFHd gives a high PL or SIL.</p>
+
+          <h3>How the letters map to each other</h3>
+
+          <p>PL and SIL measure the same thing: how rarely the guard fails. Roughly, PL b matches SIL 1, PL c sits between SIL 1 and SIL 2, PL d matches SIL 2, and PL e matches SIL 3. SIL 4 lives above PL e and belongs to planes, trains, and nuclear plants, not to normal robots.</p>
+
+          <p>You do not convert grades on real projects. You use the rule your industry expects. Machine builders use ISO 13849 and speak PL. Process engineers use IEC 61508 or IEC 62061 and speak SIL. Driverless truck teams add ISO 3691-4 on top. Pick the rulebook first, then work inside it.</p>
+
+          <p>A common beginner question is why two systems exist at all. History is the answer. Factory machine rules grew from relay circuits and use PL. Chemical plant rules grew from electronics and use SIL. Both count failures per hour. Both demand proof. Only the letters differ.</p>
+
+          <h2>Find failures early: FMEA in seven steps</h2>
+
+          <p><strong>FMEA</strong> means Failure Mode and Effects Analysis. Say it in plain words: list how each part can break, then write what follows. <strong>FMECA</strong> adds one letter C for criticality. It ranks each failure by how serious it is.</p>
+
+          <p>Think of checking a bicycle before a long trip. You squeeze each brake. You spin each wheel. You pull each cable. FMEA is that same habit, written down for every part of a robot.</p>
+
+          <h3>The seven steps</h3>
+
+          <p>Run these steps for one small block at a time. A lidar unit is a good first block. A gripper is another.</p>
+
+          <ol>
+            <li>Pick one block and list its parts: sensor, cable, mount, power, software.</li>
+            <li>For each part, write each way it can fail: no signal, wrong signal, late signal, stuck signal.</li>
+            <li>Write the effect of each failure on the robot and on nearby people.</li>
+            <li>Score severity from 1 (no harm) to 10 (death or grave injury).</li>
+            <li>Score occurrence from 1 (almost never) to 10 (very often).</li>
+            <li>Score detection from 1 (always caught) to 10 (never caught).</li>
+            <li>Multiply the three scores into the RPN, then fix the highest RPN first.</li>
+          </ol>
+
+          <div class="formula"><span class="label">Risk Priority Number</span> RPN = Severity &times; Occurrence &times; Detection</div>
+
+          <h3>A tiny worked FMEA table: lidar failure</h3>
+
+          <p>Here is a small FMEA for a 2D lidar on a delivery robot. Only three failure lines are shown. A real table would hold dozens.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Part and failure</th><th>Effect</th><th>S</th><th>O</th><th>D</th><th>RPN</th><th>Fix</th></tr></thead>
+              <tbody>
+                <tr><td>Lidar gives no scan (dead unit)</td><td>Robot drives blind, may hit a person</td><td>9</td><td>3</td><td>2</td><td>54</td><td>Watchdog stops robot if no scan for 200 ms</td></tr>
+                <tr><td>Lidar misses dark clothing</td><td>Robot sees the person late, brakes hard</td><td>8</td><td>5</td><td>7</td><td>280</td><td>Add bumper switch plus slower speed near people</td></tr>
+                <tr><td>Lidar cable shakes loose</td><td>Scan flickers, map jumps, wrong turns</td><td>6</td><td>4</td><td>4</td><td>96</td><td>Locking plug plus cable strain relief</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>The darkest-clothing line wins with RPN 280. So the team acts there first. They add a bumper switch and slow the robot near people. Then they score again. Good fixes push occurrence and detection down. The RPN falls.</p>
+
+          <div class="code">
+            <div class="code__bar">
+              <span class="code__dots"><span></span><span></span><span></span></span>
+              <span class="code__lang">Procedure</span>
+              <button class="code__copy" type="button"><i class="bi bi-clipboard"></i> Copy</button>
+            </div>
+            <pre><code>FMEA CHECKLIST -- one block at a time
+1. NAME the block and its boundary (e.g. "lidar unit + cable + mount").
+2. LIST parts: sensor, cable, plug, mount, power feed, driver software.
+3. BRAINSTORM failures per part: dead, wrong, late, stuck, loose, dirty.
+4. WRITE the effect on people first, then on the robot.
+5. SCORE S (1-10), O (1-10), D (1-10) as a team, not alone.
+6. CALC RPN = S x O x D for every line.
+7. SORT by RPN, highest first.
+8. ACT on the top lines: remove the cause, add detection, or add a guard.
+9. RE-SCORE after each fix and record the new RPN.
+10. SIGN and date the table; review it when the design changes.</code></pre>
+          </div>
+
+          <h2>Worked example: an e-stop safety function</h2>
+
+          <p>Now let us solve a full small problem. A robot arm sorts parcels on a bench. A worker stands beside it. We need an emergency stop that truly protects the worker.</p>
+
+          <h3>Step 1: name the danger</h3>
+
+          <p>The arm moves fast with a sharp gripper. If it strikes the worker's hand, bones can break. Severity is high. The worker stands near the arm all day, so exposure is high. The worker cannot pull away in time at full speed. Our risk graph points at <strong>PLr d</strong>.</p>
+
+          <h3>Step 2: draw the safety loop</h3>
+
+          <p>Every safety function is a loop with three boxes. The figure below shows ours. A red button senses the press. A safety relay thinks. A brake contactor stops the arm.</p>
+
+          <figure class="figure">
+            <div class="figure__box">
+              <svg viewBox="0 0 460 170" width="100%" role="img" aria-label="Safety function loop: sensor, logic, actuator">
+                <rect x="15" y="50" width="120" height="70" rx="10" fill="#e8eeff" stroke="#2d5bff" stroke-width="2"/>
+                <text x="75" y="80" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#1c2230">Sensor</text>
+                <text x="75" y="100" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#1c2230">E-stop button</text>
+                <rect x="170" y="50" width="120" height="70" rx="10" fill="#e6f7ef" stroke="#0f9d78" stroke-width="2"/>
+                <text x="230" y="80" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#1c2230">Logic</text>
+                <text x="230" y="100" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#1c2230">Safety relay</text>
+                <rect x="325" y="50" width="120" height="70" rx="10" fill="#f3f4f6" stroke="#7b849b" stroke-width="2"/>
+                <text x="385" y="80" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#1c2230">Actuator</text>
+                <text x="385" y="100" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#1c2230">Brake contactor</text>
+                <line x1="135" y1="85" x2="170" y2="85" stroke="#1c2230" stroke-width="2" marker-end="none"/>
+                <polygon points="170,79 180,85 170,91" fill="#1c2230"/>
+                <line x1="290" y1="85" x2="325" y2="85" stroke="#1c2230" stroke-width="2"/>
+                <polygon points="325,79 335,85 325,91" fill="#1c2230"/>
+                <path d="M 385 120 L 385 150 L 75 150 L 75 120" fill="none" stroke="#7b849b" stroke-width="1.5" stroke-dasharray="5,4"/>
+                <polygon points="69,120 75,110 81,120" fill="#7b849b"/>
+                <text x="230" y="145" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#7b849b">feedback: relay checks the brake each cycle</text>
+              </svg>
+            </div>
+            <figcaption>Figure 1. The safety loop: sensor sees, logic decides, actuator acts, and feedback checks the loop each cycle.</figcaption>
+          </figure>
+
+          <h3>Step 3: reach PL d with two channels</h3>
+
+          <p>PLr d needs strong design. So we use Category 3: two channels. The button has two contacts. Two wires run apart from each other. The relay watches both. If one wire breaks, the relay still sees the mismatch and stops the arm.</p>
+
+          <p>We pick tested parts with long MTTFd values. The relay checks itself at every start. This self-check gives high DCavg. The tool math shows PFHd below one in a million hours. That result matches PL d. Design meets PLr d, so the design passes.</p>
+
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> Key idea</div>
+            <p>PLr is what you need. PL is what you built. The design passes only when built PL meets or beats PLr. Write both numbers on every safety drawing.</p>
+          </div>
+
+          <h2>Humanoids, new laws and the price of proof</h2>
+
+          <p>A factory arm can freeze in place when danger comes. Power off, brakes on, job done. That stop has a calm resting state. Engineers call this <strong>fail-passive</strong>: when all power dies, the machine rests in a safe pose.</p>
+
+          <p>A walking humanoid has no such rest. Cut its power and a 100 kg body falls. It may fall onto the very person you wanted to protect. Freezing mid-step is no better. A frozen leg tips the body over like a cut tree.</p>
+
+          <h3>The active safe state</h3>
+
+          <p>Humanoids need an <strong>active safe state</strong>. The robot spends its last energy on purpose. It bends its knees. It lowers its center. It performs a <strong>controlled fall</strong> away from people. Some designs sit down. Some kneel. Some drop a carried box first, then crouch.</p>
+
+          <p>This gap is still open research, as the industry surveys in <a href="ch23-real-world-robotics.html">Chapter 23</a> show. No standard yet tells you exactly how a humanoid must fall. Teams borrow ideas from cars (airbags), planes (landing gear), and judo (safe falling). Each team must argue its own case to the certifier.</p>
+
+          <h3>Two new laws change the game</h3>
+
+          <p>The <strong>EU AI Act</strong>, in force from 2025, treats some robots as high-risk AI. If your robot learns or decides near people, you must keep training records, test logs, and human oversight. Safety is no longer only wires and relays. Data and software count too.</p>
+
+          <p>The <strong>EU Machinery Regulation</strong> applies fully from 2027. It replaces the older Machinery Directive. It names autonomous machines clearly. It demands risk assessment files, clear instructions, and proof that safety functions work. If you sell robots in Europe, this text rules your work.</p>
+
+          <h3>Why certification costs so much</h3>
+
+          <p>Certification means an outside body, often <strong>TUV</strong>, checks your work. They read your hazard files. They test your safety functions. They visit your factory. This takes months and costs tens of thousands of euros or more.</p>
+
+          <p>Small teams feel this pain most. The parts may cost 500 euros. The proof may cost fifty times more. Smart teams plan for this early. They buy pre-certified parts like safety relays and scanners. A pre-certified part brings its own papers. That cuts your proof work sharply.</p>
+
+          <h3>The certification path in five stages</h3>
+
+          <p>Stage one is the risk assessment file. You list hazards, scores, and chosen PLr values. Stage two is the design file. You show circuits, parts, and tool math that prove each built PL meets its PLr. Stage three is the build record. Photos and serial numbers prove the machine matches the drawing.</p>
+
+          <p>Stage four is testing. You run each safety function and record the result. You also break things on purpose: cut wires, cover sensors, kill power. Each test has a date, a name, and a pass mark. Stage five is the outside check. The certifier reads your files, repeats key tests, and grants the certificate. Keep every paper. A certificate without files behind it is worthless.</p>
+
+          <div class="callout warn">
+            <div class="callout__head"><i class="bi bi-exclamation-triangle-fill"></i> Warning</div>
+            <p>A certificate covers one exact design. Change the motor, the sensor, or the software, and the paper may no longer hold. Record every change and ask your certifier before you ship the new version.</p>
+          </div>
+
+          <h2>Common mistakes</h2>
+
+          <p><strong>Mistake 1: one sensor, no check.</strong> A single lidar with no watchdog is PL b at best. Add a second sensor or a self-check. Then your grade can rise.</p>
+
+          <p><strong>Mistake 2: the e-stop cuts all power.</strong> On a mobile robot this kills the brakes too. The robot rolls on. Use a controlled stop that keeps brakes and steering alive.</p>
+
+          <p><strong>Mistake 3: safety and normal code in one program.</strong> A bug in your navigation code can then kill your guard. Keep safety logic apart, on its own controller or thread.</p>
+
+          <p><strong>Mistake 4: FMEA done once, then forgotten.</strong> Every design change adds new failures. Review the FMEA table at each big change. Old tables lie about new designs.</p>
+
+          <p><strong>Mistake 5: confusing workshop rules with machine grades.</strong> Wearing gloves does not give your robot PL d. Only tested design plus proof gives a grade.</p>
+
+          <h2>How professionals do it</h2>
+
+          <p>Professional teams start safety on day one. The safety engineer sits in the first design meeting. They block any idea that cannot be guarded. Fixing safety at the end costs ten times more.</p>
+
+          <p>They write everything down. Hazard lists, FMEA tables, test videos, tool printouts. A full file for one machine can fill a shelf. This paper trail is the real product the certifier buys.</p>
+
+          <p>They buy proof where they can. Pre-certified safety controllers, scanners, and relays cost more per part. But each one arrives with test papers. The team then proves only the new parts they built themselves. For terms you half-remember, the <a href="glossary.html">glossary</a> keeps every definition in one place.</p>
+
+          <p>They test failure, not just success. They cut wires on purpose. They cover sensors on purpose. They crash the main computer on purpose. Each test asks: did the guard act in time? A guard nobody tested is only a hope.</p>
+
+          <h2>Try it yourself</h2>
+
+          <ol>
+            <li><strong>Easy: hazard hunt at home.</strong> Pick a household machine like a fan or blender. List five hazards in cause-then-harm lines. Hint: think about fingers, heat, noise, and tipping over.</li>
+            <li><strong>Medium: PLr with the risk graph.</strong> Take one hazard from exercise 1. Answer the three graph questions: severity, exposure, escape chance. Read off a PLr letter. Hint: high severity plus always-present exposure points at PL d or e.</li>
+            <li><strong>Harder: mini FMEA.</strong> Build a three-line FMEA for a small robot wheel motor: dead motor, stuck full speed, loose wire. Score S, O, D and compute each RPN. Hint: stuck full speed near people earns severity 8 or higher.</li>
+            <li><strong>Project: e-stop on paper.</strong> Draw the sensor-logic-actuator loop for a tabletop arm you own or imagine. Name each part, state your target PLr, and write how you check the loop each start. Hint: copy the two-channel idea from the worked example.</li>
+          </ol>
+
+          <section class="takeaways">
+            <h2><i class="bi bi-pin-angle-fill"></i> Key takeaways</h2>
+            <ul>
+              <li><i class="bi bi-check2-circle"></i> Functional safety keeps people safe even when parts fail.</li>
+              <li><i class="bi bi-check2-circle"></i> Each safety function earns its own PL or SIL grade.</li>
+              <li><i class="bi bi-check2-circle"></i> Start every project with hazard analysis, not with parts.</li>
+              <li><i class="bi bi-check2-circle"></i> FMEA finds weak points before they hurt anyone.</li>
+              <li><i class="bi bi-check2-circle"></i> Humanoids need active safe states because they cannot simply freeze.</li>
+              <li><i class="bi bi-check2-circle"></i> Certification is slow and costly, so plan for it early.</li>
+            </ul>
+          </section>
+
+          <section class="quiz">
+            <div class="quiz__head"><i class="bi bi-patch-question-fill"></i> Check your understanding</div>
+            <details>
+              <summary><span class="q-num">Q1.</span><span>What is functional safety in one sentence?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Safety built into the machine.</strong> The robot protects people even when a part breaks.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q2.</span><span>What is a safety function?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>One guard against one danger.</strong> It has a sensor, logic, and an actuator, like button, controller, brake.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q3.</span><span>Which PL is strongest, a or e?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>PL e is strongest.</strong> The scale runs from a (weakest) to e (strongest).</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q4.</span><span>What does RPN in an FMEA tell you?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Which failure to fix first.</strong> Higher RPN means higher priority for action.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q5.</span><span>Why can a humanoid not use a simple power-cut stop?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>It would collapse on someone.</strong> A falling 100 kg robot is itself a hazard, so it needs a controlled fall.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q6.</span><span>What is the fail-passive gap in humanoids?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>No fully safe resting state exists yet.</strong> Every stop choice (freeze, fall, sit) still carries some risk.</div>
+            </details>
+          </section>
+        </article>
+
+        <nav class="pager" id="pager" aria-label="Chapter navigation"></nav>
+      </div>
+    </main>
+  </div>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/book.js"></script>
+</body>
+</html>

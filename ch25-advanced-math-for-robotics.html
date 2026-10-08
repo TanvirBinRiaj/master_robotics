@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>try{var __t=localStorage.getItem("mr-theme");if(__t==="dark"||__t==="light")document.documentElement.setAttribute("data-theme",__t);}catch(e){}</script>
+  <title>Chapter 25: Advanced Mathematics for Robotics — Master Robotics</title>
+  <meta name="description" content="Rotations, quaternions, SE(3), convex QP optimization and MPC explained in plain English with worked numbers and code.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/prose.css">
+</head>
+<body data-file="ch25-advanced-math-for-robotics.html">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="topbar" id="topbar"></header>
+  <div class="progress-bar" id="progressBar"></div>
+
+  <div class="layout">
+    <div class="sidebar__backdrop" id="navBackdrop"></div>
+    <nav class="sidebar" id="sidebar" aria-label="Book contents"></nav>
+
+    <main class="main" id="main">
+      <div class="container">
+
+        <header class="chapter-head">
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="index.html">Home</a>
+            <i class="bi bi-chevron-right"></i>
+            <a href="index.html#advanced">Part 7 &middot; Advanced Foundations</a>
+            <i class="bi bi-chevron-right"></i>
+            <span>Chapter 25</span>
+          </nav>
+          <span class="chapter-kicker"><i class="bi bi-diagram-3"></i> Part 7 &middot; Advanced Foundations</span>
+          <h1>Chapter 25: Advanced Mathematics for Robotics</h1>
+          <p class="lede">You will describe turns with quaternions, pose tasks as small optimizations, and explain MPC in plain words.</p>
+          <div class="chapter-meta">
+            <span><i class="bi bi-clock"></i> ~30 min read</span>
+            <span><i class="bi bi-bar-chart"></i> Advanced</span>
+            <span><i class="bi bi-list-check"></i> Chapter 25 of 30</span>
+          </div>
+          <div class="goals">
+            <h2>What you will learn</h2>
+            <ul>
+              <li><i class="bi bi-check-circle-fill"></i> Explain rotations with SO(3), quaternions and SE(3) in plain words</li>
+              <li><i class="bi bi-check-circle-fill"></i> Formulate a robot task as a convex QP optimization problem</li>
+              <li><i class="bi bi-check-circle-fill"></i> Describe optimal control and MPC idea simply</li>
+            </ul>
+          </div>
+        </header>
+
+        <article class="article">
+          <h2>1. Why robots need better math</h2>
+          <p>Imagine you tell a robot arm to pour tea. The cup must stay upright while the arm moves. A small error spills hot tea everywhere. Simple school math is not enough here. You need a math that respects turns and limits.</p>
+          <p>Think of a door hinge. It only turns one way. You cannot describe it with one plain number. You must say which way it points. Robots are full of hinges like this. Each joint adds a new turn to track.</p>
+          <p>Now think of planning like shopping on a budget. You want the best food for the least money. You also have rules, like no nuts for allergies. Robot control works the same way. You want the best motion under strict rules.</p>
+          <h3>What this chapter gives you</h3>
+          <p>First you learn how to talk about turns. Then you learn how to talk about poses. Finally you turn whole tasks into math puzzles. Each puzzle has one best answer. A fast solver finds it for you.</p>
+          <p>If you know <a href="ch16-kinematics.html">kinematics</a> and <a href="ch15-control-systems.html">PID control</a>, you are ready. If not, read those chapters first. They give you frames and feedback in simple form.</p>
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> In plain English</div>
+            <p>A <strong>Lie group</strong> is a smooth family of moves. You can join two moves into one. You can also undo any move. Turns and poses both form such families.</p>
+          </div>
+
+          <h2>2. Rotations live in SO(3)</h2>
+          <p>A <strong>rotation</strong> turns a thing without stretching it. Lengths stay the same after a pure turn. Angles between lines also stay the same. That is the whole idea in one line.</p>
+          <p><strong>SO(3)</strong> is the name for all 3D turns. SO means special orthogonal group. The 3 means three dimensions. Think of it as a club with strict entry rules.</p>
+          <p>To join the club, a 3 by 3 matrix must pass two tests. Its columns must have length one. Its determinant must equal plus one. A mirror fails the second test. So mirrors are not rotations.</p>
+          <h3>The three rules of a rotation matrix</h3>
+          <p>First, each column is a unit arrow. Second, columns stand at right angles. Third, the handedness stays right-handed. Your right hand is a good model. Thumb, finger, and middle finger show the axes.</p>
+          <p>This sounds fussy, but it protects you. Bad matrices squash your robot model. Good matrices only turn it. The solver trusts a true rotation. So you should check these rules often.</p>
+          <div class="formula"><span class="label">2D rotation</span> R(&theta;) = [cos&theta; &minus;sin&theta; ; sin&theta; cos&theta;]</div>
+          <div class="formula"><span class="label">Rotation test</span> R&#7488; &times; R = I and det(R) = +1</div>
+          <div class="callout note">
+            <div class="callout__head"><i class="bi bi-info-circle-fill"></i> Note</div>
+            <p>Never average two rotation matrices entry by entry. The result is often not a rotation. It can stretch and shear. Blend quaternions instead, then convert back once.</p>
+          </div>
+
+          <h2>3. Quaternions: turns without tears</h2>
+          <p>A <strong>quaternion</strong> stores a turn in four numbers. One number sets the amount of turn. Three numbers set the axis of turn. It is like saying "turn this much around this stick".</p>
+          <p>Think of a spinning top. The stick is the axis. The spin amount is the angle. A quaternion packs both ideas together. It uses less memory than a matrix. It also blends smoothly between poses.</p>
+          <p>Rotation matrices have nine numbers with six rules. Quaternions have four numbers with one rule. The rule is simple: the length must equal one. That is why games and robots love them.</p>
+          <h3>The only rules you must memorize</h3>
+          <p>First, a unit quaternion has length one. Second, <code>q</code> and <code>&minus;q</code> give the same turn. Third, you multiply quaternions to chain turns. Order matters, just like putting on socks and shoes.</p>
+          <ul>
+            <li>Identity turn: <code>q = [1, 0, 0, 0]</code>. Nothing moves at all.</li>
+            <li>180-degree trap: near half turns, pick the shortest path.</li>
+            <li>Always normalize after each math step. Small drift grows fast.</li>
+          </ul>
+          <figure class="figure">
+            <div class="figure__box">
+              <svg viewBox="0 0 420 170" width="100%" role="img" aria-label="Axis angle versus quaternion versus matrix">
+                <rect x="15" y="30" width="120" height="90" rx="10" fill="#e8eeff" stroke="#2d5bff" stroke-width="2"/>
+                <text x="75" y="62" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#1c2230">Axis + angle</text>
+                <text x="75" y="82" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#7b849b">stick + amount</text>
+                <text x="75" y="102" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#7b849b">easy to picture</text>
+                <rect x="150" y="30" width="120" height="90" rx="10" fill="#e6f7f0" stroke="#0f9d78" stroke-width="2"/>
+                <text x="210" y="62" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#1c2230">Quaternion</text>
+                <text x="210" y="82" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#7b849b">4 numbers</text>
+                <text x="210" y="102" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#7b849b">smooth blend</text>
+                <rect x="285" y="30" width="120" height="90" rx="10" fill="#ffffff" stroke="#7b849b" stroke-width="2"/>
+                <text x="345" y="62" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#1c2230">Matrix SO(3)</text>
+                <text x="345" y="82" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#7b849b">9 numbers</text>
+                <text x="345" y="102" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#7b849b">easy to apply</text>
+                <line x1="135" y1="75" x2="150" y2="75" stroke="#1c2230" stroke-width="2"/>
+                <line x1="270" y1="75" x2="285" y2="75" stroke="#1c2230" stroke-width="2"/>
+                <text x="210" y="150" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#1c2230">Same turn, three containers. Convert freely.</text>
+              </svg>
+            </div>
+            <figcaption>Figure 1. One turn can live in three forms. Use each form for its strength.</figcaption>
+          </figure>
+
+          <h2>4. Poses live in SE(3)</h2>
+          <p><strong>SE(3)</strong> means all rigid poses in 3D. Each pose has a turn plus a shift. Think of moving a coffee mug. You turn it and slide it. That full move is one SE(3) pose.</p>
+          <p>A pose matrix is 4 by 4. The top-left holds the SO(3) turn. The top-right holds the shift in x, y, z. The bottom row is fixed. This layout lets you chain moves by multiplication.</p>
+          <p>The <strong>exponential map</strong> turns small twists into poses. A twist is like a short speed command. It says "spin this fast and move this fast". Apply the map and you get a real pose change.</p>
+          <h3>How to think in steps</h3>
+          <ol>
+            <li>Start from the current pose of the hand.</li>
+            <li>Pick a small twist for one short time step.</li>
+            <li>Use the exponential map to get the new pose.</li>
+            <li>Repeat many small steps to draw a smooth path.</li>
+          </ol>
+          <p>This is how smooth planners think. They do not jump far. They stack many tiny safe moves. Each move stays close to the true curved space.</p>
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> Tip</div>
+            <p>Store poses as position plus quaternion in code. Convert to a 4 by 4 matrix only for math. This keeps memory small and blends smooth. See <a href="ch16-kinematics.html">kinematics</a> for frames first.</p>
+          </div>
+
+          <h2>5. Worked example: rotate a point step by step</h2>
+          <p>We now turn the point (1, 0) by 90 degrees. This is a 2D turn in the flat plane. We show each number so you can follow. You only need a pocket calculator.</p>
+          <h3>Step 1: write the angle in numbers</h3>
+          <p>Angle &theta; = 90&deg;. So cos&theta; = 0 and sin&theta; = 1. These are exact values for a square corner. No rounding is needed here.</p>
+          <h3>Step 2: build the matrix</h3>
+          <p>Put the values into R(&theta;). The top row becomes [0, &minus;1]. The bottom row becomes [1, 0]. Check the rules now. Each column has length one. The determinant is 0 &times; 0 &minus; (&minus;1) &times; 1 = 1.</p>
+          <h3>Step 3: apply it to the point</h3>
+          <p>New x = 0 &times; 1 + (&minus;1) &times; 0 = 0. New y = 1 &times; 1 + 0 &times; 0 = 1. So (1, 0) moves to (0, 1). The point moved from east to north. That is a correct left turn.</p>
+          <h3>Step 4: sanity check</h3>
+          <ol>
+            <li>Length before: &radic;(1 + 0) = 1.</li>
+            <li>Length after: &radic;(0 + 1) = 1.</li>
+            <li>Lengths match, so no stretch occurred.</li>
+            <li>Determinant is +1, so no mirror occurred.</li>
+          </ol>
+          <p>Try 180&deg; on your own next. Cos is &minus;1 and sin is 0. Point (1, 0) should land on (&minus;1, 0).</p>
+          <div class="code">
+            <div class="code__bar">
+              <span class="code__dots"><span></span><span></span><span></span></span>
+              <span class="code__lang">Python</span>
+              <button class="code__copy" type="button"><i class="bi bi-clipboard"></i> Copy</button>
+            </div>
+            <pre><code>import numpy as np
+
+def quat_from_axis_angle(axis, angle_rad):
+    axis = np.asarray(axis, dtype=float)
+    axis = axis / np.linalg.norm(axis)
+    w = np.cos(angle_rad / 2.0)
+    xyz = axis * np.sin(angle_rad / 2.0)
+    q = np.concatenate([[w], xyz])
+    return q / np.linalg.norm(q)
+
+def quat_multiply(a, b):
+    w1, x1, y1, z1 = a
+    w2, x2, y2, z2 = b
+    return np.array([
+        w1*w2 - x1*x2 - y1*y2 - z1*z2,
+        w1*x2 + x1*w2 + y1*z2 - z1*y2,
+        w1*y2 - x1*z2 + y1*w2 + z1*x2,
+        w1*z2 + x1*y2 - y1*x2 + z1*w2,
+    ])
+
+# 90 deg about z, then 90 deg about y: order matters!
+qz = quat_from_axis_angle([0, 0, 1], np.pi / 2)
+qy = quat_from_axis_angle([0, 1, 0], np.pi / 2)
+q = quat_multiply(qy, qz)  # apply qz first, then qy
+print("q =", np.round(q, 4), " norm =", round(float(np.linalg.norm(q)), 4))
+
+# Tiny QP-style idea: min 1/2 x^T P x + q^T x, subject to A x &lt;= b
+# P must be positive-definite (bowl shape). Then one best x exists.
+P = np.array([[2.0, 0.0], [0.0, 2.0]])
+qv = np.array([-4.0, -6.0])
+x_free = -np.linalg.solve(P, qv)  # unconstrained answer: [2, 3]
+x = np.minimum(x_free, np.array([1.5, 10.0]))  # fake clip by x1 &lt;= 1.5
+print("free:", x_free, " clipped:", x)</code></pre>
+          </div>
+
+          <h2>6. Every task is an optimization: the convex QP</h2>
+          <p>A <strong>convex QP</strong> is a puzzle with one bowl. QP means quadratic program. The cost is a smooth bowl shape. Any local low point is the global low point.</p>
+          <p>Picture a soup bowl on a table. Drop a marble anywhere inside. It always rolls to the same bottom. That bottom is the best answer. Convex math gives you this promise.</p>
+          <p>The standard form looks scary but reads simply. Minimize half of x&#7488; P x plus q&#7488; x. Keep Ax &le; b and Cx = d. P sets the bowl shape. The rest sets walls and rails.</p>
+          <div class="formula"><span class="label">Convex QP</span> min &frac12; x&#7488; P x + q&#7488; x &nbsp; s.t. A x &le; b, C x = d</div>
+          <div class="formula"><span class="label">Tiny answer</span> P = 2I, q = [&minus;4, &minus;6] &rarr; x* = [2, 3], clipped to [1.5, 3]</div>
+          <h3>Tiny numeric example with words</h3>
+          <p>Let P be 2 on the diagonal and 0 elsewhere. Let q be [&minus;4, &minus;6]. Without walls, the best x is [2, 3]. You find it by solving P x = &minus;q. That is one linear solve.</p>
+          <p>Now add a wall: x1 &le; 1.5. The free answer breaks the wall. So you slide along the wall to [1.5, 3]. That clipped point is the new best. Real solvers do this sliding for many walls at once.</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Solver</th><th>Best for</th><th>Note in plain words</th></tr></thead>
+              <tbody>
+                <tr><td>OSQP</td><td>Large sparse robots</td><td>First try for most teams</td></tr>
+                <tr><td>PROXQP</td><td>Fast dense steps</td><td>Strong on small control QPs</td></tr>
+                <tr><td>qpOASES</td><td>Active-set MPC</td><td>Reuses last answer well</td></tr>
+                <tr><td>HPIPM</td><td>Predictive control</td><td>Built for horizon problems</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="callout warn">
+            <div class="callout__head"><i class="bi bi-exclamation-triangle-fill"></i> Warning</div>
+            <p>P must be positive-definite for a true convex bowl. If P has a flat or upside-down bend, the solver can stall. Check eigenvalues of P before you blame the robot.</p>
+          </div>
+
+          <h2>7. Optimal control and MPC in plain words</h2>
+          <p><strong>Optimal control</strong> picks the best pushes over time. It cares about the full trip, not one step. Think of driving with fuel, comfort, and time in mind. You trade them off along the whole road.</p>
+          <p><strong>Pontryagin</strong> gives rules like traffic lights. At each moment, the best push follows a helper signal. That helper is called the costate. It tells you how precious each state is.</p>
+          <p><strong>HJB</strong> looks at the whole map at once. It asks what the best future cost is from each spot. If you knew that map, control would be easy. But the map is too big to store exactly.</p>
+          <h3>MPC: plan short, move one step, repeat</h3>
+          <ol>
+            <li>Measure where the robot is right now.</li>
+            <li>Plan the best short movie of the next seconds.</li>
+            <li>Play only the first frame of that movie.</li>
+            <li>Measure again and plan a fresh movie.</li>
+          </ol>
+          <p>This loop is called <strong>MPC</strong>, or model predictive control. It always uses fresh sensor data. That is why it handles bumps and wind well. Short plans stay fast enough to run live.</p>
+          <p>For state guessing, teams use an <strong>EKF</strong> or a <strong>factor graph</strong>. An EKF blends model and sensors step by step. A factor graph solves many steps as one smoothing puzzle. Both feed cleaner states to MPC. See <a href="glossary.html">glossary</a> for quick term refreshers.</p>
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> Key idea</div>
+            <p>MPC does not trust an old plan for long. It replans every tick from new data. Short honest plans beat one long stale plan.</p>
+          </div>
+
+          <h2>8. Common mistakes</h2>
+          <p>Most bugs here come from small math slips. They look fine on screen but break the robot. Check this list before long tests.</p>
+          <ul>
+            <li><strong>Euler angle flips.</strong> Near straight up, angles jump wildly. Use quaternions for blending instead.</li>
+            <li><strong>Forgot to normalize.</strong> A quaternion of length 1.02 slowly scales poses. Normalize after every update step.</li>
+            <li><strong>Wrong multiply order.</strong> World-frame and body-frame chains differ. Test with a known 90-degree turn first.</li>
+            <li><strong>Non-convex cost.</strong> A wavy cost has many fake bottoms. Start convex, then add detail only if needed.</li>
+            <li><strong>Ignored units.</strong> Mixing degrees and radians breaks maps. Pick radians in code and stay with it.</li>
+          </ul>
+
+          <h2>9. How professionals do it</h2>
+          <p>Pro teams keep math code boring and tested. They wrap SO(3) and SE(3) in one small library. Every convert function has a unit test. No raw matrix math sits in control loops.</p>
+          <p>They warm-start each QP with the last answer. Most ticks need only small changes. They also cap solve time strictly. If the solver runs long, they reuse a safe fallback.</p>
+          <p>They log P conditioning, solve times, and MPC horizons. They review plots after each run. A slow drift in solve time warns of trouble. It often means constraints fight each other.</p>
+
+          <h2>10. Try it yourself</h2>
+          <ol>
+            <li><strong>Turn (0, 1) by 90&deg;.</strong> Build R(90&deg;) on paper. Apply it to (0, 1). <em>Hint: expect (&minus;1, 0) for a left turn.</em></li>
+            <li><strong>Fix a bad quaternion.</strong> Normalize [0.5, 0.5, 0.5, 0.5] and check length one. <em>Hint: divide by its norm, which is 1.0 here already.</em></li>
+            <li><strong>Solve a 1D QP.</strong> Minimize x&sup2; &minus; 6x with x &le; 2. <em>Hint: free answer is 3, so the wall wins at 2.</em></li>
+            <li><strong>Explain MPC in 30 seconds.</strong> Say it to a friend without math words. <em>Hint: use "short movie, play one frame, repeat".</em></li>
+          </ol>
+
+          <h2>Going deeper (optional): estimation with EKF and factor graphs</h2>
+          <p>Sensors lie a little. <strong>Estimation</strong> blends many lying sensors into one honest guess. Two tools rule this job.</p>
+          <p>First, the <strong>extended Kalman filter (EKF)</strong>. It keeps a guess and a doubt score. Predict with the model, then correct with the measurement. Big surprise means big correction. Small doubt means trust the guess.</p>
+          <div class="formula"><span class="label">Kalman idea</span> new guess = prediction + gain &times; (measurement &minus; prediction)</div>
+          <p>Second, <strong>factor graphs</strong> (solved by libraries like GTSAM). Instead of one guess marching forward, keep the whole history of poses and landmarks as a web of clues. Each clue is a <strong>factor</strong>: odometry links two poses, a camera sighting links a pose to a landmark, a loop closure pulls an old place tight. Then solve the whole web at once. This is how modern SLAM gets maps that do not drift.</p>
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> Tip</div>
+            <p>Remember this split: EKF for fast live pose at 100+ Hz, factor graphs for the best map when you can afford to solve the web. Real robots run both.</p>
+          </div>
+
+          <section class="takeaways">
+            <h2><i class="bi bi-pin-angle-fill"></i> Key takeaways</h2>
+            <ul>
+              <li><i class="bi bi-check2-circle"></i> SO(3) holds all true 3D turns, with no stretch or mirror.</li>
+              <li><i class="bi bi-check2-circle"></i> Unit quaternions store turns compactly and blend smoothly.</li>
+              <li><i class="bi bi-check2-circle"></i> SE(3) joins a turn with a shift into one pose.</li>
+              <li><i class="bi bi-check2-circle"></i> The exponential map turns small twists into real pose steps.</li>
+              <li><i class="bi bi-check2-circle"></i> A convex QP has one best answer solvers find fast.</li>
+              <li><i class="bi bi-check2-circle"></i> MPC plans a short future, moves once, then replans.</li>
+            </ul>
+          </section>
+
+          <section class="quiz">
+            <div class="quiz__head"><i class="bi bi-patch-question-fill"></i> Check your understanding</div>
+            <details>
+              <summary><span class="q-num">Q1.</span><span>What two tests must a rotation matrix pass?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> R-transpose times R equals I, and det equals +1.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q2.</span><span>Why do q and minus q give the same turn?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Both encode the same axis and full turn; it is a double cover.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q3.</span><span>What does SE(3) add on top of SO(3)?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> A 3D shift, so a full rigid pose results.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q4.</span><span>What makes a QP convex and easy?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> P is positive-definite, so cost is one bowl.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q5.</span><span>Why does MPC play only the first step?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Fresh sensor data arrives, so it replans from truth.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q6.</span><span>When should you prefer a quaternion over Euler angles?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> When blending or near vertical, to avoid jumps.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q7.</span><span>When does a robot prefer quaternions over Euler angles?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> When it blends orientations or turns through any pose: quaternions never hit gimbal lock, while Euler angles freeze at the poles.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q8.</span><span>What does the gain do in the Kalman update?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> It sets how much the surprise moves the guess: high gain trusts the measurement, low gain trusts the prediction.</div>
+            </details>
+          </section>
+        </article>
+
+        <nav class="pager" id="pager" aria-label="Chapter navigation"></nav>
+      </div>
+    </main>
+  </div>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/book.js"></script>
+</body>
+</html>
