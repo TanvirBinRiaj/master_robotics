@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>try{var __t=null;try{__t=localStorage.getItem("mr-theme")}catch(e){}if(__t!=="dark"&&__t!=="light"){try{var __m=document.cookie.match(/(?:^|;\s*)mr-theme=(dark|light)/);__t=__m?__m[1]:null}catch(e){__t=null}}if(__t!=="dark"&&__t!=="light"){try{var __w=String(window.name||"").match(/mr-theme=(dark|light)/);__t=__w?__w[1]:null}catch(e){}}if(__t!=="dark"&&__t!=="light"&&window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches){__t="dark"}if(__t==="dark"||__t==="light")document.documentElement.setAttribute("data-theme",__t)}catch(e){}</script>
+  <title>Appendix C: Mathematical Reference — Master Robotics</title>
+  <meta name="description" content="One-page math cheatsheet for robotics: rotations, quaternions, SE(3), QP optimization, MPC and factor graphs in plain English.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="vendor/bootstrap-icons/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/prose.css">
+  <link rel="stylesheet" href="assets/css/mobile.css">
+</head>
+<body data-file="appendix-c-math-reference.html">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="topbar" id="topbar"></header>
+  <div class="progress-bar" id="progressBar"></div>
+
+  <div class="layout">
+    <div class="sidebar__backdrop" id="navBackdrop"></div>
+    <nav class="sidebar" id="sidebar" aria-label="Book contents"></nav>
+
+    <main class="main" id="main">
+      <div class="container">
+
+        <header class="chapter-head">
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="index.html">Home</a>
+            <i class="bi bi-chevron-right"></i>
+            <a href="index.html#contents">Appendices</a>
+            <i class="bi bi-chevron-right"></i>
+            <span>Appendix C</span>
+          </nav>
+          <span class="chapter-kicker"><i class="bi bi-collection"></i> Appendix C &middot; Reference</span>
+          <h1>Mathematical Reference</h1>
+          <p class="lede">The maths of <a href="ch25-advanced-math-for-robotics.html">Chapter 25</a> and <a href="ch26-whole-body-control-mpc.html">Chapter 26</a> on one page. Copy a formula, check a sign, then go back to building.</p>
+          <div class="chapter-meta">
+            <span><i class="bi bi-clock"></i> Reference</span>
+            <span><i class="bi bi-bar-chart"></i> Advanced</span>
+            <span><i class="bi bi-list-check"></i> Appendix C of D</span>
+          </div>
+        </header>
+
+        <article class="article">
+
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> How to use this page</div>
+            <p>This is a <strong>cheatsheet</strong>, not a lesson. Learn the ideas in <a href="ch25-advanced-math-for-robotics.html">Chapter 25</a> first. Then use this page to recall exact forms while you code.</p>
+          </div>
+
+          <h2>2D rotation</h2>
+          <p>A point (x, y) turned by angle &theta; becomes a new point. The <strong>rotation matrix</strong> is the recipe.</p>
+          <div class="formula"><span class="label">2D rotation</span> x' = x cos&theta; &minus; y sin&theta;, &nbsp; y' = x sin&theta; + y cos&theta;</div>
+          <p>Example: turn (1, 0) by 90&deg;. cos90 = 0, sin90 = 1. So x' = 0, y' = 1. The point now aims straight up.</p>
+
+          <h2>SO(3): rotation matrices in 3D</h2>
+          <p><strong>SO(3)</strong> is the set of all 3&times;3 rotation matrices R. Two rules define them.</p>
+          <div class="formula"><span class="label">SO(3) rules</span> R^T R = I &nbsp; and &nbsp; det(R) = +1</div>
+          <p>R^T R = I means the columns are unit arrows at right angles. det = +1 means no mirror flip. To compose rotations, multiply: R_total = R2 &times; R1 (apply R1 first).</p>
+
+          <h2>Quaternions</h2>
+          <p>A <strong>quaternion</strong> stores a rotation as four numbers: one scalar plus a 3D arrow.</p>
+          <div class="formula"><span class="label">Quaternion</span> q = [w, x, y, z], &nbsp; |q| = 1 &nbsp; (unit length)</div>
+          <p>Rotation of angle &theta; around unit axis (ux, uy, uz): w = cos(&theta;/2), (x,y,z) = sin(&theta;/2) &times; (ux,uy,uz). Always <strong>normalize</strong> after blending two quaternions, or the rotation will also scale.</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Need</th><th>Use this</th></tr></thead>
+              <tbody>
+                <tr><td>Store a pose on the robot</td><td>Quaternion (compact, no gimbal lock)</td></tr>
+                <tr><td>Rotate many points fast</td><td>Rotation matrix (one multiply each)</td></tr>
+                <tr><td>Blend two orientations</td><td>Normalized lerp (nlerp) or slerp of quaternions</td></tr>
+                <tr><td>Small correction step in optimization</td><td>Exponential map of a 3-vector (see below)</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2>SE(3): poses as 4&times;4 matrices</h2>
+          <p><strong>SE(3)</strong> packs rotation R and position p into one matrix T. It moves points between frames.</p>
+          <div class="formula"><span class="label">SE(3) pose</span> T = [ R &nbsp; p ; 0 &nbsp; 1 ], &nbsp; point' = T &times; point</div>
+          <p>Compose poses by multiplying: T_world_foot = T_world_hip &times; T_hip_foot. Inverse swaps the direction: R goes to R^T, p goes to &minus;R^T&nbsp;p.</p>
+
+          <h2>Exponential and logarithm maps</h2>
+          <p>The <strong>exponential map</strong> turns a small 3-vector &omega; (axis times angle) into a rotation. The <strong>logarithm map</strong> goes back.</p>
+          <div class="formula"><span class="label">SO(3) exp / log</span> R = exp(&omega;^), &nbsp; &omega; = log(R), &nbsp; |&omega;| = angle</div>
+          <p>Optimizers use this trick: store the pose as a matrix or quaternion, but take correction steps as small vectors &omega;. Small-angle shortcut: R &asymp; I + &omega;^.</p>
+
+          <h2>Quadratic program (QP)</h2>
+          <p>The standard form every solver (OSQP, HPIPM, qpOASES, PROXQP) accepts:</p>
+          <div class="formula"><span class="label">QP form</span> minimize &frac12; x^T P x + q^T x &nbsp; subject to &nbsp; l &le; A x &le; u</div>
+          <p>P must be positive semi-definite (bowl shape, one bottom). A holds limits such as friction cones and torque caps. Add a tiny <strong>regularization</strong> (&epsilon; times identity) to P if the solver complains.</p>
+
+          <h2>Whole-body QP variables</h2>
+          <p>For walking and manipulation, the decision vector stacks accelerations and contact forces:</p>
+          <div class="formula"><span class="label">WBC variable</span> &xi; = [ accelerations ; contact forces ], &nbsp; torques from rigid-body dynamics</div>
+          <p>Priority order used in <a href="ch26-whole-body-control-mpc.html">Chapter 26</a>: physics (dynamics, friction) first, then feet and balance, then hands and gaze, then posture and comfort.</p>
+
+          <h2>MPC loop in five lines</h2>
+          <div class="code">
+            <div class="code__bar">
+              <span class="code__dots"><span></span><span></span><span></span></span>
+              <span class="code__lang">Python</span>
+              <button class="code__copy" type="button"><i class="bi bi-clipboard"></i> Copy</button>
+            </div>
+            <pre><code>while robot_is_running:
+    state = estimate_state()          # fuse encoders + IMU
+    plan = solve_mpc(state, horizon=1.0)  # QP over short future
+    apply(plan.first_step)            # torques to motors
+    warm_start_next_cycle(plan)       # reuse plan, solve faster</code></pre>
+          </div>
+
+          <h2>Factor-graph SLAM pieces</h2>
+          <p>A <strong>factor graph</strong> is a web of clues. Common factors and what each says:</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Factor</th><th>Plain meaning</th></tr></thead>
+              <tbody>
+                <tr><td>Prior</td><td>Where we think we started, with some doubt.</td></tr>
+                <tr><td>Odometry / IMU preintegration</td><td>How far we moved between two poses.</td></tr>
+                <tr><td>Landmark observation</td><td>A camera or LiDAR saw a known point from a pose.</td></tr>
+                <tr><td>Loop closure</td><td>We returned to a known place; pull the map tight.</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <figure class="figure">
+            <div class="figure__box">
+              <svg viewBox="0 0 420 150" width="100%" role="img" aria-label="Map from math topic to chapter">
+                <rect x="15" y="45" width="115" height="60" rx="10" fill="#e8eeff" stroke="#2d5bff"/>
+                <text x="72" y="70" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#1c2230">SO(3)/SE(3)</text>
+                <text x="72" y="90" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#7b849b">Ch. 25</text>
+                <rect x="152" y="45" width="115" height="60" rx="10" fill="#e6f7f0" stroke="#0f9d78"/>
+                <text x="210" y="70" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#1c2230">QP / MPC</text>
+                <text x="210" y="90" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#7b849b">Ch. 26</text>
+                <rect x="289" y="45" width="115" height="60" rx="10" fill="#eef0f4" stroke="#7b849b"/>
+                <text x="347" y="70" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#1c2230">Factors</text>
+                <text x="347" y="90" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#7b849b">Ch. 25/28</text>
+              </svg>
+            </div>
+            <figcaption>Figure 1. Where each tool lives: geometry in Chapter 25, control in Chapter 26, mapping in Chapters 25 and 28.</figcaption>
+          </figure>
+
+          <section class="takeaways">
+            <h2><i class="bi bi-pin-angle-fill"></i> Key takeaways</h2>
+            <ul>
+              <li><i class="bi bi-check2-circle"></i> SO(3) stores rotations; SE(3) stores full poses.</li>
+              <li><i class="bi bi-check2-circle"></i> Quaternions blend cleanly; always normalize them.</li>
+              <li><i class="bi bi-check2-circle"></i> Every WBC/MPC solver eats the same QP form.</li>
+              <li><i class="bi bi-check2-circle"></i> MPC means plan short, run the first step, replan.</li>
+            </ul>
+          </section>
+
+        </article>
+
+        <nav class="pager" id="pager" aria-label="Chapter navigation"></nav>
+      </div>
+    </main>
+  </div>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/book.js"></script>
+</body>
+</html>

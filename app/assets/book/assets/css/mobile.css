@@ -1,0 +1,34 @@
+/* Master Robotics — mobile (WebView) tweaks.
+   Injected ONLY into the offline app copy by tool/sync_book.py.
+   The web originals never include this file. */
+
+html {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  overscroll-behavior-y: none;
+}
+
+/* Respect phone notches and gesture bars. */
+.topbar {
+  padding-left: max(12px, env(safe-area-inset-left));
+  padding-right: max(12px, env(safe-area-inset-right));
+}
+
+.container {
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
+}
+
+/* Comfortable touch targets ( Material minimum 48px where it fits ). */
+.icon-btn,
+.topbar__menu,
+.code__copy,
+.quiz summary {
+  min-height: 44px;
+}
+
+.topbar__search input {
+  font-size: 16px; /* stops iOS-style auto-zoom, harmless on Android */
+}

@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>try{var __t=null;try{__t=localStorage.getItem("mr-theme")}catch(e){}if(__t!=="dark"&&__t!=="light"){try{var __m=document.cookie.match(/(?:^|;\s*)mr-theme=(dark|light)/);__t=__m?__m[1]:null}catch(e){__t=null}}if(__t!=="dark"&&__t!=="light"){try{var __w=String(window.name||"").match(/mr-theme=(dark|light)/);__t=__w?__w[1]:null}catch(e){}}if(__t!=="dark"&&__t!=="light"&&window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches){__t="dark"}if(__t==="dark"||__t==="light")document.documentElement.setAttribute("data-theme",__t)}catch(e){}</script>
+  <title>Chapter 16: Kinematics: Where the Robot Is and Where It Goes — Master Robotics</title>
+  <meta name="description" content="A gentle, plain-English guide to robot kinematics. Learn coordinates and frames, forward and inverse kinematics, a full 2-link arm worked example, and how wheel speeds steer a mobile robot.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="vendor/bootstrap-icons/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/prose.css">
+  <link rel="stylesheet" href="assets/css/mobile.css">
+</head>
+<body data-file="ch16-kinematics.html">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="topbar" id="topbar"></header>
+  <div class="progress-bar" id="progressBar"></div>
+
+  <div class="layout">
+    <div class="sidebar__backdrop" id="navBackdrop"></div>
+    <nav class="sidebar" id="sidebar" aria-label="Book contents"></nav>
+
+    <main class="main" id="main">
+      <div class="container">
+
+        <header class="chapter-head">
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="index.html">Home</a>
+            <i class="bi bi-chevron-right"></i>
+            <a href="index.html#software">Part 4 &middot; Software and Control</a>
+            <i class="bi bi-chevron-right"></i>
+            <span>Chapter 16</span>
+          </nav>
+          <span class="chapter-kicker"><i class="bi bi-code-slash"></i> Part 4 &middot; Software and Control</span>
+          <h1>Kinematics: Where the Robot Is and Where It Goes</h1>
+          <p class="lede">Kinematics is the maths of position and motion. By the end of this chapter you will turn joint angles into a position, turn a target position back into joint angles, and steer a wheeled robot with simple formulas.</p>
+          <div class="chapter-meta">
+            <span><i class="bi bi-clock"></i> ~28 min read</span>
+            <span><i class="bi bi-bar-chart"></i> Intermediate</span>
+            <span><i class="bi bi-list-check"></i> Chapter 16 of 30</span>
+          </div>
+          <div class="goals">
+            <h2>What you will learn</h2>
+            <ul>
+              <li><i class="bi bi-check-circle-fill"></i> Explain forward and inverse kinematics</li>
+              <li><i class="bi bi-check-circle-fill"></i> Work through a simple 2-joint arm example</li>
+              <li><i class="bi bi-check-circle-fill"></i> Understand frames and coordinates</li>
+            </ul>
+          </div>
+        </header>
+
+        <article class="article">
+
+          <p class="lead">Picture a robot arm in a factory. It must pick up a tiny screw and place it into a hole. The screw sits at a certain spot on the table. The arm has two joints, each with a motor. The motors only understand angles. Yet the screw is a position. How does the robot turn "place the tip here" into "set joint one to this angle and joint two to that angle"? That riddle has a name. It is called <strong>kinematics</strong>.</p>
+
+          <p>Kinematics sounds like heavy maths. It is not. At heart it is geometry: triangles, angles and distances. We use only three simple tools here: the distance triangle, sine and cosine, and the law of cosines. Every symbol is explained in words, so nothing is left as a mystery letter.</p>
+
+          <p>By the end you will follow a full worked example, from a target point on a table all the way to the joint angles that reach it. You will also see how the same ideas steer a wheeled robot.</p>
+
+          <h2>What kinematics means</h2>
+
+          <p><strong>Kinematics</strong> is the study of motion and position, without worrying about forces. It answers questions like "where is the tip?" and "how fast is it moving?". It does not ask "how much force is needed?" or "how heavy is the load?".</p>
+
+          <p>The companion word is <strong>dynamics</strong>. Dynamics is the study of forces and how they create motion. Think of the difference this way. Kinematics describes the plan of a dance. Dynamics describes how strong the dancers must be to perform it.</p>
+
+          <div class="formula"><span class="label">Two ideas, one clear split</span> Kinematics = geometry of motion (positions, angles, speeds). Dynamics = forces that cause that motion.</div>
+
+          <p>For a first robot, kinematics is the more useful half. It lets you decide which way to turn the motors to reach a point. Force comes later, when the arm must lift something heavy.</p>
+
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> In simple words</div>
+            <p>Kinematics asks "where and how fast?". Dynamics asks "how strong?". A game of pool is a good picture: the angles of the balls are kinematics, the hard hit is dynamics.</p>
+          </div>
+
+          <h3>Two directions of one question</h3>
+
+          <p>Robotics uses kinematics in two directions. Learn their names now.</p>
+
+          <ul>
+            <li><strong>Forward kinematics</strong> — you know the joint angles, and you want the position of the tip. Simple and always has one answer.</li>
+            <li><strong>Inverse kinematics</strong> — you know the position you want, and you want the joint angles. Harder, and it can have none, one or two answers.</li>
+          </ul>
+
+          <p>Think of a claw machine at an arcade. As you push the joystick, it tracks where the claw has moved: that is forward kinematics. When it works out how to slide over a prize, that is inverse kinematics.</p>
+
+          <h2>Coordinates: how we say where something is</h2>
+
+          <p>Before a robot can move anywhere, we need a way to write down "here". We describe a position with numbers that measure distance along straight lines called <strong>axes</strong>.</p>
+
+          <p>On a flat surface, two numbers are enough. We call them <strong>x</strong> and <strong>y</strong>. A position is a pair written as (x, y). The x number counts how far along the sideways axis. The y number counts how far along the forward axis.</p>
+
+          <p>In three dimensions, we add a third number, <strong>z</strong>, for height. A position becomes a triple (x, y, z). A drone needs all three: sideways, forward and up.</p>
+
+          <div class="formula"><span class="label">A position is a list of numbers</span> 2D: (x, y) &nbsp;&middot;&nbsp; 3D: (x, y, z)</div>
+
+          <p>Each axis has a positive direction. On paper we usually draw x to the right and y upward. Distance to the right or up is positive; to the left or down it is negative. The sign just tells you which side of the origin you are on. The <strong>origin</strong> is the point (0, 0) in 2D, or (0, 0, 0) in 3D, where the axes meet. Every other position is measured away from it.</p>
+
+          <div class="callout note">
+            <div class="callout__head"><i class="bi bi-info-circle-fill"></i> Note</div>
+            <p>Coordinates are always relative to some origin. A point can be (0.5, 0) from the table but (3.5, 2.0) from the room corner. The numbers change when the origin changes. Remember this rule and frames will make sense.</p>
+          </div>
+
+          <h2>Frames: a ruler attached to each part</h2>
+
+          <p>A <strong>frame</strong> is an origin plus a set of axes glued to one part of the robot. You can picture it as a small ruler with arrows, screwed onto that part. The frame travels with the part as the part moves and turns.</p>
+
+          <p>Why do we need many frames? Because each joint measures its angle against the part just before it. The first joint measures against the base. The second joint measures against the first link. The gripper has its own frame at its fingertips.</p>
+
+          <p>Here is the idea in a familiar scene. In a car, "two metres ahead" means nothing until you say two metres ahead of what. Ahead of the driver or the passenger? Each person has a different frame. Every robot number needs a frame too.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Frame</th><th>Attached to</th><th>Used to answer</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Base frame</td><td>The fixed ground or chassis</td><td>Where is the arm in the room?</td></tr>
+                <tr><td>Joint frames</td><td>One at each joint</td><td>How is this joint turned?</td></tr>
+                <tr><td>Link frames</td><td>Each rigid arm segment</td><td>Where does this link point?</td></tr>
+                <tr><td>Tool frame</td><td>The gripper or tool tip</td><td>Where is the tool, and which way does it face?</td></tr>
+                <tr><td>World frame</td><td>The room or building</td><td>Where is everything together?</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 16.1 — The frames on a typical robot arm. Each one is a ruler with its own origin.</p>
+
+          <p>Frames matter because a single position can be correct in one frame and wrong in another. If you forget to say which frame your numbers are in, your robot will nod politely and go to the wrong place.</p>
+
+          <div class="callout warn">
+            <div class="callout__head"><i class="bi bi-exclamation-triangle-fill"></i> Watch out</div>
+            <p>Most robot bugs near the start are frame bugs. The maths is right, but the numbers were measured from the wrong origin. When an arm moves oddly, always ask first: "which frame is this position in?"</p>
+          </div>
+
+          <h2>A gentle look at sines and cosines</h2>
+
+          <p>Two functions do most of the work in kinematics: <strong>sine</strong> and <strong>cosine</strong>. You only need them for right-angled triangles, a triangle with one square (90&deg;) corner.</p>
+
+          <p>Imagine a ramp going up to the right. Draw a line across and a line up to close the shape, and you have a right-angled triangle. The ramp is the long side, called the <strong>hypotenuse</strong>. The flat bottom is the base, and the up-and-down side is the <strong>height</strong>. The angle at the ground we call &theta; (the Greek letter theta).</p>
+
+          <div class="formula"><span class="label">Sine and cosine in plain words</span> sin(&theta;) tells you the height as a share of the ramp. cos(&theta;) tells you the width as a share of the ramp.</div>
+
+          <p>To get the actual height, you multiply the ramp length by the sine. To get the actual width, you multiply the ramp length by the cosine. When the ramp is flat, &theta; = 0&deg;. The height is zero and the width is the full ramp. When the ramp is straight up, &theta; = 90&deg;. The height is the full ramp and the width is zero. This matches our everyday sense, which is a good sign.</p>
+
+          <p>The third simple tool is the <strong>Pythagorean theorem</strong>. It connects the three sides of any right-angled triangle.</p>
+
+          <div class="formula"><span class="label">Pythagorean theorem</span> ramp<sup>2</sup> = x<sup>2</sup> + y<sup>2</sup> &nbsp;&nbsp; so &nbsp;&nbsp; ramp = &radic;(x<sup>2</sup> + y<sup>2</sup>)</div>
+
+          <p>This says: square the two short sides, add them, and you get the square of the long side. The mark &radic; means "square root", which undoes a square. It finds the straight-line distance between two points, such as the distance from the arm base to a target.</p>
+
+          <h3>Degrees or radians?</h3>
+
+          <p>Angles come in two units. <strong>Degrees</strong> split a full circle into 360 parts. <strong>Radians</strong> measure the angle by the arc it cuts. One full circle is 2&pi; radians, about 6.28.</p>
+
+          <p>Most people like degrees. Most computers use radians. This mismatch is a common beginner bug.</p>
+
+          <div class="formula"><span class="label">The bridge between the two</span> 180&deg; = &pi; radians &nbsp;&nbsp; so &nbsp;&nbsp; radians = degrees &times; (&pi; / 180)</div>
+          <div class="formula"><span class="label">The other way</span> degrees = radians &times; (180 / &pi;)</div>
+
+          <p>To turn 90&deg; into radians: 90 &times; (&pi; / 180) = &pi; / 2 &asymp; 1.571. To turn 1.571 radians back: 1.571 &times; (180 / &pi;) &asymp; 90&deg;. The circle closes.</p>
+
+          <h2>Rotations: turning a point around</h2>
+
+          <p>A rotation spins a point around the origin by a fixed angle. We always need to agree on the positive direction. The convention in robotics is simple: a positive angle turns <strong>counter-clockwise</strong>, the way a normal screw loosens. A negative angle turns clockwise.</p>
+
+          <p>We also need a reference to measure from. An angle is always measured from the positive x axis. A point sitting on the x axis has angle 0&deg;. A point straight up on the y axis has angle 90&deg;.</p>
+
+          <p>Suppose a point starts at (x, y). We turn it by an angle &theta; around the origin. The new position is called (x&prime;, y&prime;). The rule to find it is a short pair of lines.</p>
+
+          <div class="formula"><span class="label">Rotating a point by angle &theta;</span> x&prime; = x &times; cos(&theta;) &minus; y &times; sin(&theta;)<br>y&prime; = x &times; sin(&theta;) + y &times; cos(&theta;)</div>
+
+          <p>Read the first line in words: the new width equals the old width times the cosine, minus the old height times the sine. Read the second line: the new height equals the old width times the sine, plus the old height times the cosine. It looks like shuffle, but it is just the ramp rule applied to both axes at once.</p>
+
+          <figure class="figure">
+            <div class="figure__box">
+              <svg viewBox="0 0 520 260" width="100%" role="img" aria-label="A point (x, y) rotated counter-clockwise by angle theta about the origin to a new point (x prime, y prime)">
+                <line x1="40" y1="220" x2="480" y2="220" stroke="#7b849b" stroke-width="1.5"></line>
+                <line x1="60" y1="240" x2="60" y2="30" stroke="#7b849b" stroke-width="1.5"></line>
+                <text x="472" y="238" font-family="Inter, sans-serif" font-size="12" fill="#4a5266">x</text>
+                <text x="44" y="40" font-family="Inter, sans-serif" font-size="12" fill="#4a5266">y</text>
+                <text x="44" y="238" font-family="Inter, sans-serif" font-size="12" fill="#4a5266">O</text>
+                <line x1="60" y1="220" x2="300" y2="90" stroke="#2d5bff" stroke-width="2.5"></line>
+                <circle cx="300" cy="90" r="6" fill="#2d5bff"></circle>
+                <text x="308" y="82" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#2d5bff">(x&prime;, y&prime;)</text>
+                <line x1="60" y1="220" x2="330" y2="220" stroke="#0f9d78" stroke-width="2.5"></line>
+                <circle cx="330" cy="220" r="6" fill="#0f9d78"></circle>
+                <text x="338" y="214" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#0f9d78">(x, y)</text>
+                <path d="M120 220 A60 60 0 0 0 110 190" fill="none" stroke="#7a4ddb" stroke-width="2"></path>
+                <text x="118" y="200" font-family="Inter, sans-serif" font-size="13" fill="#7a4ddb">&theta;</text>
+                <path d="M300 90 A300 300 0 0 1 330 220" fill="none" stroke="#b6bccb" stroke-width="1.5" stroke-dasharray="5 5"></path>
+                <text x="330" y="150" font-family="Inter, sans-serif" font-size="12" fill="#7b849b">the point sweeps along a circle</text>
+              </svg>
+            </div>
+            <figcaption>Figure 16.1 — Rotating a point by &theta; around the origin. A positive angle turns counter-clockwise. The point travels along a circle but stays the same distance from the origin.</figcaption>
+          </figure>
+
+          <p>One useful fact: a rotation never changes the distance from the origin. The point slides along a circle. Only its angle changes. That is why an arm link of fixed length sweeps a circle as its joint turns.</p>
+
+          <h2>Forward kinematics: from angles to position</h2>
+
+          <p><strong>Forward kinematics</strong> (FK) starts with the joint angles and finds where the tip ends up. It is the easy direction. There is always exactly one answer, and you find it by adding up triangles.</p>
+
+          <h3>One link: a single arm segment</h3>
+
+          <p>Start with the simplest arm: one straight link of length L, joined to the origin. The joint turns it by angle &theta; from the x axis. Where is the tip?</p>
+
+          <p>Draw it and the ramp rule jumps out. The link is the ramp. The x distance across is L times the cosine of &theta;. The y distance up is L times the sine of &theta;.</p>
+
+          <div class="formula"><span class="label">One-link forward kinematics</span> x = L &times; cos(&theta;)<br>y = L &times; sin(&theta;)</div>
+
+          <p>Say L = 1 m and &theta; = 0&deg;. Then x = 1 and y = 0. The tip lies straight along the x axis, which is exactly right. Now &theta; = 90&deg;. Then x = 0 and y = 1. The link points straight up. The formula passes both sanity checks.</p>
+
+          <h3>Two links: the arm bends</h3>
+
+          <p>Real arms have more than one link, so they can fold. Add a second link, length L2, on the tip of the first. The first joint angle is &theta;1, measured from the x axis. The second joint angle is &theta;2, measured from the direction of the first link.</p>
+
+          <p>Where does the second link point? Its direction is the first link's direction plus &theta;2. In angle terms, that is &theta;1 + &theta;2. So the second link's own angle from the x axis is the sum of both joint angles.</p>
+
+          <p>Now just add the two links together. The first contributes its x and y as before. The second contributes its own x and y, using the combined angle. The result is the two-link forward kinematics.</p>
+
+          <div class="formula"><span class="label">Two-link forward kinematics</span> x = L1 &times; cos(&theta;1) + L2 &times; cos(&theta;1 + &theta;2)<br>y = L1 &times; sin(&theta;1) + L2 &times; sin(&theta;1 + &theta;2)</div>
+
+          <p>Read line one in words: the total width is the width of link one plus the width of link two. Link two's width uses the combined angle &theta;1 + &theta;2, because it is carried along by the first joint. Line two says the same for height. That is all forward kinematics is: adding up each link's little triangle.</p>
+
+          <figure class="figure">
+            <div class="figure__box">
+              <svg viewBox="0 0 560 300" width="100%" role="img" aria-label="A two-link planar arm with link lengths L1 and L2, joint angles theta1 and theta2, and the end tip at position x comma y">
+                <line x1="40" y1="250" x2="520" y2="250" stroke="#7b849b" stroke-width="1.5"></line>
+                <line x1="60" y1="270" x2="60" y2="30" stroke="#7b849b" stroke-width="1.5"></line>
+                <text x="512" y="268" font-family="Inter, sans-serif" font-size="12" fill="#4a5266">x</text>
+                <text x="44" y="40" font-family="Inter, sans-serif" font-size="12" fill="#4a5266">y</text>
+                <circle cx="60" cy="250" r="6" fill="#1c2230"></circle>
+                <text x="30" y="268" font-family="Inter, sans-serif" font-size="12" fill="#4a5266">base</text>
+
+                <line x1="60" y1="250" x2="230" y2="150" stroke="#2d5bff" stroke-width="6" stroke-linecap="round"></line>
+                <circle cx="230" cy="150" r="7" fill="#2d5bff"></circle>
+                <text x="120" y="188" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#2d5bff">L1</text>
+
+                <line x1="230" y1="150" x2="400" y2="110" stroke="#0f9d78" stroke-width="6" stroke-linecap="round"></line>
+                <circle cx="400" cy="110" r="7" fill="#0f9d78"></circle>
+                <text x="312" y="118" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#0f9d78">L2</text>
+                <text x="392" y="96" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#1c2230">tip (x, y)</text>
+
+                <path d="M108 250 A48 48 0 0 0 100 218" fill="none" stroke="#7a4ddb" stroke-width="2"></path>
+                <text x="112" y="226" font-family="Inter, sans-serif" font-size="13" fill="#7a4ddb">&theta;1</text>
+
+                <line x1="230" y1="150" x2="360" y2="170" stroke="#b6bccb" stroke-width="1.5" stroke-dasharray="5 5"></line>
+                <path d="M262 156 A36 36 0 0 1 258 166" fill="none" stroke="#c25e00" stroke-width="2"></path>
+                <text x="264" y="150" font-family="Inter, sans-serif" font-size="13" fill="#c25e00">&theta;2</text>
+                <text x="300" y="212" font-family="Inter, sans-serif" font-size="12" fill="#7b849b">dashed line shows link one's direction</text>
+              </svg>
+            </div>
+            <figcaption>Figure 16.2 — A two-link planar arm. The first joint turns by &theta;1 from the x axis. The second joint turns by &theta;2, measured from the direction of link one. The tip sits at (x, y).</figcaption>
+          </figure>
+
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> Tip</div>
+            <p>Always check a forward kinematics answer against common sense first. If &theta;1 = 0&deg; and &theta;2 = 0&deg;, the whole arm lies flat on the x axis. Then x should be L1 + L2 and y should be 0. If your formula does not give that, you made an error.</p>
+          </div>
+
+          <h3>Seeing it in code</h3>
+
+          <p>Here is the same forward kinematics written as short Python code. Notice how little there is: two multiplies and an add for each axis. Computers use radians, so we convert the angles first.</p>
+
+          <div class="code">
+            <div class="code__bar">
+              <span class="code__dots"><span></span><span></span><span></span></span>
+              <span class="code__lang">Python</span>
+              <button class="code__copy" type="button"><i class="bi bi-clipboard"></i> Copy</button>
+            </div>
+            <pre><code>import math
+
+def forward_kinematics(L1, L2, th1_deg, th2_deg):
+    # convert degrees to radians, because math.sin wants radians
+    t1 = math.radians(th1_deg)
+    t2 = math.radians(th2_deg)
+
+    x = L1 * math.cos(t1) + L2 * math.cos(t1 + t2)
+    y = L1 * math.sin(t1) + L2 * math.sin(t1 + t2)
+    return x, y
+
+x, y = forward_kinematics(0.30, 0.25, 40, 30)
+print(round(x, 4), round(y, 4))   # 0.3153 0.4277</code></pre>
+          </div>
+
+          <p>The comment on the last line shows the answer we computed by hand. If your code prints a very different pair, the usual cause is a missed degree-to-radian conversion.</p>
+
+          <h2>Worked example: forward kinematics with real numbers</h2>
+
+          <p>Enough theory. Let us push the two-link formulas through with real numbers, showing every step. Take an arm with these values.</p>
+
+          <ul>
+            <li>Link one, <strong>L1 = 0.30 m</strong> (30 centimetres).</li>
+            <li>Link two, <strong>L2 = 0.25 m</strong> (25 centimetres).</li>
+            <li>First joint angle, <strong>&theta;1 = 40&deg;</strong>.</li>
+            <li>Second joint angle, <strong>&theta;2 = 30&deg;</strong>.</li>
+          </ul>
+
+          <p>We want the tip position (x, y) in metres, measured in the base frame. Follow the six steps below. Do not skip the table of values. It saves lots of confusion.</p>
+
+          <ol>
+            <li><strong>Write down what we know.</strong> L1 = 0.30, L2 = 0.25, &theta;1 = 40&deg;, &theta;2 = 30&deg;. All angles are in degrees for now.</li>
+            <li><strong>Find the combined angle.</strong> The second link points along &theta;1 + &theta;2 = 40&deg; + 30&deg; = 70&deg;. This one number is the key to the whole problem.</li>
+            <li><strong>Look up the four values.</strong> We need cos(40&deg;), sin(40&deg;), cos(70&deg;) and sin(70&deg;). Use a calculator or the table below.</li>
+            <li><strong>Compute the x part.</strong> Add the two links' widths.</li>
+            <li><strong>Compute the y part.</strong> Add the two links' heights.</li>
+            <li><strong>Check with common sense.</strong> Both angles are positive and modest, so the tip should be up and to the right. Our answer must match that picture.</li>
+          </ol>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Angle</th><th>cos</th><th>sin</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>40&deg;</td><td>0.7660</td><td>0.6428</td></tr>
+                <tr><td>70&deg;</td><td>0.3420</td><td>0.9397</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 16.2 — The four trigonometric values we need, rounded to four decimal places.</p>
+
+          <p><strong>Step 4, the x part.</strong> Start from the formula:</p>
+
+          <div class="formula"><span class="label">x (two links)</span> x = L1 &times; cos(&theta;1) + L2 &times; cos(&theta;1 + &theta;2)</div>
+
+          <p>Put the numbers in, one piece at a time.</p>
+
+          <ul>
+            <li>x = 0.30 &times; cos(40&deg;) + 0.25 &times; cos(70&deg;)</li>
+            <li>x = 0.30 &times; 0.7660 + 0.25 &times; 0.3420</li>
+            <li>x = 0.2298 + 0.0855</li>
+            <li>x = 0.3153 m</li>
+          </ul>
+
+          <p>So the tip sits about <strong>0.315 m</strong> to the right of the base. That is 31.5 centimetres.</p>
+
+          <p><strong>Step 5, the y part.</strong> Now the vertical formula:</p>
+
+          <div class="formula"><span class="label">y (two links)</span> y = L1 &times; sin(&theta;1) + L2 &times; sin(&theta;1 + &theta;2)</div>
+
+          <p>Again, one piece at a time.</p>
+
+          <ul>
+            <li>y = 0.30 &times; sin(40&deg;) + 0.25 &times; sin(70&deg;)</li>
+            <li>y = 0.30 &times; 0.6428 + 0.25 &times; 0.9397</li>
+            <li>y = 0.1928 + 0.2349</li>
+            <li>y = 0.4277 m</li>
+          </ul>
+
+          <p>So the tip sits about <strong>0.428 m</strong> above the base, or 42.8 centimetres.</p>
+
+          <p><strong>Step 6, the check.</strong> The answer is (0.315, 0.428) metres. It is up and to the right, just as we predicted. The total distance from the base is &radic;(0.315<sup>2</sup> + 0.428<sup>2</sup>) = &radic;(0.0992 + 0.1832) = &radic;0.2824 &asymp; 0.531 m. That is comfortably less than L1 + L2 = 0.55 m, so the arm is not fully stretched. The answer is believable.</p>
+
+          <div class="callout note">
+            <div class="callout__head"><i class="bi bi-info-circle-fill"></i> Note</div>
+            <p>Keep your units straight. If lengths are in metres, positions come out in metres. If one link is in centimetres and another in metres, your answer will be nonsense. Convert everything to one unit first.</p>
+          </div>
+
+          <h2>Inverse kinematics: from position back to angles</h2>
+
+          <p><strong>Inverse kinematics</strong> (IK) flips the question. You know the target point (x, y). You want the joint angles that place the tip there. This is the direction a robot needs most: "put the hand here, now move the motors".</p>
+
+          <p>IK is harder than FK, and the reason is simple. Several different arm shapes can reach the same point. The maths can give zero answers (the point is too far), one answer (the arm is fully stretched), or two answers (elbow up or elbow down). You must choose.</p>
+
+          <h3>Why there can be two answers</h3>
+
+          <p>Hold your arm out to touch a spot on a table. You can reach it with your elbow pointing up, or with your elbow tucked down. Both put your fingertip in the same place. A robot arm has the same choice. We call the two options the <strong>elbow-up</strong> and <strong>elbow-down</strong> solutions.</p>
+
+          <p>This choice is a gift, not a problem. If an obstacle blocks the elbow-up pose, the robot can use elbow-down instead. We will use exactly this trick in the big worked example later.</p>
+
+          <h3>The law of cosines gives &theta;2</h3>
+
+          <p>The law of cosines is a cousin of the Pythagorean theorem. It works for triangles that are not right-angled. It connects a side to the angle across from it.</p>
+
+          <p>Picture the triangle formed by the base, the first joint and the tip. Its three sides are L1, L2 and the straight-line distance from base to tip. That distance we call <strong>r</strong>, and r = &radic;(x<sup>2</sup> + y<sup>2</sup>). The angle inside, across from r, is exactly &theta;2. The law of cosines ties them together.</p>
+
+          <div class="formula"><span class="label">Law of cosines for the arm</span> r<sup>2</sup> = L1<sup>2</sup> + L2<sup>2</sup> &minus; 2 &times; L1 &times; L2 &times; cos(180&deg; &minus; &theta;2)</div>
+
+          <p>That form has a messy angle, so we simplify it. Using the rule cos(180&deg; &minus; a) = &minus;cos(a), the expression turns into the clean IK formula you will actually use.</p>
+
+          <div class="formula"><span class="label">Inverse kinematics: solve for &theta;2</span> cos(&theta;2) = (x<sup>2</sup> + y<sup>2</sup> &minus; L1<sup>2</sup> &minus; L2<sup>2</sup>) / (2 &times; L1 &times; L2)</div>
+
+          <p>Read it in words: take the squared distance to the tip. Subtract the square of each link. Divide by twice the product of the link lengths. The result is the cosine of the second joint angle. Apply the inverse cosine (usually written acos or cos<sup>&minus;1</sup>) and you have &theta;2.</p>
+
+          <h3>Then &theta;1 comes from geometry</h3>
+
+          <p>Once &theta;2 is known, &theta;1 is easier. Two angles add up to it. The first is the direction from the base to the tip, which is atan2(y, x). The second is a correction for how much the second link bends the path, which is atan2(L2 &times; sin &theta;2, L1 + L2 &times; cos &theta;2).</p>
+
+          <div class="formula"><span class="label">Inverse kinematics: solve for &theta;1</span> &theta;1 = atan2(y, x) &minus; atan2(L2 &times; sin(&theta;2), L1 + L2 &times; cos(&theta;2))</div>
+
+          <p>The function <strong>atan2</strong> is a smart version of the inverse tangent. Give it a y and an x, and it returns the true angle of the point, telling apart all four quarters of the circle. Plain atan cannot do that by itself.</p>
+
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> Tip</div>
+            <p>Notice that cos(&theta;2) gives the same number for +&theta;2 and &minus;&theta;2. That is where the two elbow solutions come from. Solve once with +&theta;2, once with &minus;&theta;2, and check the resulting &theta;1 each time.</p>
+          </div>
+
+          <h2>Worked example: inverse kinematics, backwards and forwards</h2>
+
+          <p>Now let us prove the two formulas fit together. We take the position we just computed, (0.315, 0.428), and work backwards to find the joint angles. If IK is correct, we should recover &theta;1 = 40&deg; and &theta;2 = 30&deg;.</p>
+
+          <ol>
+            <li><strong>Write the target.</strong> x = 0.3153 m, y = 0.4277 m. Links again: L1 = 0.30, L2 = 0.25.</li>
+            <li><strong>Square the coordinates.</strong> x<sup>2</sup> = 0.0992 and y<sup>2</sup> = 0.1832. Their sum is 0.2824.</li>
+            <li><strong>Square the links.</strong> L1<sup>2</sup> = 0.0900 and L2<sup>2</sup> = 0.0625. Their sum is 0.1525.</li>
+            <li><strong>Find cos(&theta;2).</strong> Top = 0.2824 &minus; 0.1525 = 0.1299. Bottom = 2 &times; 0.30 &times; 0.25 = 0.15. So cos(&theta;2) = 0.1299 / 0.15 = 0.8660.</li>
+            <li><strong>Take the inverse cosine.</strong> acos(0.8660) = 30&deg;. We recovered &theta;2 exactly. The two options are +30&deg; (elbow up) and &minus;30&deg; (elbow down).</li>
+            <li><strong>Find &theta;1 for the elbow-up choice.</strong> atan2(0.4277, 0.3153) = 53.6&deg;. The correction term: atan2(0.25 &times; 0.5, 0.30 + 0.25 &times; 0.8660) = atan2(0.125, 0.5165) = 13.6&deg;. Then &theta;1 = 53.6&deg; &minus; 13.6&deg; = 40.0&deg;. We recovered &theta;1. Perfect.</li>
+            <li><strong>Find &theta;1 for the elbow-down choice.</strong> Same first term, 53.6&deg;. Now &theta;2 is negative, so the correction is atan2(&minus;0.125, 0.5165) = &minus;13.6&deg;. Then &theta;1 = 53.6&deg; &minus; (&minus;13.6&deg;) = 67.2&deg;.</li>
+            <li><strong>Check the second solution works.</strong> With &theta;1 = 67.2&deg; and &theta;2 = &minus;30&deg;, forward kinematics gives x = 0.315 m and y = 0.428 m. Yes, both poses hit the same target. That is the elbow choice in action.</li>
+          </ol>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Solution</th><th>&theta;1</th><th>&theta;2</th><th>Shape</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Elbow up</td><td>40.0&deg;</td><td>+30&deg;</td><td>Elbow bends upward</td></tr>
+                <tr><td>Elbow down</td><td>67.2&deg;</td><td>&minus;30&deg;</td><td>Elbow tucks downward</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 16.3 — Two joint solutions reach the same tip position. The robot must choose one.</p>
+
+          <h2>Reachable workspace and singularities</h2>
+
+          <p>The <strong>reachable workspace</strong> is the set of all points the tip can touch. It is the arm's territory. For a two-link planar arm, it is a ring: an outer circle and an inner circle.</p>
+
+          <p>The outer circle has radius L1 + L2, when the arm is fully stretched. The inner circle has radius |L1 &minus; L2|, when the arm is fully folded back on itself. Anything between those two circles can be reached. Anything outside or inside the hole cannot.</p>
+
+          <figure class="figure">
+            <div class="figure__box">
+              <svg viewBox="0 0 560 320" width="100%" role="img" aria-label="The reachable workspace of a two-link arm drawn as a ring between an outer circle of radius L1 plus L2 and an inner circle of radius the difference of the links">
+                <circle cx="280" cy="170" r="130" fill="#e8eeff" stroke="#2d5bff" stroke-width="2"></circle>
+                <circle cx="280" cy="170" r="40" fill="#ffffff" stroke="#2d5bff" stroke-width="2"></circle>
+                <circle cx="280" cy="170" r="6" fill="#1c2230"></circle>
+                <line x1="280" y1="170" x2="410" y2="170" stroke="#0f9d78" stroke-width="2" stroke-dasharray="6 4"></line>
+                <text x="330" y="162" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#0f9d78">L1 + L2</text>
+                <line x1="280" y1="170" x2="320" y2="170" stroke="#c25e00" stroke-width="2" stroke-dasharray="6 4"></line>
+                <text x="288" y="200" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#c25e00">|L1 &minus; L2|</text>
+                <text x="280" y="52" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#2d5bff">reachable ring</text>
+                <text x="280" y="108" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#4a5266">every point here is touchable</text>
+                <text x="280" y="170" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#7b849b">hole</text>
+              </svg>
+            </div>
+            <figcaption>Figure 16.3 — The reachable workspace of a two-link arm is a ring. The tip can reach any point between the inner circle and the outer circle, but not the hole in the middle or the space beyond.</figcaption>
+          </figure>
+
+          <p>Now for a word about trouble spots. A <strong>singularity</strong> is a pose where the arm loses the ability to move in some direction. The tip cannot go some way you want, no matter how the joints turn. The maths also gets unstable there, because it must divide by a number close to zero.</p>
+
+          <p>Two singularities live at the edges of the workspace. One is the fully stretched pose, at the outer circle. The other is the fully folded pose, at the inner circle. Near those poses, tiny errors in position demand huge changes in joint angle. The arm lurches.</p>
+
+          <div class="callout danger">
+            <div class="callout__head"><i class="bi bi-shield-exclamation"></i> Danger zone</div>
+            <p>Never send an arm to a pose exactly at full stretch. The motors may fight each other, the arm may shake, and fast joint corrections can damage gears or hurt someone nearby. Stay a clear margin inside the workspace.</p>
+          </div>
+
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> In simple words</div>
+            <p>A singularity is a pose where the arm cannot move the way you want, and the maths gets jumpy. It happens when the arm is dead straight or fully folded. Keep it slightly bent and you are safe.</p>
+          </div>
+
+          <h2>Degrees of freedom and constraints</h2>
+
+          <p>Back in Chapter 5 you learned about <strong>degrees of freedom</strong> (DoF): one independent way a body can move. Now we can connect that idea to kinematics.</p>
+
+          <p>A planar two-link arm has two joints, so it has <strong>2 degrees of freedom</strong>. It must place a tip on a flat surface, which needs two numbers, x and y. Two freedoms for two needs: a good match, and generally one or two solutions.</p>
+
+          <p>Take that same arm into three dimensions and the tip needs three numbers, x, y and z. With only two joints, the arm cannot reach every point. It is <strong>under-actuated</strong>: fewer freedoms than the task needs.</p>
+
+          <p>The reverse is just as telling. Give a robot extra joints, so it has more freedoms than the task needs, and we call it <strong>redundant</strong>. A redundant arm has many IK answers, and it can use that freedom to dodge obstacles or avoid its joint limits.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Situation</th><th>Freedoms vs task</th><th>What it means</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Two-link arm on a plane</td><td>2 vs 2</td><td>Exactly enough; usually one or two solutions</td></tr>
+                <tr><td>Two joints reaching in 3D</td><td>2 vs 3</td><td>Under-actuated; cannot reach everywhere</td></tr>
+                <tr><td>Six-joint arm on a plane</td><td>6 vs 2</td><td>Redundant; many solutions, great freedom</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 16.4 — Matching degrees of freedom to the task. Too few limits reach; too many allows clever choices.</p>
+
+          <h2>Mobile robot kinematics: wheels that steer</h2>
+
+          <p>Arms are not the only machines that need kinematics. A robot on wheels needs the same care, just in a different form. Let us look at the most common design: <strong>differential drive</strong>.</p>
+
+          <p>A differential-drive robot has two driven wheels, one on the left and one on the right, plus a small free caster wheel for balance. There is no steering wheel. The robot turns purely by making the two wheels spin at different speeds.</p>
+
+          <p>Two numbers describe how the robot moves on the floor: its <strong>linear speed</strong> v (how fast it travels forward) and its <strong>turn rate</strong> &omega; (how fast it spins around, measured in radians per second). We compute both from the two wheel speeds.</p>
+
+          <div class="formula"><span class="label">Differential drive, forward speed</span> v = (vR + vL) / 2</div>
+          <div class="formula"><span class="label">Differential drive, turn rate</span> &omega; = (vR &minus; vL) / b</div>
+
+          <p>Here vR is the right wheel's linear speed and vL is the left wheel's. The symbol b is the <strong>wheelbase</strong>: the distance between the two wheels. Read the first formula in words: the robot's speed is just the average of the two wheels. Read the second: the robot's turn rate is how much faster the right wheel is than the left, divided by the gap between them.</p>
+
+          <p>What about the motor itself? A motor spins in rotations per second, so we must convert that to a wheel speed. The wheel speed is the spin rate times the wheel's circumference, and circumference is 2&pi;r.</p>
+
+          <div class="formula"><span class="label">From wheel spin to wheel speed</span> wheel speed = spin rate (rad/s) &times; r &nbsp;&nbsp; where &nbsp; r = wheel radius</div>
+
+          <h3>A worked example: forward, then spin in place</h3>
+
+          <p>Take a small robot with wheel radius r = 0.05 m (5 cm) and wheelbase b = 0.20 m (20 cm). We want two behaviours.</p>
+
+          <ol>
+            <li><strong>Drive straight forward at 0.2 m/s.</strong> For straight motion, both wheels must match: vR = vL = 0.2 m/s. Then v = (0.2 + 0.2) / 2 = 0.2 m/s. And &omega; = (0.2 &minus; 0.2) / 0.20 = 0. The robot travels forward and does not turn. Correct.</li>
+            <li><strong>Spin in place.</strong> A spin means v = 0 but &omega; is not zero. For v = 0, the wheels must be equal and opposite: vR = +0.1 m/s and vL = &minus;0.1 m/s. Then v = (0.1 &minus; 0.1) / 2 = 0. And &omega; = (0.1 &minus; (&minus;0.1)) / 0.20 = 0.2 / 0.20 = 1.0 rad/s. The robot rotates on the spot.</li>
+            <li><strong>Convert to wheel spin.</strong> A wheel speed of 0.1 m/s through a radius of 0.05 m needs a spin rate of 0.1 / 0.05 = 2 rad/s. So each motor spins at 2 radians per second, one forward and one backward.</li>
+            <li><strong>Read the numbers back.</strong> Equal wheels mean straight travel. Opposite wheels mean a spin. The bigger the difference, the sharper the turn. This single idea drives almost every small robot you will ever build.</li>
+          </ol>
+
+          <div class="callout note">
+            <div class="callout__head"><i class="bi bi-info-circle-fill"></i> Note</div>
+            <p>A differential-drive robot can never slide sideways. It cannot move left or right without turning first. That missing sideways motion is a <strong>constraint</strong>, and it is why a car-like robot must make a three-point turn to reverse direction in a tight space.</p>
+          </div>
+
+          <h2>A full worked example: placing a gripper and dodging an obstacle</h2>
+
+          <p>Now we put everything together. This is the real task from the start of the chapter. A two-link arm must place its gripper on a target point. There is an obstacle in the way, and we must choose the elbow solution that avoids it. Follow the reasoning at every step.</p>
+
+          <p><strong>The scene.</strong> The arm has L1 = 0.30 m and L2 = 0.25 m. The target sits at (x, y) = (0.315, 0.428) metres in the base frame. A tall block stands in the upper-left area, and the gripper must not sweep through it. The elbow-up pose bends the arm upward into the block. The elbow-down pose tucks the elbow low, well clear.</p>
+
+          <ol>
+            <li><strong>Check the target is reachable.</strong> Distance to the target: r = &radic;(0.315<sup>2</sup> + 0.428<sup>2</sup>) = &radic;0.2824 &asymp; 0.531 m. The outer limit is L1 + L2 = 0.55 m and the inner limit is |L1 &minus; L2| = 0.05 m. The target sits between them, so it is reachable. Good, we can continue.</li>
+            <li><strong>Solve for &theta;2.</strong> Using the IK formula: cos(&theta;2) = (0.2824 &minus; 0.0900 &minus; 0.0625) / (2 &times; 0.30 &times; 0.25) = 0.1299 / 0.15 = 0.8660. So &theta;2 = &plusmn;30&deg;. Two candidate angles exist.</li>
+            <li><strong>Solve for &theta;1 both ways.</strong> Elbow up: &theta;1 = 53.6&deg; &minus; 13.6&deg; = 40.0&deg;. Elbow down: &theta;1 = 53.6&deg; &minus; (&minus;13.6&deg;) = 67.2&deg;. Both reach the target, as we proved earlier.</li>
+            <li><strong>Compare the two poses against the obstacle.</strong> Elbow-up sends the elbow joint upward into the block's footprint. Elbow-down keeps the elbow low and forward, on the open side of the table.</li>
+            <li><strong>Choose elbow-down.</strong> It avoids the obstacle, so we select &theta;1 = 67.2&deg; and &theta;2 = &minus;30&deg;. This is the whole point of having two solutions: we get to pick the safer one.</li>
+            <li><strong>Check joint limits.</strong> Suppose the second joint of this arm can only turn between &minus;170&deg; and +170&deg;. Our &minus;30&deg; is allowed. If the chosen angle had fallen outside the limit, we would have had to reject that solution and use the other, or report that the task is impossible.</li>
+            <li><strong>Check we are not near a singularity.</strong> The arm is bent, not straight, and the distance r = 0.531 m is a clear margin below the 0.55 m limit. We are far from the trouble spots. Safe to move.</li>
+            <li><strong>Send the angles to the motors, then verify.</strong> The controller commands the two joints. A sensor reads the real tip position afterwards. If it drifts, the controller corrects, using the feedback loop you learned in Chapter 15.</li>
+          </ol>
+
+          <p>Look at the reasoning. We did not just solve for angles. We solved, gathered the options, tested each against the world, and then chose. That mix of maths and judgement is what real robot programming feels like.</p>
+
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> The key idea</div>
+            <p>Inverse kinematics gives you candidates, not commands. A good robot programmer always checks the candidates against obstacles, joint limits and singularities before moving a single motor.</p>
+          </div>
+
+          <h2>Common mistakes beginners make</h2>
+
+          <p>Kinematics has a few well-worn traps. Knowing them saves many frustrating evenings.</p>
+
+          <ul>
+            <li><strong>Mixing degrees and radians.</strong> This is the number one bug. If your code library wants radians and you feed it degrees, the arm points at the wrong angle every time. Decide the unit at the start and convert with the bridge formula.</li>
+            <li><strong>Forgetting the base frame.</strong> A position measured from the wrong origin gives a wrong answer that looks almost right. Always label which frame your numbers belong to.</li>
+            <li><strong>Using only the first IK solution.</strong> If you always take +&theta;2, your robot may crash into obstacles it could have avoided. Compute both and choose.</li>
+            <li><strong>Working near singularities.</strong> Asking for a fully stretched pose makes the joints jumpy and the gears suffer. Keep a clear margin inside the workspace.</li>
+            <li><strong>Ignoring joint limits.</strong> A mathematically perfect answer is useless if the joint cannot physically reach that angle. Check the limits every time.</li>
+            <li><strong>Assuming a target is reachable.</strong> If r is larger than L1 + L2, no solution exists. Check the workspace before you solve.</li>
+            <li><strong>Rounding too early.</strong> Rounding cos to two decimals in the middle of a chain of arithmetic can throw the final position off by centimetres. Keep full precision until the end.</li>
+          </ul>
+
+          <div class="callout warn">
+            <div class="callout__head"><i class="bi bi-exclamation-triangle-fill"></i> Watch out</div>
+            <p>When an arm behaves strangely, check these in order: units, frame, solution choice, joint limits. Nine times out of ten, the bug is one of these four, not deep maths.</p>
+          </div>
+
+          <h2>How professionals do it</h2>
+
+          <p>The two-link arm is a teaching tool. Real robots have six joints, turn in three dimensions, and carry heavy tools. The ideas are the same, but the bookkeeping grows. Here is how professionals handle it.</p>
+
+          <h3>Homogeneous transforms and matrices</h3>
+
+          <p>Professionals package a rotation and a shift together into one grid of numbers called a <strong>homogeneous transform</strong>. Feeding one of these through the chain of joints moves a position from the tool frame to the world frame in one clean step. It replaces pages of trigonometry with neat matrix multiplication, and computers love it.</p>
+
+          <h3>DH parameters</h3>
+
+          <p>To build those transforms for a real arm, engineers use a standard recipe called <strong>Denavit&ndash;Hartenberg parameters</strong>, or DH for short. DH describes each link and each joint with just four numbers, written in a fixed order. Any arm, from a tiny gripper to a giant welding robot, can be described this way. It is the shared language of robot arm geometry.</p>
+
+          <h3>Numerical inverse kinematics</h3>
+
+          <p>When an arm has six joints, the clean formulas of this chapter stop working. Instead, software solves IK by <strong>iteration</strong>: guess the angles, measure how far off the tip is, nudge the angles, and repeat until the error is tiny. This method handles any shape of arm, and it fits naturally with real-time control loops.</p>
+
+          <h3>Redundancy and joint limits</h3>
+
+          <p>Extra joints give a robot spare freedom. A professional solver uses that freedom to keep the arm away from obstacles, to stay clear of joint limits, and to move smoothly. The robot picks the best path among many, rather than the only path.</p>
+
+          <h3>ROS and the TF2 frame system</h3>
+
+          <p>In the <strong>Robot Operating System</strong>, or ROS, frames are managed by a tool called <strong>TF2</strong>. You declare how each frame connects to the next, and TF2 tracks every part's position in real time. It can answer "where is the gripper relative to the base right now?" instantly. This is the professional cure for frame confusion. You will meet ROS properly in Chapter 18.</p>
+
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> In simple words</div>
+            <p>Professionals use matrices to move between frames, a four-number recipe called DH to describe arms, and a software tracker called TF2 to keep every frame straight. Big words, same small ideas as this chapter.</p>
+          </div>
+
+          <h2>Going deeper (optional)</h2>
+
+          <p>If you enjoyed this chapter, here is one idea to carry with you. The robot does not reason about position alone. It cares just as much about <strong>speed</strong>. The link between joint speed and tip speed is called the <strong>Jacobian</strong>.</p>
+
+          <p>Think of the Jacobian as a translator. It says: if joint one turns a little faster, how much faster does the tip move, and in which direction? It is the bridge from joint motion to world motion.</p>
+
+          <p>The Jacobian also explains singularities in one clean stroke. At a singularity, the Jacobian cannot be inverted, which is the fancy way of saying "some directions of tip motion are impossible here". That is exactly the fully stretched or fully folded pose we met earlier. One idea, two views of the same trouble.</p>
+
+          <h2>Try it yourself</h2>
+
+          <p>You learn kinematics best with a pencil and a calculator. These exercises need no hardware, and they build real skill.</p>
+
+          <ol>
+            <li><strong>Find a one-link tip.</strong> A link of length 0.5 m points at &theta; = 30&deg;. Use x = L cos(&theta;) and y = L sin(&theta;). Find the tip. Hint: cos(30&deg;) = 0.8660 and sin(30&deg;) = 0.5.</li>
+            <li><strong>Do a two-link FK by hand.</strong> Use L1 = 0.20 m, L2 = 0.20 m, &theta;1 = 60&deg;, &theta;2 = 45&deg;. Compute x and y with the two-link formulas. Hint: first find the combined angle 105&deg;, then look up its sine and cosine.</li>
+            <li><strong>Solve one IK by hand.</strong> Take L1 = 0.30 m and L2 = 0.25 m, with the target at (0.40, 0.20). Find cos(&theta;2), then the two &theta;2 options. Hint: r<sup>2</sup> = 0.40<sup>2</sup> + 0.20<sup>2</sup> = 0.20, and the bottom of the formula is 0.15.</li>
+            <li><strong>Plot an arm's workspace.</strong> Draw two axes. Sketch an outer circle of radius L1 + L2 and an inner circle of radius |L1 &minus; L2| using L1 = 0.30 and L2 = 0.25. Shade the ring between them. That shaded band is everything the arm can touch. Hint: mark the fully stretched and fully folded poses first.</li>
+            <li><strong>Steer a robot with numbers.</strong> A differential-drive robot has b = 0.25 m and r = 0.04 m. Find the wheel speeds for a gentle left turn at v = 0.15 m/s with &omega; = 0.4 rad/s. Hint: vR = v + (&omega; &times; b) / 2 and vL = v &minus; (&omega; &times; b) / 2.</li>
+          </ol>
+
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> Where this leads</div>
+            <p>You place grippers with frames and angles. Professionals describe poses with <strong>SE(3)</strong>, rotations with <strong>quaternions</strong>, and motion with dynamics, not just geometry. The formal tools are in <a href="ch25-advanced-math-for-robotics.html">Chapter 25: Advanced Mathematics for Robotics</a>.</p>
+          </div>
+
+          <section class="takeaways">
+            <h2><i class="bi bi-pin-angle-fill"></i> Key takeaways</h2>
+            <ul>
+              <li><i class="bi bi-check2-circle"></i> Kinematics is the geometry of motion: positions, angles and speeds, with no forces.</li>
+              <li><i class="bi bi-check2-circle"></i> A position is written as (x, y) in 2D or (x, y, z) in 3D, measured from an origin.</li>
+              <li><i class="bi bi-check2-circle"></i> A frame is an origin and axes glued to a part; robots have many frames.</li>
+              <li><i class="bi bi-check2-circle"></i> sin gives the height and cos gives the width of a sloped line.</li>
+              <li><i class="bi bi-check2-circle"></i> Positive angles turn counter-clockwise from the x axis.</li>
+              <li><i class="bi bi-check2-circle"></i> Forward kinematics adds each link's triangle to find the tip.</li>
+              <li><i class="bi bi-check2-circle"></i> Inverse kinematics finds the angles for a target, and can have zero, one or two answers.</li>
+              <li><i class="bi bi-check2-circle"></i> The two IK answers are the elbow-up and elbow-down poses; choose the one that works.</li>
+              <li><i class="bi bi-check2-circle"></i> A differential-drive robot sets its speed and turn rate from the two wheel speeds.</li>
+            </ul>
+          </section>
+
+          <section class="quiz">
+            <div class="quiz__head"><i class="bi bi-patch-question-fill"></i> Check your understanding</div>
+            <details>
+              <summary><span class="q-num">Q1.</span><span>What is the difference between kinematics and dynamics?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Kinematics describes position and motion (angles, positions, speeds). Dynamics describes the forces that cause the motion (torque, weight, acceleration).</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q2.</span><span>In plain words, what does cos(&theta;) tell you?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> It tells you the width of a sloped line as a share of its length. To get the actual width, multiply the length by cos(&theta;).</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q3.</span><span>Why does a robot arm need so many coordinate frames?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Each joint measures its angle against the part just before it. So we attach a frame to the base, each joint, each link and the tool. Then any position has a clear, local reference.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q4.</span><span>A point on the x axis is rotated by 90&deg; counter-clockwise. Which axis does it now lie on?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> The positive y axis. A 90&deg; counter-clockwise turn takes (x, 0) to (0, x).</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q5.</span><span>With a two-link arm at &theta;1 = 0&deg; and &theta;2 = 0&deg;, what are x and y in terms of L1 and L2?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> x = L1 + L2 and y = 0. The whole arm lies flat along the x axis, so the lengths add and there is no height.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q6.</span><span>Convert 90&deg; to radians.</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> 90 &times; (&pi; / 180) = &pi; / 2, which is about 1.571 radians.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q7.</span><span>Why can the same target point have two different joint-angle solutions?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Because cos(&theta;2) is the same for +&theta;2 and &minus;&theta;2. Both elbow-up and elbow-down poses place the tip at the same point, so the robot must choose one.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q8.</span><span>A differential-drive robot drives both wheels forward at 0.3 m/s. What is its turn rate?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Zero. Equal wheel speeds mean &omega; = (vR &minus; vL) / b = 0, so the robot travels straight with no turning.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q9.</span><span>What is a singularity, in plain words, and why avoid it?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> A pose where the arm cannot move some way you want, and the maths becomes unstable. It happens at full stretch or full fold. Avoid it because tiny errors cause huge, jumpy joint changes.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q10.</span><span>A two-link arm must reach a point that is 0.60 m from its base. L1 = 0.30 m and L2 = 0.25 m. Can it?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> No. The maximum reach is L1 + L2 = 0.55 m, and 0.60 m is beyond that. No IK solution exists, so the target is outside the reachable workspace.</div>
+            </details>
+          </section>
+
+        </article>
+
+        <nav class="pager" id="pager" aria-label="Chapter navigation"></nav>
+      </div>
+    </main>
+  </div>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/book.js"></script>
+</body>
+</html>

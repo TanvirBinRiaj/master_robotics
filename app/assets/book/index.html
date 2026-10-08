@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>try{var __t=null;try{__t=localStorage.getItem("mr-theme")}catch(e){}if(__t!=="dark"&&__t!=="light"){try{var __m=document.cookie.match(/(?:^|;\s*)mr-theme=(dark|light)/);__t=__m?__m[1]:null}catch(e){__t=null}}if(__t!=="dark"&&__t!=="light"){try{var __w=String(window.name||"").match(/mr-theme=(dark|light)/);__t=__w?__w[1]:null}catch(e){}}if(__t!=="dark"&&__t!=="light"&&window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches){__t="dark"}if(__t==="dark"||__t==="light")document.documentElement.setAttribute("data-theme",__t)}catch(e){}</script>
+  <title>Master Robotics — From Beginner to Professional Engineer</title>
+  <meta name="description" content="A complete, plain-English robotics book. Learn mechanics, electronics, software, AI and career skills from zero, and become a professional robotics engineer.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="vendor/bootstrap-icons/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/prose.css">
+  <link rel="stylesheet" href="assets/css/mobile.css">
+</head>
+<body data-file="index.html">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="topbar" id="topbar"></header>
+  <div class="progress-bar" id="progressBar"></div>
+
+  <div class="layout">
+    <div class="sidebar__backdrop" id="navBackdrop"></div>
+    <nav class="sidebar" id="sidebar" aria-label="Book contents"></nav>
+
+    <main class="main" id="main">
+      <div class="container">
+        <section class="hero">
+          <span class="chapter-kicker"><i class="bi bi-journal-bookmark-fill"></i> A Complete Course in One Book</span>
+          <h1>Master Robotics</h1>
+          <p class="lede">From the first question — <em>what is a robot?</em> — to the skills of a paid professional engineer. Written in simple, clear English, so anyone can follow, even if English is not your first language.</p>
+          <div class="hero__stats">
+            <span class="stat"><i class="bi bi-collection"></i> <b>30</b> <span>chapters</span></span>
+            <span class="stat"><i class="bi bi-diagram-3"></i> <b>7</b> <span>parts</span></span>
+            <span class="stat"><i class="bi bi-book"></i> <b>4</b> <span>appendices</span></span>
+            <span class="stat"><i class="bi bi-clock-history"></i> <b>~12</b> <span>hours of reading</span></span>
+          </div>
+          <p style="margin-top:26px;display:flex;gap:14px;flex-wrap:wrap;">
+            <a class="chapter-card" style="flex:0 0 auto;padding:12px 18px;" href="ch01-what-is-a-robot.html">
+              <span class="cc-body"><span class="cc-title"><i class="bi bi-play-circle"></i> Start reading — Chapter 1</span></span>
+            </a>
+          </p>
+        </section>
+
+        <hr>
+
+        <section>
+          <h2 style="font-size:24px;letter-spacing:-.02em;">How to read this book</h2>
+          <p class="lead">You do not need a university degree, a big budget, or perfect English. You need three simple habits:</p>
+          <ol class="article" style="font-size:17px;">
+            <li><strong>Read one chapter at a time.</strong> Each chapter is short and stands on its own.</li>
+            <li><strong>Pause at every example.</strong> Say the idea out loud in your own words. If you can explain it, you understand it.</li>
+            <li><strong>Build something early.</strong> The book ends with a full robot project. The sooner your hands are busy, the faster your brain learns.</li>
+          </ol>
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> Plain-English promise</div>
+            <p>Every technical word is explained the first time it appears, and again in the <a href="glossary.html">glossary</a>. Short sentences. Everyday examples. No jargon without a translation.</p>
+          </div>
+        </section>
+
+        <hr>
+
+        <section id="contents">
+          <h2 style="font-size:24px;letter-spacing:-.02em;margin-bottom:4px;">Table of contents</h2>
+          <p style="color:var(--text-mute);margin-top:0;">Seven parts, thirty chapters, four appendices. Follow them in order, or jump to what you need.</p>
+          <div id="toc"></div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/book.js"></script>
+</body>
+</html>

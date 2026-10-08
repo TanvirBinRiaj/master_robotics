@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>try{var __t=null;try{__t=localStorage.getItem("mr-theme")}catch(e){}if(__t!=="dark"&&__t!=="light"){try{var __m=document.cookie.match(/(?:^|;\s*)mr-theme=(dark|light)/);__t=__m?__m[1]:null}catch(e){__t=null}}if(__t!=="dark"&&__t!=="light"){try{var __w=String(window.name||"").match(/mr-theme=(dark|light)/);__t=__w?__w[1]:null}catch(e){}}if(__t!=="dark"&&__t!=="light"&&window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches){__t="dark"}if(__t==="dark"||__t==="light")document.documentElement.setAttribute("data-theme",__t)}catch(e){}</script>
+  <title>Chapter 15: Control Systems: Making Robots Behave — Master Robotics</title>
+  <meta name="description" content="Open-loop and closed-loop control, feedback, error, and the famous PID idea made simple. Learn to tune a controller by watching how a real robot behaves.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="vendor/bootstrap-icons/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/prose.css">
+  <link rel="stylesheet" href="assets/css/mobile.css">
+</head>
+<body data-file="ch15-control-systems.html">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="topbar" id="topbar"></header>
+  <div class="progress-bar" id="progressBar"></div>
+
+  <div class="layout">
+    <div class="sidebar__backdrop" id="navBackdrop"></div>
+    <nav class="sidebar" id="sidebar" aria-label="Book contents"></nav>
+
+    <main class="main" id="main">
+      <div class="container">
+
+        <header class="chapter-head">
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="index.html">Home</a>
+            <i class="bi bi-chevron-right"></i>
+            <a href="index.html#software">Part 4 &middot; Software and Control</a>
+            <i class="bi bi-chevron-right"></i>
+            <span>Chapter 15</span>
+          </nav>
+          <span class="chapter-kicker"><i class="bi bi-code-slash"></i> Part 4 &middot; Software and Control</span>
+          <h1>Control Systems: Making Robots Behave</h1>
+          <p class="lede">A robot that only follows fixed commands drifts off course. This chapter shows you how feedback keeps a robot on target, and how the famous PID controller lets you tune that behaviour by hand.</p>
+          <div class="chapter-meta">
+            <span><i class="bi bi-clock"></i> ~25 min read</span>
+            <span><i class="bi bi-bar-chart"></i> Intermediate</span>
+            <span><i class="bi bi-list-check"></i> Chapter 15 of 30</span>
+          </div>
+          <div class="goals">
+            <h2>What you will learn</h2>
+            <ul>
+              <li><i class="bi bi-check-circle-fill"></i> Explain feedback and error.</li>
+              <li><i class="bi bi-check-circle-fill"></i> Describe what a PID controller does.</li>
+              <li><i class="bi bi-check-circle-fill"></i> Tune a simple controller by watching behaviour.</li>
+            </ul>
+          </div>
+        </header>
+
+        <article class="article">
+
+          <p class="lead">Imagine stepping into a shower. You turn the tap and wait. The water feels too cold, so you twist it a little toward hot. It becomes too hot, so you twist back. In a few seconds you find the right spot. Without knowing any maths, you just controlled a system using feedback. Robots do the same thing, only faster and more precisely.</p>
+
+          <p>By the end of this chapter you will be able to write a control loop, explain what each part does, and tune it by watching how your robot moves. Almost every moving robot you will ever build depends on this skill.</p>
+
+          <h2>Open-loop control: acting without checking</h2>
+
+          <p>Start with the simplest way to control something: tell it what to do and hope for the best. This is called <strong>open-loop control</strong>. The word "open" means there is no loop back. The controller acts, but it never checks the result.</p>
+
+          <p>Think about the shower again. Suppose you decide the tap position for a warm shower and never touch it again. You set it once and walk away. That is open-loop. You picked a tap position, but you did not measure the water temperature even once.</p>
+
+          <p>Now think of a robot. You want it to drive at a steady speed. In open-loop control, you send the motors a fixed amount of power and leave it. "Go at half power," you say. The robot obeys. There is no sensor, no checking, no correcting. Just a fixed command.</p>
+
+          <h3>Why open-loop drifts</h3>
+
+          <p>Open-loop control works only when nothing changes. In the real world, things change all the time. Here is what happens to your half-power robot.</p>
+
+          <ul>
+            <li><strong>The battery voltage drops.</strong> A fresh battery might push the motor hard. After twenty minutes of driving, the same "half power" setting gives less push. The robot slows down on its own.</li>
+            <li><strong>The floor changes.</strong> Smooth tile is easy to drive on. Thick carpet or a small ramp adds resistance. Suddenly half power is not enough.</li>
+            <li><strong>The load changes.</strong> A robot carrying a heavy box needs more push than an empty one. Same command, different speed.</li>
+            <li><strong>The motors grow hot.</strong> Heat changes how a motor behaves. Two motors from the same box may even run at slightly different speeds.</li>
+          </ul>
+
+          <p>None of these changes are dramatic alone, but together they make the robot slow down or speed up without warning. The command was fixed, but the world was not.</p>
+
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> In simple words</div>
+            <p>Open-loop means "do it and do not look". Closed-loop means "do it, look at the result, and fix it". Real robots drift when they do not look.</p>
+          </div>
+
+          <h2>Closed-loop control: acting and checking</h2>
+
+          <p>Now add one new habit: after acting, measure what actually happened. Compare it with what you wanted. Use the difference to adjust your next command. This is <strong>closed-loop control</strong>. The word "closed" means the information flows in a full circle, back to the start.</p>
+
+          <p>The shower is closed-loop when you keep testing the water and adjusting. You measure the temperature with your hand, compare it with what you want, and twist the tap a little more or less. You repeat until it feels right.</p>
+
+          <p>The robot changes in the same way. Suppose it has a wheel speed sensor, so it can measure how fast a wheel is really turning. It compares that real speed with the speed you asked for. If the real speed is low, it pushes harder; if it is high, it eases off. The battery may sag and the floor may change, but the robot quietly corrects for both.</p>
+
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> The key idea</div>
+            <p><strong>Feedback</strong> is measuring the result of an action and using that measurement to correct the next action. It is the single most important idea in control systems.</p>
+          </div>
+
+          <figure class="figure">
+            <div class="figure__box">
+              <svg viewBox="0 0 720 260" width="100%" role="img" aria-label="A closed control loop: desired speed, subtract measured speed to get error, controller, motor, robot moves, sensor measures speed, and the measurement feeds back to the subtraction">
+                <rect x="20" y="100" width="130" height="64" rx="10" fill="#e8eeff" stroke="#2d5bff" stroke-width="2"></rect>
+                <text x="85" y="128" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#2d5bff">Setpoint</text>
+                <text x="85" y="147" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#4a5266">desired speed</text>
+
+                <circle cx="225" cy="132" r="22" fill="#f2f4f9" stroke="#7b849b" stroke-width="2"></circle>
+                <line x1="212" y1="120" x2="238" y2="144" stroke="#7b849b" stroke-width="2"></line>
+                <line x1="212" y1="144" x2="238" y2="120" stroke="#7b849b" stroke-width="2"></line>
+                <text x="225" y="176" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#7b849b">subtract</text>
+
+                <rect x="280" y="100" width="140" height="64" rx="10" fill="#f0e9fd" stroke="#7a4ddb" stroke-width="2"></rect>
+                <text x="350" y="126" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#7a4ddb">Controller</text>
+                <text x="350" y="146" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#4a5266">PID maths</text>
+
+                <rect x="470" y="100" width="130" height="64" rx="10" fill="#e2f6ef" stroke="#0f9d78" stroke-width="2"></rect>
+                <text x="535" y="126" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#0f9d78">Motor</text>
+                <text x="535" y="146" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#4a5266">turns wheel</text>
+
+                <line x1="150" y1="132" x2="203" y2="132" stroke="#7b849b" stroke-width="2" marker-end="url(#ar15)"></line>
+                <line x1="247" y1="132" x2="280" y2="132" stroke="#7b849b" stroke-width="2" marker-end="url(#ar15)"></line>
+                <line x1="420" y1="132" x2="470" y2="132" stroke="#7b849b" stroke-width="2" marker-end="url(#ar15)"></line>
+                <line x1="600" y1="132" x2="680" y2="132" stroke="#7b849b" stroke-width="2" marker-end="url(#ar15)"></line>
+                <text x="640" y="122" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#7b849b">robot moves</text>
+
+                <rect x="500" y="20" width="130" height="46" rx="10" fill="#fff4e0" stroke="#d98a00" stroke-width="2"></rect>
+                <text x="565" y="48" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#b06a00">Sensor</text>
+                <line x1="680" y1="132" x2="720" y2="132" stroke="#7b849b" stroke-width="2"></line>
+                <path d="M720 132 C720 60 640 43 630 43" fill="none" stroke="#7b849b" stroke-width="2" marker-end="url(#ar15)"></path>
+                <path d="M500 43 C300 43 225 60 225 110" fill="none" stroke="#0f9d78" stroke-width="2" stroke-dasharray="6 6" marker-end="url(#ar15)"></path>
+                <text x="360" y="34" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#0f9d78">measured speed feeds back</text>
+
+                <text x="225" y="232" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#4a5266">error = setpoint &minus; measured</text>
+                <defs>
+                  <marker id="ar15" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+                    <path d="M0,0 L9,4.5 L0,9 z" fill="#7b849b"></path>
+                  </marker>
+                </defs>
+              </svg>
+            </div>
+            <figcaption>Figure 15.1 — The control loop. The desired value goes in, the measured value is subtracted to find the error, and the controller turns that error into a command. The sensor sends the result back to the start.</figcaption>
+          </figure>
+
+          <h2>The idea of error</h2>
+
+          <p>Everything in this chapter grows from one tiny subtraction. We need three words first. Learn them now and the rest will feel easy.</p>
+
+          <ul>
+            <li><strong>Setpoint</strong> — the value you want. "I want the wheel to spin at 200 revolutions per minute."</li>
+            <li><strong>Measured value</strong> — the value you really have, read from a sensor. "The sensor says the wheel is spinning at 170 revolutions per minute."</li>
+            <li><strong>Output</strong> — the command you send to the actuator. "Send 60 percent power to the motor."</li>
+          </ul>
+
+          <p>The difference between the first two is the <strong>error</strong>. Error tells you how far you are from your goal. It also tells you the direction: are you too high or too low?</p>
+
+          <div class="formula"><span class="label">Error</span> error = setpoint &minus; measured value</div>
+
+          <p>Plug in the numbers. Setpoint is 200, measured value is 170. So error = 200 &minus; 170 = +30. The positive sign means the wheel is too slow. We need more output. If the wheel were spinning at 230, error = 200 &minus; 230 = &minus;30. The negative sign means too fast. We need less output.</p>
+
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> Tip</div>
+            <p>Read the sign of the error as a direction. Positive error means "push more". Negative error means "push less". Zero error means "we are exactly on target".</p>
+          </div>
+
+          <p>Keep those three words in your head: <strong>setpoint</strong>, <strong>measured value</strong>, <strong>output</strong>. The rest of the chapter uses them again and again, always with the same meaning.</p>
+
+          <h2>Proportional control: push in proportion to the error</h2>
+
+          <p>Now that we can measure the error, we need a rule to turn it into an output. The simplest rule is: the bigger the error, the bigger the push. This is <strong>proportional control</strong>, often called <strong>P</strong>.</p>
+
+          <p>Imagine steering a car toward the centre of a lane. If you are only a little off centre, you turn the wheel gently. If you are drifting toward the edge, you turn much harder. A proportional controller does exactly that with a motor.</p>
+
+          <p>The rule is one multiplication. The <strong>gain</strong> is the number you multiply the error by. For proportional control we call it <strong>Kp</strong>.</p>
+
+          <div class="formula"><span class="label">Proportional control</span> output = Kp &times; error</div>
+
+          <p><strong>Kp</strong> is a tuning number you choose. It decides how strongly the controller reacts to error. Watch what happens as we change it, using the motor example with an error of +30.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Kp</th><th>Error</th><th>Output</th><th>What you see</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>0.5</td><td>+30</td><td>+15</td><td>Very weak push. The robot is slow to reach speed.</td></tr>
+                <tr><td>2</td><td>+30</td><td>+60</td><td>A firm push. It reaches speed reasonably fast.</td></tr>
+                <tr><td>6</td><td>+30</td><td>+180</td><td>A violent push. It overshoots and wobbles.</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 15.1 — The same error, three different gains. Kp changes how strongly the controller reacts.</p>
+
+          <h3>If Kp is too small</h3>
+
+          <p>The controller reacts weakly. It takes a long time to reach the setpoint, and it gives up easily. A small disturbance, like a tiny bump in the floor, knocks the robot off speed for several seconds. The behaviour feels lazy and soft. The robot never becomes snappy or precise.</p>
+
+          <h3>If Kp is too large</h3>
+
+          <p>The controller reacts too strongly. It pushes hard, overshoots the target, then pushes back the other way. The robot speed swings above and below the setpoint, over and over. This back-and-forth wobble is called <strong>oscillation</strong>. In the worst case the robot shakes and buzzes constantly.</p>
+
+          <figure class="figure">
+            <div class="figure__box">
+              <svg viewBox="0 0 720 300" width="100%" role="img" aria-label="Two response curves over time. A P-only curve rises, overshoots, oscillates, then settles below the target line. A PID curve rises smoothly and settles on the target.">
+                <line x1="70" y1="40" x2="70" y2="250" stroke="#7b849b" stroke-width="2"></line>
+                <line x1="70" y1="250" x2="670" y2="250" stroke="#7b849b" stroke-width="2"></line>
+                <text x="30" y="45" font-family="Inter, sans-serif" font-size="12" fill="#7b849b">speed</text>
+                <text x="660" y="272" text-anchor="end" font-family="Inter, sans-serif" font-size="12" fill="#7b849b">time &rarr;</text>
+                <line x1="70" y1="120" x2="670" y2="120" stroke="#0f9d78" stroke-width="2" stroke-dasharray="7 6"></line>
+                <text x="676" y="118" font-family="Inter, sans-serif" font-size="11" fill="#0f9d78">setpoint</text>
+
+                <path d="M70 250 C150 250 170 90 230 95 C280 99 300 175 350 170 C395 165 415 108 465 112 C505 115 525 140 570 132 C610 125 640 128 670 130" fill="none" stroke="#2d5bff" stroke-width="3"></path>
+                <text x="470" y="222" font-family="Inter, sans-serif" font-size="12" fill="#2d5bff">P only: overshoot and wobble, settles low</text>
+
+                <path d="M70 250 C180 250 230 150 320 124 C410 112 500 118 670 119" fill="none" stroke="#7a4ddb" stroke-width="3"></path>
+                <text x="360" y="92" font-family="Inter, sans-serif" font-size="12" fill="#7a4ddb">PID: smooth, reaches target, stays there</text>
+              </svg>
+            </div>
+            <figcaption>Figure 15.2 — The blue curve is proportional control alone. It overshoots and wobbles. The purple curve adds integral and derivative, which calm the wobble and remove the leftover gap.</figcaption>
+          </figure>
+
+          <h3>Why P alone never quite finishes the job</h3>
+
+          <p>Here is a subtle but important problem. With P control, the output is proportional to the error. So when the error is zero, the output is zero. But sometimes you need a small output to hold your position.</p>
+
+          <p>Think about the speed robot again. To keep a wheel spinning, the motor must fight friction. It needs a little power just to keep going. Where does that power come from? From the error. So the robot settles at a speed slightly below the setpoint, where the small error produces exactly enough power to beat friction. It never quite reaches the target.</p>
+
+          <p>That leftover gap is called <strong>steady-state error</strong>, or sometimes <strong>droop</strong>. It is the reason a P-only robot always seems a little slow. The fix is adding a second term.</p>
+
+          <div class="callout note">
+            <div class="callout__head"><i class="bi bi-info-circle-fill"></i> Note</div>
+            <p>Steady-state error is not a bug you can remove by raising Kp alone. Higher Kp shrinks the gap but also worsens the oscillation. The proper cure is integral control, which we meet next.</p>
+          </div>
+
+          <h2>Integral control: learn from the past</h2>
+
+          <p>The speed robot has a small error that refuses to disappear. The proportional term stops pushing as that error shrinks. We need something that keeps pushing until the gap is truly closed. That something is <strong>integral control</strong>, or <strong>I</strong>.</p>
+
+          <p>Integral control adds up all the error you have seen so far. A tiny error that lasts a long time slowly builds a big total. Even a small leftover gap will, after a while, grow into a strong push that finally closes the gap. Think of it as remembering your past mistakes and growing more insistent.</p>
+
+          <div class="formula"><span class="label">Integral control</span> output = Ki &times; (running total of error)</div>
+
+          <p><strong>Ki</strong> is the integral gain. It sets how fast the accumulated error grows and how strongly it pushes. The running total is often called the <strong>integral</strong> or the <strong>integral term</strong>.</p>
+
+          <p>In a real robot the error is added up step by step. Each loop, you take the current error and add it to a running sum. That sum is the memory of past error. Let us picture it with the motor example, one loop every 0.1 seconds.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Loop</th><th>Error</th><th>Running total</th><th>Effect on push</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>1</td><td>+10</td><td>10</td><td>Tiny push upward.</td></tr>
+                <tr><td>2</td><td>+10</td><td>20</td><td>Push doubles.</td></tr>
+                <tr><td>3</td><td>+10</td><td>30</td><td>Push triples.</td></tr>
+                <tr><td>4</td><td>+10</td><td>40</td><td>Push keeps growing until the gap closes.</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 15.2 — The integral term remembers a small error. A small gap that never closes still builds a strong push over time.</p>
+
+          <h3>The danger: integral windup</h3>
+
+          <p>Integral control is powerful, but it has a famous flaw. Imagine the robot is switched on and the wheel cannot move yet because a brake is on. The error stays large for several seconds. The integral term keeps adding and adding, growing huge, even though the motor cannot act on it.</p>
+
+          <p>Then you release the brake. The integral term is now enormous. It slams the motor with far too much power, overshoots badly, and takes ages to settle. This runaway build-up is called <strong>integral windup</strong>. The word "windup" means the term wound itself up like a spring while it was helpless.</p>
+
+          <p>The standard fix is a <strong>clamp</strong>, also called an <strong>anti-windup limit</strong>. You simply stop the running total from going above or below a chosen maximum. You say, "the integral term may never be larger than 100, or smaller than &minus;100." That keeps the spring from winding too tight.</p>
+
+          <div class="code">
+            <div class="code__bar">
+              <span class="code__dots"><span></span><span></span><span></span></span>
+              <span class="code__lang">Pseudo-code</span>
+              <button class="code__copy" type="button"><i class="bi bi-clipboard"></i> Copy</button>
+            </div>
+            <pre><code>integral = integral + error * dt
+
+# anti-windup clamp: keep the spring from winding too tight
+if integral &gt; 100:
+    integral = 100
+if integral &lt; -100:
+    integral = -100</code></pre>
+          </div>
+
+          <h3>If Ki is too large</h3>
+
+          <p>Too much integral makes the robot sluggish and wobbly in a slow, rolling way. It overshoots the target, drifts back, overshoots again, and takes a long time to calm down. This is different from the fast buzz caused by too much Kp. Slow waves usually mean the integral term is too strong.</p>
+
+          <h2>Derivative control: look at how fast things change</h2>
+
+          <p>Proportional looks at the error now. Integral remembers error from the past. The third term, <strong>derivative control</strong> or <strong>D</strong>, looks at the future. It watches how fast the error is changing and tries to slow the robot down before it overshoots.</p>
+
+          <p>You already do this when driving toward a red light. As you get close, the gap is shrinking quickly. Your brain notices the fast change and eases off the accelerator early, so you stop smoothly at the line instead of braking hard at the last second. The derivative term is that early easing.</p>
+
+          <div class="formula"><span class="label">Derivative control</span> output = Kd &times; (rate of change of error)</div>
+
+          <p><strong>Kd</strong> is the derivative gain. The rate of change is how much the error moved since the last moment. If the error is shrinking fast, the derivative term is large and pushes against the motion. It acts like a brake that is applied earlier and more gently, which is why we say it <strong>dampens</strong> the response.</p>
+
+          <p>A soft-close hinge dampens a door so it never slams. Derivative control is the soft-close hinge of a robot's movement.</p>
+
+          <h3>The danger: noise amplification</h3>
+
+          <p>Derivative control has one big weakness. It looks at how fast the error changes. But sensor readings are never perfectly clean. They jump around slightly, even when nothing real is happening. That tiny jump looks like a very fast change, so the derivative term reacts strongly to pure noise.</p>
+
+          <p>The result is a buzzing or hissing output, and the motor shakes. The faster the noise, the worse the derivative term makes it. Too much Kd turns a smooth robot into a jittery one. The fix is to filter the sensor reading so the noise is smoothed out, which we cover later and in Chapter 10.</p>
+
+          <div class="callout warn">
+            <div class="callout__head"><i class="bi bi-exclamation-triangle-fill"></i> Watch out</div>
+            <p>Never add derivative control on top of noisy sensor data. It will amplify the noise, not calm the robot. Smooth the measurements first, then use D.</p>
+          </div>
+
+          <h2>Putting it together: PID</h2>
+
+          <p>Each term solves one problem. P gives a fast, direct response. I removes the small leftover gap. D calms the overshoot. Put all three together and you get <strong>PID control</strong>. The name simply lists its three parts: proportional, integral, derivative.</p>
+
+          <div class="formula"><span class="label">PID controller</span> output = Kp &times; error + Ki &times; &int;error dt + Kd &times; (d error / dt)</div>
+
+          <p>That formula can look scary. Read it in words instead. "Push in proportion to the error, plus more push for the error we have accumulated, plus a braking push for how fast the error is changing." The &int; symbol means "add up over time". The d/dt symbol means "rate of change". Both are just the ideas you just learned.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Term</th><th>Gain</th><th>Looks at</th><th>Main job</th><th>Too much causes</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>P — proportional</td><td>Kp</td><td>The error right now</td><td>React fast to the gap</td><td>Overshoot and fast wobble</td></tr>
+                <tr><td>I — integral</td><td>Ki</td><td>Error built up over time</td><td>Remove the leftover gap</td><td>Windup and slow waves</td></tr>
+                <tr><td>D — derivative</td><td>Kd</td><td>How fast error changes</td><td>Damp the overshoot</td><td>Noise and jitter</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 15.3 — The three terms of a PID controller. Each one has a clear job and a clear failure mode.</p>
+
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> In simple words</div>
+            <p>P reacts now. I remembers the past. D guesses the future. A good controller uses all three gently. No single term is enough on its own.</p>
+          </div>
+
+          <h2>PID in real code: the discrete form</h2>
+
+          <p>On paper, a controller runs all the time. In a real robot, the computer works in steps. It runs the loop, waits a small moment, then runs it again. That small moment is called <strong>dt</strong>, the time between loops. If your loop runs 100 times a second, dt is 0.01 seconds.</p>
+
+          <p>Because the robot works in steps, we change the maths slightly. Instead of adding up all error forever, we add a small slice each loop. Instead of the true rate of change, we measure the change since the last loop. This stepped version is called the <strong>discrete form</strong>, and it is what you actually type into code.</p>
+
+          <div class="code">
+            <div class="code__bar">
+              <span class="code__dots"><span></span><span></span><span></span></span>
+              <span class="code__lang">Pseudo-code</span>
+              <button class="code__copy" type="button"><i class="bi bi-clipboard"></i> Copy</button>
+            </div>
+            <pre><code># runs once every dt seconds
+error = setpoint - measured
+
+integral = integral + error * dt
+
+derivative = (error - last_error) / dt
+last_error = error
+
+output = Kp * error + Ki * integral + Kd * derivative</code></pre>
+          </div>
+
+          <p>Take it line by line. First we find the error. Then we add a slice of error to the integral: error times dt. Then we measure how much the error changed since last time and divide by dt to get a rate. Finally we mix the three terms together with the three gains.</p>
+
+          <p><strong>dt matters a lot.</strong> If your loop speed changes, dt changes, and the integral and derivative terms change with it. A controller tuned when the loop ran 100 times a second will misbehave if a slow sensor drags the loop down to 10 times a second. Professionals always use the real measured dt, not a guess.</p>
+
+          <div class="code">
+            <div class="code__bar">
+              <span class="code__dots"><span></span><span></span><span></span></span>
+              <span class="code__lang">Pseudo-code</span>
+              <button class="code__copy" type="button"><i class="bi bi-clipboard"></i> Copy</button>
+            </div>
+            <pre><code># a safer loop: measure real dt, clamp output, respect limits
+time_now = millis()
+dt = (time_now - time_last) / 1000.0     # seconds
+time_last = time_now
+
+error      = setpoint - measured
+integral   = clamp(integral + error * dt, -100, 100)
+derivative = (error - last_error) / dt
+last_error = error
+
+output = Kp * error + Ki * integral + Kd * derivative
+output = clamp(output, min_power, max_power)   # never exceed limits</code></pre>
+          </div>
+
+          <p>The second version is closer to real robot code. It measures the real dt, clamps the integral to prevent windup, and clamps the output so it never asks for more than the motor can give. Two small lines prevent big problems.</p>
+
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> Tip</div>
+            <p>Start with Ki and Kd set to zero. Get proportional control working first. Then add the other terms one at a time, testing after each change.</p>
+          </div>
+
+          <h2>A worked example: the line-following robot</h2>
+
+          <p>Let us build a controller from scratch, on paper, and watch the numbers change. The task is simple and very common: a small robot must follow a black line on a white floor. A light sensor under the robot reports a value. We will use the sensor error to steer.</p>
+
+          <p><strong>The setup.</strong> The ideal sensor reading for being centred on the line is 500. Lower readings mean we are drifting left; higher readings mean we are drifting right. The controller's output is the steering correction, from &minus;100 (turn hard left) to +100 (turn hard right). We start with only P.</p>
+
+          <h3>Step 1: proportional only</h3>
+
+          <p>We choose Kp = 0.1 and set Ki and Kd to zero. The robot reads the sensor and computes the error.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Loop</th><th>Setpoint</th><th>Measured</th><th>Error</th><th>Output (Kp = 0.1)</th><th>Behaviour</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>1</td><td>500</td><td>560</td><td>+60</td><td>+6.0</td><td>Gently steers right.</td></tr>
+                <tr><td>2</td><td>500</td><td>520</td><td>+20</td><td>+2.0</td><td>Eases off as it nears centre.</td></tr>
+                <tr><td>3</td><td>500</td><td>480</td><td>&minus;20</td><td>&minus;2.0</td><td>Now steers slightly left.</td></tr>
+                <tr><td>4</td><td>500</td><td>400</td><td>&minus;100</td><td>&minus;10.0</td><td>Stronger correction when far off.</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 15.4 — Proportional control. The output grows with the error, so the robot corrects harder when it drifts further.</p>
+
+          <p>The robot steers, but on fast corners it lingers a little off centre and overshoots, then weaves back and forth. It follows the line, but the ride is loose and wobbly.</p>
+
+          <h3>Step 2: add derivative to calm the weave</h3>
+
+          <p>The weaving is overshoot. The robot reacts to the error but does not slow down as it approaches the centre. This is the exact job for D. We keep Kp = 0.1 and try Kd = 0.5. Now the output also depends on how fast the error changed since the last loop.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Loop</th><th>Error</th><th>Change since last</th><th>P part</th><th>D part (Kd = 0.5)</th><th>Output</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>1</td><td>+60</td><td>+60</td><td>+6.0</td><td>+30.0</td><td>+36.0</td></tr>
+                <tr><td>2</td><td>+20</td><td>&minus;40</td><td>+2.0</td><td>&minus;20.0</td><td>&minus;18.0</td></tr>
+                <tr><td>3</td><td>&minus;20</td><td>&minus;40</td><td>&minus;2.0</td><td>&minus;20.0</td><td>&minus;22.0</td></tr>
+                <tr><td>4</td><td>&minus;100</td><td>&minus;80</td><td>&minus;10.0</td><td>&minus;40.0</td><td>&minus;50.0</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 15.5 — Derivative control adds a braking push based on how fast the error is changing. Notice how the D part spikes when the error moves quickly.</p>
+
+          <p>Now the numbers tell a story. In loop 2, the error is still positive (+20) but falling fast. Without D the robot would keep steering right. The D part, at &minus;20, cancels that and flips the steering to brake the swing. The weave shrinks and the ride becomes smooth.</p>
+
+          <div class="callout note">
+            <div class="callout__head"><i class="bi bi-info-circle-fill"></i> Note</div>
+            <p>In this example Kd = 0.5 is large because dt is large. In real code the derivative is divided by dt, so the numbers differ. Always tune against your own real loop speed, never by copying numbers.</p>
+          </div>
+
+          <h3>Step 3: add integral to close the last gap</h3>
+
+          <p>The robot now tracks smoothly, but suppose the floor is slightly tilted or the sensor is a little biased. The robot settles just off centre and stays there. A small error remains because P alone cannot fully close it. Time to add I. We try Ki = 0.02, keeping Kp = 0.1 and Kd = 0.5.</p>
+
+          <p>Each loop we add error times dt to a running total. A persistent error of +20, added again and again, slowly builds. After a second at 100 loops per second, that total is 20 &times; 0.01 &times; 100 = 20. Multiplied by Ki = 0.02, it adds 0.4 to the output, and it keeps growing until the error reaches zero.</p>
+
+          <div class="formula"><span class="label">Term values at loop 3</span> output = 0.1&times;(&minus;20) + 0.02&times;(20) + 0.5&times;(&minus;40) = &minus;2 + 0.4 &minus; 20 = &minus;21.6</div>
+
+          <p>The P and D parts steer the robot; the small I part pushes it patiently toward the exact centre. P reacts, D brakes, I finishes. The robot holds the line tightly on corners, straights and gentle slopes.</p>
+
+          <p>Of course, we would still clamp the integral to avoid windup, and clamp the output so the steering never exceeds its limits. And if the derivative part caused buzzing, we would filter the sensor. The bones of the controller, though, are exactly what we just built.</p>
+
+          <h2>How to tune a controller by watching it</h2>
+
+          <p>Tuning means choosing Kp, Ki and Kd so the robot behaves well. There is maths that can help, but you can go a long way by watching the robot and adjusting one gain at a time. This is called <strong>manual tuning</strong>, and it is how most real robots are set up.</p>
+
+          <h3>The practical tuning order</h3>
+
+          <p>Do not change all three gains at once. You will never learn which change did what. Work in this order.</p>
+
+          <ol>
+            <li><strong>Start with P only.</strong> Set Ki and Kd to zero. Raise Kp slowly until the robot moves briskly but begins to wobble. Then back it off a little so the wobble just disappears.</li>
+            <li><strong>Add D.</strong> Increase Kd until the wobble and overshoot are damped. The movement becomes smoother. If the motor starts to buzz or hiss, you have gone too far; reduce Kd.</li>
+            <li><strong>Add I last.</strong> Increase Ki slowly, just enough to remove the leftover gap. If the robot starts to drift slowly back and forth, Ki is too high; reduce it.</li>
+            <li><strong>Re-check P.</strong> Adding D and I often allows a slightly higher Kp. Nudge it up if you want a faster response, then test again.</li>
+          </ol>
+
+          <h3>The Ziegler&ndash;Nichols idea in plain words</h3>
+
+          <p>Manual tuning is a skill, but engineers wanted a recipe. In the 1940s, Ziegler and Nichols suggested one. Set I and D to zero and raise Kp until the robot oscillates steadily, just barely, without dying out. Note that gain and how long each wobble takes, called the period.</p>
+
+          <p>From those two numbers, a short table gives rough starting values for Kp, Ki and Kd. It is a first guess, not a perfect answer. Even if you never use the table, the idea is useful: find the edge of stability, then step back from it.</p>
+
+          <h3>Test safely and log everything</h3>
+
+          <p>Tuning is where robots surprise you. Follow a few simple safety habits.</p>
+
+          <ul>
+            <li><strong>Use small setpoints.</strong> Ask for a little speed, not full speed. A mistake at low power is harmless.</li>
+            <li><strong>Lift the wheels off the ground.</strong> Tune on the bench first, so the robot cannot run away.</li>
+            <li><strong>Log the data.</strong> Print setpoint, measured value and output every loop, then plot them.</li>
+            <li><strong>Change one gain at a time.</strong> Write down what you changed and what happened.</li>
+            <li><strong>Have a kill switch.</strong> A button or a "stop" command that cuts the motors. Test it before you need it.</li>
+          </ul>
+
+          <h2>When PID is the wrong tool</h2>
+
+          <p>PID is famous, but it is not always the answer. Before you spend hours tuning, check the basics. A controller works best on a machine that is already sound.</p>
+
+          <p><strong>Fix the mechanics first.</strong> If a wheel is loose, a belt slips, or a joint is stiff, no controller can hide it. A wobbly wheel will wobble no matter how clever your gains are. Tighten and align the machine before you tune the software.</p>
+
+          <p><strong>Calibrate before you control.</strong> If a sensor is biased, the robot will chase a wrong number. A light sensor that always reads 20 too high will drag the robot off the line. Correct the reading once, and the controller suddenly has an easier job.</p>
+
+          <p><strong>Filter before you fight.</strong> If the noise is the problem, filtering the sensor often beats tuning the gains. A smooth reading gives a smooth response, covered in Chapter 10.</p>
+
+          <p>Some jobs are simply the wrong shape for PID. When you know exactly what the robot should do ahead of time, a feedforward plan beats a feedback loop. You will meet feedforward and cascaded loops in the professional section below.</p>
+
+          <div class="callout warn">
+            <div class="callout__head"><i class="bi bi-exclamation-triangle-fill"></i> Watch out</div>
+            <p>Beginners reach for PID to fix every problem. Often the real problem is a loose screw, a bad calibration, or noisy data. Solve the physical cause first, then control what is left.</p>
+          </div>
+
+          <h2>Practical issues you will meet</h2>
+
+          <p>Real robots are messier than the neat formulas. Here are the issues that catch almost everyone.</p>
+
+          <h3>Sampling rate</h3>
+
+          <p>The controller only sees the world each time it runs. If the loop is slow, the robot learns about a problem too late and overshoots. Run the control loop much faster than the robot moves. Ten to fifty times a second is a common starting point for small robots.</p>
+
+          <h3>Sensor noise and filtering</h3>
+
+          <p>Sensor readings jitter, and the jitter is not real movement, but the controller cannot tell the difference. This hurts the derivative term most, because it reacts to fast change. A simple fix is a <strong>low-pass filter</strong>: blend each new reading with the previous smoothed value. The result reads calmer. Filtering is covered fully in Chapter 10.</p>
+
+          <h3>Output limits and saturation</h3>
+
+          <p>Your controller might ask for 300 percent power, but the motor cannot give it. This is called <strong>saturation</strong>. It is fine to hit a limit briefly, but it fools the controller, because the robot did not move as much as the maths expected. Always clamp the output to a real range, and tell the integral term about the limit to avoid windup.</p>
+
+          <h3>Actuator limits</h3>
+
+          <p>Motors have a maximum speed and torque, and joints cannot bend past their angle. A good controller respects these limits instead of fighting them. Asking a joint to reach an impossible angle just winds up the integral term and wastes energy.</p>
+
+          <h3>Safety cutoffs</h3>
+
+          <p>Build in rules that stop everything if something goes wrong. If the error stays huge for too long, if the sensor stops answering, or if the current spikes, cut the motors. These <strong>safety cutoffs</strong> are not optional on real robots. They are the difference between a bad test and a broken machine.</p>
+            <div class="callout danger">
+            <div class="callout__head"><i class="bi bi-shield-exclamation"></i> Danger</div>
+            <p>Never test a new controller with the robot free to run at full power. Always start with the wheels off the ground, small setpoints, and a kill switch within reach. A mis-tuned controller can send a robot across the room in a blink.</p>
+          </div>
+
+          <h2>Common mistakes beginners make</h2>
+
+          <p>You will avoid a lot of pain by knowing these traps up front.</p>
+
+          <ul>
+            <li><strong>Tuning with noisy data.</strong> If the sensor jitters, every gain you try is fighting noise, not movement. Filter or average the reading first.</li>
+            <li><strong>Changing all gains at once.</strong> You can never tell which change helped. Move one gain at a time.</li>
+            <li><strong>No output limits.</strong> Without clamps, the controller asks for impossible power and winds up the integral term.</li>
+            <li><strong>No logging.</strong> Without a record of setpoint, measured value and output, you are guessing. Log and plot the data.</li>
+            <li><strong>Testing at full speed first.</strong> Always start small. High speed magnifies every mistake.</li>
+            <li><strong>Forgetting dt.</strong> If the loop speed changes and you ignore it, the integral and derivative terms become wrong.</li>
+          </ul>
+
+          <h2>How professionals do it</h2>
+
+          <p>On a real robot, the same three terms still sit in the code, but engineers surround them with extra tools that make the machine faster, smoother and safer.</p>
+
+          <p><strong>Feedforward.</strong> If you already know what command will roughly do the job, send it directly, then let feedback clean up the small remaining error. For an arm, gravity gives a known pull; the controller can push back against it before any error appears. This makes feedback's job much easier.</p>
+
+          <p><strong>Cascaded loops.</strong> Fast things are controlled inside slow things. A drone controls its tilt quickly inside a slower loop that controls position. The outer loop hands a target to the inner one. This is called a <strong>cascade</strong>.</p>
+
+          <p><strong>Model-based control and MPC.</strong> Instead of guessing the response, engineers build a maths model of the robot. Model Predictive Control looks further: at each step it predicts the next short stretch of time, tests many commands, and picks the best one that respects the limits. It handles constraints like "never exceed this torque" directly. It costs far more computing than PID, so it lives on larger robots and cars, but it is a powerful extension of everything here.</p>
+
+          <p>Professionals also insist on hard safety limits, careful logging, and plots they study after every test. The fancy methods change the maths, but they never remove the need for measurement, limits and testing.</p>
+
+          <h2>Try it yourself</h2>
+
+          <p>These exercises build from pure thinking to a real tuning session. Do them in order if you can.</p>
+
+          <ol>
+            <li><strong>Find the three words in daily life.</strong> For a shower, a car on a hill, or your body holding a temperature, name the setpoint, the measured value, the output and the error. Hint: your body wants about 37 &deg;C; sweating and shivering are the output.</li>
+            <li><strong>Spot open-loop vs closed-loop.</strong> List three devices at home. Mark each as open-loop or closed-loop. Explain what sensor would turn an open-loop one into closed-loop. Hint: a microwave with a timer is open-loop; one with a temperature probe is closed-loop.</li>
+            <li><strong>Tune a PID simulator.</strong> Find a free online PID simulator. Start P only and watch the response curve. Add D to remove overshoot, then add I to remove the leftover gap. Write down the three gains each time. Hint: change one gain per run, and record the plot.</li>
+            <li><strong>Tune a real motor.</strong> With the wheels off the ground, make a motor hold a target speed. Start with small values. Log setpoint, measured speed and output. Tune P, then D, then I, exactly in the order from this chapter.</li>
+            <li><strong>Break it on purpose.</strong> With a working controller, lower the loop rate and watch what happens. Now add fake noise to the measured value and watch the derivative term go wild. This shows you why sampling rate and filtering matter. Hint: you can add random jitter to the sensor in code to simulate noise.</li>
+          </ol>
+
+          <h2>Going deeper (optional)</h2>
+
+          <p>If you enjoyed this, one idea is worth a peek. A PID controller is a special case of a bigger family called <strong>state-space control</strong>. There you describe the robot by numbers like position and speed, and use a matrix of gains to steer them together. Same spirit — measure, compare, correct — but many targets at once. You will meet the maths in Chapter 17.</p>
+
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> Where this leads</div>
+            <p>PID handles one loop at a time. Walking robots and arms control the <strong>whole body</strong> with stacked tasks and short-horizon planning. The next step is <a href="ch26-whole-body-control-mpc.html">Chapter 26: Whole-Body Control and MPC</a>, with the optimization maths in <a href="ch25-advanced-math-for-robotics.html">Chapter 25</a>.</p>
+          </div>
+
+          <section class="takeaways">
+            <h2><i class="bi bi-pin-angle-fill"></i> Key takeaways</h2>
+            <ul>
+              <li><i class="bi bi-check2-circle"></i> Feedback means measuring the result and correcting the next action.</li>
+              <li><i class="bi bi-check2-circle"></i> Error is setpoint minus measured value, and its sign shows which way to push.</li>
+              <li><i class="bi bi-check2-circle"></i> P reacts now, I remembers the past, D looks at the rate of change.</li>
+              <li><i class="bi bi-check2-circle"></i> P alone leaves a small steady gap; I closes it; D calms the overshoot.</li>
+              <li><i class="bi bi-check2-circle"></i> Tune one gain at a time: P first, then D, then I, testing safely.</li>
+              <li><i class="bi bi-check2-circle"></i> Always clamp the output and the integral to avoid windup and impossible commands.</li>
+              <li><i class="bi bi-check2-circle"></i> Fix mechanics, calibration and noise before you blame your gains.</li>
+            </ul>
+          </section>
+
+          <section class="quiz">
+            <div class="quiz__head"><i class="bi bi-patch-question-fill"></i> Check your understanding</div>
+            <details>
+              <summary><span class="q-num">Q1.</span><span>What is the difference between open-loop and closed-loop control?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Open-loop acts without checking the result. Closed-loop measures what happened and uses that measurement to correct the next action.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q2.</span><span>Write the formula for error, and say what each word means.</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> error = setpoint &minus; measured value. The setpoint is the value you want, the measured value is what the sensor reads, and the error is the difference between them.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q3.</span><span>Your robot reaches a steady speed slightly below target and stays there. Which term is missing, and why does it help?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> The integral term. It adds up past error over time, so a small leftover gap keeps building a push until the gap closes. This removes steady-state error.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q4.</span><span>Your motor buzzes and hisses with derivative control active. What is the likely cause and the fix?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Kd is too high, or the sensor data is noisy, so D is amplifying noise. Reduce Kd and filter the sensor reading before using it.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q5.</span><span>What is integral windup, and how do you prevent it?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Windup is the integral term growing huge while the robot cannot act, such as during startup, then causing a violent overshoot. Prevent it with a clamp that limits the integral total, an anti-windup limit.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q6.</span><span>In what order should you tune the three gains, and why?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Start with P, then add D, then add I. Doing one at a time lets you see what each change does. Adding them all together makes the cause of any problem impossible to find.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q7.</span><span>Why does dt matter in the real-code version of the controller?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> The integral adds error times dt, and the derivative divides by dt. If the loop speed changes and dt is wrong, both terms become wrong, so the controller behaves differently than it was tuned to.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q8.</span><span>Give one case where you should fix the machine instead of tuning the controller.</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Any physical cause: a loose wheel or joint, a slipping belt, a biased sensor, or noisy readings. These produce bad behaviour that no gains can cure. Tighten, calibrate or filter first.</div>
+            </details>
+          </section>
+        </article>
+
+        <nav class="pager" id="pager" aria-label="Chapter navigation"></nav>
+      </div>
+    </main>
+  </div>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/book.js"></script>
+</body>
+</html>

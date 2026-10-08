@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>try{var __t=null;try{__t=localStorage.getItem("mr-theme")}catch(e){}if(__t!=="dark"&&__t!=="light"){try{var __m=document.cookie.match(/(?:^|;\s*)mr-theme=(dark|light)/);__t=__m?__m[1]:null}catch(e){__t=null}}if(__t!=="dark"&&__t!=="light"){try{var __w=String(window.name||"").match(/mr-theme=(dark|light)/);__t=__w?__w[1]:null}catch(e){}}if(__t!=="dark"&&__t!=="light"&&window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches){__t="dark"}if(__t==="dark"||__t==="light")document.documentElement.setAttribute("data-theme",__t)}catch(e){}</script>
+  <title>Chapter 23: Real-World Robotics: Industry and Applications — Master Robotics</title>
+  <meta name="description" content="See where robots really work today: factories, warehouses, hospitals, farms, energy sites and homes. Learn why some robots succeed, how payback works, and which jobs use your skills.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="vendor/bootstrap-icons/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/prose.css">
+  <link rel="stylesheet" href="assets/css/mobile.css">
+</head>
+<body data-file="ch23-real-world-robotics.html">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="topbar" id="topbar"></header>
+  <div class="progress-bar" id="progressBar"></div>
+
+  <div class="layout">
+    <div class="sidebar__backdrop" id="navBackdrop"></div>
+    <nav class="sidebar" id="sidebar" aria-label="Book contents"></nav>
+
+    <main class="main" id="main">
+      <div class="container">
+
+        <header class="chapter-head">
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="index.html">Home</a>
+            <i class="bi bi-chevron-right"></i>
+            <a href="index.html#career">Part 6 &middot; Practice and Career</a>
+            <i class="bi bi-chevron-right"></i>
+            <span>Chapter 23</span>
+          </nav>
+          <span class="chapter-kicker"><i class="bi bi-mortarboard"></i> Part 6 &middot; Practice and Career</span>
+          <h1>Real-World Robotics: Industry and Applications</h1>
+          <p class="lede">You have learned how robots sense, decide and act. Now you will see where they actually work, why some succeed and some fail, and how the skills you are building turn into real jobs.</p>
+          <div class="chapter-meta">
+            <span><i class="bi bi-clock"></i> ~22 min read</span>
+            <span><i class="bi bi-bar-chart"></i> Beginner</span>
+            <span><i class="bi bi-list-check"></i> Chapter 23 of 30</span>
+          </div>
+          <div class="goals">
+            <h2>What you will learn</h2>
+            <ul>
+              <li><i class="bi bi-check-circle-fill"></i> Name major robotics industries and their needs.</li>
+              <li><i class="bi bi-check-circle-fill"></i> Explain why some robots succeeded.</li>
+              <li><i class="bi bi-check-circle-fill"></i> Connect your skills to real jobs.</li>
+            </ul>
+          </div>
+        </header>
+
+        <article class="article">
+
+          <p class="lead">It is two in the morning at a large warehouse. The lights are dim. No people walk the long aisles. Yet the floor is busy. Flat robot platforms slide under tall shelves, lift them, and carry them to a packing station where a worker waits. Somewhere nearby, a machine that looks almost human picks up a plastic tote and sets it on a conveyor.</p>
+
+          <p>This is not a scene from a science-fiction film. It is an ordinary night in warehouses and factories around the world. Big companies are testing this mix of simple mobile robots and human-shaped robots right now.</p>
+
+          <p>Amazon works with a company called Agility on a robot named "Digit" that moves warehouse totes. Mercedes-Benz works with Apptronik on a robot named "Apollo" that carries material along production lines. BMW has piloted Figure AI robots for logistics inside its Spartanburg plant. These are real projects, and they are reported in a 2025 McKinsey review of robotics.</p>
+
+          <p>But look closely, because the honest picture is smaller than the headlines. Today's humanoid wins are mostly <strong>moving goods</strong> and <strong>inspection</strong>. They are not yet the delicate assembly work of a skilled human hand. That difference matters, and this chapter will explain it.</p>
+
+          <h2>The big picture: the four D reasons</h2>
+
+          <p>Why does a robot get a job at all? People rarely build a robot just because it is fun. They build one because a job is hard on humans. Engineers sum this up with four "D" reasons: <strong>dull</strong>, <strong>dirty</strong>, <strong>dangerous</strong>, and one about precision.</p>
+
+          <h3>Dull</h3>
+          <p>A dull job repeats the same small action thousands of times. Placing a part on a conveyor. Scanning a barcode. Welding the same seam again and again. Humans get bored and tired, and tired people make mistakes. A robot never gets bored.</p>
+
+          <h3>Dirty</h3>
+          <p>A dirty job puts a person in a place that is unpleasant or harmful. Spraying paint, handling chemicals, cleaning inside a tank, or working in thick dust. A robot does not mind smells, fumes or mess.</p>
+
+          <h3>Dangerous</h3>
+          <p>A dangerous job could hurt a person. Working next to a red-hot furnace. Carrying heavy loads until the back gives out. Climbing a wind turbine. Here the robot is not faster than a human. It simply does not get hurt the same way.</p>
+
+          <h3>Delicate or repeatable beyond human limits</h3>
+          <p>The last reason is <strong>super-human repeatability</strong>. A robot can place a chip on a phone board in the same spot to a thousandth of a millimetre, a million times, without drifting. A human hand is wonderful at new things but cannot hold that exact repeat forever.</p>
+
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> The key idea</div>
+            <p>Robots do not succeed because they are clever. They succeed because a job is dull, dirty, dangerous, or needs repeatability beyond human limits. Find that kind of job and you find a place a robot belongs.</p>
+          </div>
+
+          <figure class="figure">
+            <div class="figure__box">
+              <svg viewBox="0 0 640 250" width="100%" role="img" aria-label="A decision chart: four reasons a job suits a robot, feeding into one question about whether the robot pays off">
+                <rect x="20" y="20" width="130" height="52" rx="10" fill="#e8eeff" stroke="#2d5bff" stroke-width="2"></rect>
+                <text x="85" y="52" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#2d5bff">Dull</text>
+
+                <rect x="20" y="82" width="130" height="52" rx="10" fill="#e2f6ef" stroke="#0f9d78" stroke-width="2"></rect>
+                <text x="85" y="114" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#0f9d78">Dirty</text>
+
+                <rect x="20" y="144" width="130" height="52" rx="10" fill="#fdeceb" stroke="#d64545" stroke-width="2"></rect>
+                <text x="85" y="176" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#d64545">Dangerous</text>
+
+                <rect x="20" y="206" width="130" height="52" rx="10" fill="#f0e9fd" stroke="#7a4ddb" stroke-width="2"></rect>
+                <text x="85" y="230" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#7a4ddb">Repeatable</text>
+
+                <rect x="250" y="86" width="150" height="76" rx="12" fill="#fff7e6" stroke="#c98a00" stroke-width="2"></rect>
+                <text x="325" y="118" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#c98a00">Is the job one</text>
+                <text x="325" y="138" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#c98a00">of the four?</text>
+
+                <rect x="470" y="76" width="150" height="96" rx="12" fill="#e8eeff" stroke="#2d5bff" stroke-width="2"></rect>
+                <text x="545" y="110" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#2d5bff">Can it be done</text>
+                <text x="545" y="130" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#2d5bff">reliably and</text>
+                <text x="545" y="150" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#2d5bff">pay back?</text>
+
+                <line x1="150" y1="46" x2="250" y2="112" stroke="#7b849b" stroke-width="2"></line>
+                <line x1="150" y1="108" x2="250" y2="118" stroke="#7b849b" stroke-width="2"></line>
+                <line x1="150" y1="170" x2="250" y2="128" stroke="#7b849b" stroke-width="2"></line>
+                <line x1="150" y1="232" x2="250" y2="140" stroke="#7b849b" stroke-width="2"></line>
+                <line x1="400" y1="124" x2="470" y2="124" stroke="#7b849b" stroke-width="2" marker-end="url(#ar23)"></line>
+                <defs>
+                  <marker id="ar23" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+                    <path d="M0,0 L9,4.5 L0,9 z" fill="#7b849b"></path>
+                  </marker>
+                </defs>
+              </svg>
+            </div>
+            <figcaption>Figure 23.1 — The four D reasons point to jobs worth automating. But a good reason is not enough. The robot must also work reliably and pay for itself.</figcaption>
+          </figure>
+
+          <h2>Manufacturing and assembly</h2>
+
+          <p>Manufacturing is where robotics grew up. A factory makes the same product many times, so the work is repeatable and often dull. That is exactly what a robot loves.</p>
+
+          <h3>What the robot does</h3>
+          <p>The most common factory robot is a <strong>robot arm</strong>. It welds metal, paints car bodies, and picks up parts to place them. A welding robot joins two pieces of metal with heat, moving along a fixed path. A painting robot sprays an even coat. A pick-and-place robot grabs a part from one spot and drops it in another, again and again.</p>
+
+          <h3>Why robots are used</h3>
+          <p>Cars and electronics must be built the same way every time. A robot repeats the same motion with the same force, every second, all day. It never gets tired. It also keeps people away from welding sparks and paint fumes.</p>
+
+          <h3>The hard problem</h3>
+          <p>The hard problem is <strong>cycle time</strong>: how long one task takes, from start to finish. A factory earns money by making more parts in the same time, so every second counts. Engineers must make the arm move along the fastest safe path and still hit the exact spot. Speed and accuracy pull against each other.</p>
+
+          <h3>One real example</h3>
+          <p>Car factories have used robot arms on assembly lines for decades. A modern car body can pass through hundreds of welding robots, each repeating one seam. This works because the car arrives in the same place every time. The environment is <strong>structured</strong>, meaning everything is arranged and predictable.</p>
+
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> In simple words</div>
+            <p>Structured means the robot knows exactly where everything will be. Unstructured means things are messy or in new places. Robots are best in structured places.</p>
+          </div>
+
+          <h2>Warehousing and logistics</h2>
+
+          <p>Warehousing moves goods, and it is growing fast. Orders arrive, workers pick items, and boxes go out. The work is dull and tiring, and warehouses are huge. This is a perfect fit for mobile robots.</p>
+
+          <h3>What the robot does</h3>
+          <p>Two kinds of robot lead here. An <strong>AMR</strong> (autonomous mobile robot) drives itself across the floor and carries a shelf or a cart to a worker. A humanoid in a pilot may move a tote or a box between stations. Amazon's "Digit", made with Agility, moves warehouse totes in this way.</p>
+
+          <h3>Why robots are used</h3>
+          <p>A worker can walk many kilometres in a single shift just fetching goods. That is dull, tiring and slow. Letting robots bring the shelves to the worker saves those steps. It also lets the warehouse run at night, as in our opening scene.</p>
+
+          <h3>The hard problem</h3>
+          <p>The hard problem is <strong>navigation and fleet coordination</strong>. Each robot must know where it is and avoid crashing into people, shelves and other robots. A <strong>fleet</strong> is a group of robots working together. With hundreds on one floor, the software must plan routes so they do not block each other.</p>
+
+          <h3>One real example</h3>
+          <p>BMW has piloted Figure AI robots for logistics inside its Spartanburg plant, and Mercedes-Benz has worked with Apptronik on the "Apollo" robot to move material along production lines. Notice the pattern. These robots carry and deliver. They do not yet build the car.</p>
+
+          <figure class="figure">
+            <div class="figure__box">
+              <svg viewBox="0 0 640 300" width="100%" role="img" aria-label="Top-down view of a warehouse: tall shelf rows, mobile robots in the aisles, a packing station, and a charging dock">
+                <rect x="10" y="10" width="620" height="280" rx="14" fill="#f4f7fc" stroke="#cfd8ea" stroke-width="2"></rect>
+                <text x="320" y="34" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#4a5266">Warehouse floor (view from above)</text>
+
+                <rect x="60" y="60" width="470" height="26" rx="5" fill="#e8eeff" stroke="#2d5bff" stroke-width="2"></rect>
+                <rect x="60" y="110" width="470" height="26" rx="5" fill="#e8eeff" stroke="#2d5bff" stroke-width="2"></rect>
+                <rect x="60" y="160" width="470" height="26" rx="5" fill="#e8eeff" stroke="#2d5bff" stroke-width="2"></rect>
+                <text x="295" y="79" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#2d5bff">shelf row</text>
+                <text x="295" y="129" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#2d5bff">shelf row</text>
+                <text x="295" y="179" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#2d5bff">shelf row</text>
+
+                <rect x="120" y="92" width="34" height="14" rx="4" fill="#0f9d78"></rect>
+                <rect x="300" y="142" width="34" height="14" rx="4" fill="#0f9d78"></rect>
+                <rect x="430" y="92" width="34" height="14" rx="4" fill="#0f9d78"></rect>
+                <text x="230" y="205" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#0f9d78">mobile robots in the aisles</text>
+
+                <rect x="60" y="228" width="180" height="46" rx="8" fill="#f0e9fd" stroke="#7a4ddb" stroke-width="2"></rect>
+                <text x="150" y="256" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#7a4ddb">packing station</text>
+
+                <rect x="430" y="228" width="110" height="46" rx="8" fill="#fff7e6" stroke="#c98a00" stroke-width="2"></rect>
+                <text x="485" y="256" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#c98a00">charging</text>
+              </svg>
+            </div>
+            <figcaption>Figure 23.2 — A simple warehouse layout. Robots glide along the aisles between shelf rows, bring goods to the packing station, and return to the charging dock. The arrows of the real system are routes planned by the fleet software.</figcaption>
+          </figure>
+
+          <h2>Healthcare</h2>
+
+          <p>Medicine is a field where robots help people directly. Health care combines two of our four reasons. Some work is delicate beyond human steadiness, and some is dull and tiring for a busy nurse.</p>
+
+          <h3>What the robot does</h3>
+          <p>A <strong>surgical robot</strong> is an arm that holds tiny tools. The surgeon sits at a console and moves hand controls. The robot copies those moves at the patient, but more steadily and at a smaller scale. Other robots carry meals, linen and medicines around a hospital. A <strong>rehabilitation robot</strong> helps a person practise walking after an injury. In eldercare, robots can remind people to take medicine or help lift them safely.</p>
+
+          <h3>Why robots are used</h3>
+          <p>A surgeon's hand can shake a tiny amount. A robot arm filters that out, so cuts can be smaller and recovery faster. Hospital logistics robots save nurses long walks, so they spend more time with patients. Lifting a patient is dangerous for a nurse's back, so a robot makes the job safer.</p>
+
+          <h3>The hard problem</h3>
+          <p>The hard problem is <strong>safety and trust</strong>. A robot that works on or near a human body must never make a harmful move. It must be checked far more strictly than a factory arm, and be simple enough for busy staff to trust.</p>
+
+          <h3>One real example</h3>
+          <p>Surgical arms are used for many operations today. They do not operate by themselves. The surgeon stays in control the whole time. The robot is a tool that adds steadiness, not a replacement for judgement.</p>
+
+          <div class="callout note">
+            <div class="callout__head"><i class="bi bi-info-circle-fill"></i> Note</div>
+            <p>In most medical robots, the human keeps the final decision. The robot adds precision and comfort. This idea — the robot helps a skilled person — appears again and again in health care.</p>
+          </div>
+
+          <h2>Agriculture</h2>
+
+          <p>Farms are hard, open places. The ground is uneven, the weather changes, and every plant is a little different. This is an <strong>unstructured</strong> world, which makes farming one of the hardest areas for robotics.</p>
+
+          <h3>What the robot does</h3>
+          <p>An <strong>autonomous tractor</strong> drives itself up and down a field with great accuracy. A harvesting robot picks fruit or vegetables. A weeding robot removes unwanted plants without harming the crop. A spraying robot applies water or treatment only where it is needed.</p>
+
+          <h3>Why robots are used</h3>
+          <p>Farm work is often dull and dirty, and it happens in short bursts, such as harvest time. Farms also struggle to find workers for these seasons. A robot can work all day and night, and spraying only where needed saves money and reduces chemicals.</p>
+
+          <h3>The hard problem</h3>
+          <p>The hard problem is <strong>rough terrain and soft, variable produce</strong>. A field is full of mud, stones and slopes. Worse, no two apples are the same size or shape, and many are hidden behind leaves. A robot must recognise the fruit and grip it firmly enough to hold, but gently enough not to bruise.</p>
+
+          <h3>One real example</h3>
+          <p>Self-steering tractors using satellite guidance are already common on large farms. They drive a straight line better than a tired human, which saves fuel and seed. Picking soft fruit by machine is still hard, so most of it is done by hand.</p>
+
+          <div class="callout warn">
+            <div class="callout__head"><i class="bi bi-exclamation-triangle-fill"></i> Watch out</div>
+            <p>Do not assume a robot that works in one field works in another. A weeding robot for a flat field may fail on a hillside. Every farm, crop and season changes the problem.</p>
+          </div>
+
+          <h2>Inspection and energy</h2>
+
+          <p>Pipelines, power lines, wind turbines and bridges must be checked often. The checking itself is usually dull and often dangerous, sometimes at great height or inside tight spaces.</p>
+
+          <h3>What the robot does</h3>
+          <p>A <strong>drone</strong> flies along a power line or around a wind turbine blade and takes pictures. A <strong>crawler</strong> is a small robot that drives inside a pipe and films the walls. Both carry cameras and sensors instead of people.</p>
+
+          <h3>Why robots are used</h3>
+          <p>Sending a person up a turbine or into a pipe is dangerous and slow. A drone can fly the same route every month and take the same picture, so engineers can compare changes over time. It also reaches places a person cannot easily go.</p>
+
+          <h3>The hard problem</h3>
+          <p>The hard problem is <strong>staying steady and finding real faults</strong>. Wind shakes a drone, pipes are dark, and a small crack can look like a harmless mark. The robot must hold position and help humans spot the difference between a real problem and noise.</p>
+
+          <h3>One real example</h3>
+          <p>Energy companies use drones to inspect turbines and power lines. The drone does not decide whether a blade is safe. It collects clear images, and a human engineer makes the judgement. This is inspection, the kind of work today's robots do best.</p>
+
+          <h2>Construction and mining</h2>
+
+          <p>Building sites and mines are dirty, dangerous and always changing. Each day the ground and layout are different. This is an extreme unstructured world.</p>
+
+          <h3>What the robot does</h3>
+          <p>Surveying robots map the land with great accuracy before work begins. Some pilot robots lay bricks. In mining, an <strong>autonomous haul truck</strong> drives loads of rock along a fixed route without a driver.</p>
+
+          <h3>Why robots are used</h3>
+          <p>Mines are far from towns, and driving a huge truck all day is tiring and risky. An autonomous truck drives the same safe route again and again. Surveying robots collect data fast and precisely, which helps planners avoid costly mistakes.</p>
+
+          <h3>The hard problem</h3>
+          <p>The hard problem is a <strong>changing, rough environment</strong>. On a building site, the walls go up and the piles of material move, so a robot that learned yesterday's layout may be lost today. Mining trucks work because their route is fixed and separate from people.</p>
+
+          <h3>One real example</h3>
+          <p>Large mines use autonomous haul trucks on set routes, kept apart from human workers for safety. Bricklaying robots on building sites remain small pilots. The difference is control: the mine keeps the robot in a known, separate zone; the building site does not.</p>
+
+          <h2>Service and consumer</h2>
+
+          <p>Service and consumer robots work near ordinary people. Some do it in our homes, some in shops and hotels. Here the market is huge, so even simple robots can sell in millions.</p>
+
+          <h3>What the robot does</h3>
+          <p>A <strong>robot vacuum</strong> cleans floors on its own. A delivery robot carries food or parcels along a pavement. In hotels and restaurants, a service robot may carry a tray of dishes to a table.</p>
+
+          <h3>Why robots are used</h3>
+          <p>Cleaning is dull, and people would rather not do it. Carrying a tray across a busy room is tiring in a short-staffed café. These jobs are simple and repeated, which suits a cheap robot.</p>
+
+          <h3>The hard problem</h3>
+          <p>The hard problem is <strong>cost and safety around people</strong>. A home robot must be very cheap, because a person buys it with their own money. A delivery robot must never hurt a child or block a wheelchair on a busy street. Being light and slow helps both.</p>
+
+          <h3>One real example</h3>
+          <p>The robot vacuum is one of the great robotics success stories. It is small, simple and cheap. It does one clear job, and the world bought millions. We will use it again later to explain why it worked.</p>
+
+          <h2>Space and defence</h2>
+
+          <p>Some jobs happen where people cannot easily survive. Space is airless and freezing. Hazards such as a damaged reactor are too dangerous for people.</p>
+
+          <h3>What the robot does</h3>
+          <p>Space <strong>rovers</strong> drive across another planet, take samples and send pictures home. Drones and ground robots inspect or enter hazardous sites. In defence, robots handle dangerous objects such as suspected bombs.</p>
+
+          <h3>Why robots are used</h3>
+          <p>For space, the distance is the reason. A signal takes many minutes to reach Mars, so the rover must decide a lot on its own. For hazards, the reason is danger. A robot can be sent where no person should enter.</p>
+
+          <h3>The hard problem</h3>
+          <p>The hard problem is <strong>extreme environments and limited help</strong>. A Mars rover cannot be repaired. Dust covers its solar panels, and it faces cold that can break parts. The design must survive with no repair, which is the hardest reliability problem in robotics.</p>
+
+          <h3>One real example</h3>
+          <p>Mars rovers drive slowly and check each move, because a single mistake can end the mission. Their success comes from very careful engineering and simple, tested behaviours.</p>
+
+          <h2>Industry summary</h2>
+
+          <p>The table below collects the tour. For each industry, it lists a typical robot, the four D reason that fits best, and the key challenge. Keep it as a map you can return to.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Industry</th><th>Typical robot</th><th>Main reason</th><th>Key challenge</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Manufacturing</td><td>Robot arm</td><td>Dull, repeatable</td><td>Cycle time and accuracy</td></tr>
+                <tr><td>Warehousing</td><td>AMR and humanoid pilots</td><td>Dull</td><td>Navigation and fleet coordination</td></tr>
+                <tr><td>Healthcare</td><td>Surgical and logistics robots</td><td>Delicate, dull</td><td>Safety and trust</td></tr>
+                <tr><td>Agriculture</td><td>Autonomous tractor</td><td>Dull, dirty</td><td>Rough terrain and soft produce</td></tr>
+                <tr><td>Inspection and energy</td><td>Drones and crawlers</td><td>Dangerous</td><td>Steady flight and fault finding</td></tr>
+                <tr><td>Construction and mining</td><td>Survey and haul robots</td><td>Dirty, dangerous</td><td>Changing, rough ground</td></tr>
+                <tr><td>Service and consumer</td><td>Robot vacuum</td><td>Dull</td><td>Low cost and safety near people</td></tr>
+                <tr><td>Space and defence</td><td>Rover and hazardous-site robot</td><td>Dangerous</td><td>Extreme places, no repair</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 23.1 — Industry, a typical robot, the four D reason that fits best, and the hard part.</p>
+
+          <h2>Why some robots succeed and others fail</h2>
+
+          <p>Two robots can be built from the same parts, yet one sells in millions and the other is forgotten. The difference is not how clever the robot is. It is whether the robot fits five simple criteria. Professionals check all five before they build.</p>
+
+          <h3>1. A clear, repetitive task</h3>
+          <p>The job must be specific and must repeat. "Vacuum the floor" is clear. "Help around the house" is not. If the task changes every time, the robot cannot be designed or tested properly.</p>
+
+          <h3>2. A structured or improvable environment</h3>
+          <p>Either the place is already organised, or you can change it to help the robot. A factory line is structured. In a warehouse, engineers paint markers and add clear lanes so robots can find their way. If you cannot structure the world, the robot must be far more clever and far more expensive.</p>
+
+          <h3>3. A strong ROI</h3>
+          <p><strong>ROI</strong> means return on investment. In plain words: does the robot save more money than it costs? A robot that costs a lot but saves very little will not be bought, no matter how impressive it is. You will meet the maths shortly.</p>
+
+          <h3>4. Reliability and uptime</h3>
+          <p><strong>Uptime</strong> is the share of time a robot is working and not broken. A robot that runs 95 percent of the time is far more valuable than one that runs 70 percent. A broken robot earns nothing and still must be paid for.</p>
+
+          <h3>5. A safe design</h3>
+          <p>If a robot cannot work safely near people, it can only work in a locked zone. That limits its value. A safe design opens up more places to work and helps people trust the robot.</p>
+
+          <h3>A success: the robot vacuum</h3>
+          <p>The robot vacuum checks every box. The task is clear and repetitive. The home floor is fairly simple to navigate. It is cheap enough for a strong ROI over many years. With few moving parts, it is reliable. And it is light and gentle, so it is safe around people and pets. That is why it sold in millions.</p>
+
+          <h3>A hard case: humanoid dexterity</h3>
+          <p>Now compare a humanoid asked to do delicate assembly. The task is not fully clear because parts and situations change. The environment is unstructured. The robot is very expensive, so ROI is unproven. It is new, so uptime is low. And a large, strong machine near workers needs strict safety controls. All five criteria are weak. That is why factories today use humanoids to carry and inspect, not to build.</p>
+
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> Tip</div>
+            <p>Before you design any robot, score it on the five criteria from one to five. A low total is a warning. A fancy robot with a low total is still a bad idea.</p>
+          </div>
+
+          <h2>The economics: does the robot pay?</h2>
+
+          <p>A robot is a tool, and a business buys a tool to save or earn money. The question is simple. Alone, does the robot cost less over time than the human labour it replaces or helps?</p>
+
+          <h3>Cost of a robot</h3>
+          <p>The cost has several parts. The purchase price is only the start. Add installation, safety fencing, training, spare parts, and maintenance. Also add the cost of downtime: the money lost when the robot is broken. Per a 2025 McKinsey report, an industrial humanoid is estimated at around US$55,000 per unit, and multi-purpose robots are expected later this decade. Even that price is not the full cost of ownership.</p>
+
+          <h3>Cost of human labour</h3>
+          <p>A worker is paid an hourly wage, plus costs for tax, training and holidays. Multiply the yearly cost by the number of years the robot will run, and you see the money at stake. Labour also rises over time, while a robot's cost is mostly paid up front.</p>
+
+          <h3>Payback period</h3>
+          <p>The key number is the <strong>payback period</strong>: how long it takes for the savings to equal the robot's total cost. After that point, the robot is saving money. Businesses often want a payback under a few years. For industrial humanoids, a target under two years is often quoted.</p>
+
+          <div class="formula"><span class="label">Payback period</span> Payback (years) = Total robot cost &divide; Yearly savings</div>
+
+          <h3>A worked payback example</h3>
+          <p>Imagine a warehouse task. A worker costs $30,000 a year. A robot could do half of that worker's job and free them for other work, saving $15,000 a year. The robot costs $40,000 to buy and install, plus $3,000 a year to maintain. Let us compute the payback.</p>
+
+          <ol>
+            <li>Write the yearly saving: $15,000.</li>
+            <li>Write the yearly maintenance: $3,000.</li>
+            <li>Subtract: net yearly saving = $15,000 &minus; $3,000 = $12,000.</li>
+            <li>Write the up-front cost: $40,000.</li>
+            <li>Divide: payback = $40,000 &divide; $12,000 = 3.3 years.</li>
+          </ol>
+
+          <p>So the robot pays for itself in about 3.3 years. If the business wants payback under two years, this fails. If the robot lasts ten years, it saves money in the long run. Notice how one number — uptime — can change the answer. If downtime cuts the real saving in half, payback doubles to 6.6 years, and the project may die.</p>
+
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> The key idea</div>
+            <p>Uptime is the real driver of value. A robot that works almost all the time keeps saving money every hour. A robot that keeps stopping stops saving too.</p>
+          </div>
+
+          <h3>Robots as a service</h3>
+          <p>Not every business wants to buy a robot outright. Under <strong>RaaS</strong> (Robot as a Service), a company rents the robot and pays a monthly or per-use fee. The supplier handles maintenance and updates. This lowers the up-front cost and the risk. If the robot does not help, the customer can stop paying sooner. RaaS is popular for changing or uncertain tasks.</p>
+
+          <h2>What the current wave really means</h2>
+
+          <p>You have seen bold headlines about humanoid robots and AI. It helps to read them calmly. Here is an honest summary of where things stand, based on the 2025 McKinsey and Horvath reports and industry news.</p>
+
+          <h3>What is real today</h3>
+          <p>Real deployments are mostly <strong>transport and inspection in controlled areas</strong>. Amazon, Mercedes-Benz and BMW are testing humanoids that move goods inside plants, often in semi-separated zones for safety. China is moving fastest, with a 2024 government road map and more than 35 new humanoid models in one year. UBTech's "Walker", Fourier machines, and Tesla's "Optimus" are well-known examples. Optimus uses custom actuators and trains its vision models on Tesla's own computing.</p>
+
+          <h3>What is still hard</h3>
+          <p>Three barriers remain. <strong>Dexterity</strong>: a human hand is amazingly skilled, and copying it is very hard. <strong>Safety regulation</strong>: new rules such as the EU AI Act of 2025 and the EU Machinery Regulation, effective in 2027, shape what robots may do near people. <strong>Cost</strong>: today's units are expensive and their long-term reliability is still being proved. First series production of industrial humanoids is expected around 2026, with multi-purpose robots later this decade.</p>
+
+          <h3>The order of priority</h3>
+          <p>Engineers working on this wave agree on the order that matters. First, <strong>safety systems</strong>. Then <strong>uptime</strong>. Then <strong>dexterity</strong>. Then <strong>cost</strong>. It is tempting to chase clever hands first. But a robot that stops often, or cannot be trusted near people, never gets to use those clever hands.</p>
+
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> In simple words</div>
+            <p>Humanoids today are good at carrying and checking. They are not yet good at fine handwork. The order to fix things is: safe, then always working, then skilled, then cheap.</p>
+          </div>
+
+          <h2>Reliability and safety in the field</h2>
+
+          <p>A robot in a factory or a hospital runs for years. The gap between a clever demo and a working machine is huge, and reliability closes it. This is why uptime matters more than brilliance.</p>
+
+          <h3>Why uptime beats brilliance</h3>
+          <p>Picture two robots. Robot A does a brilliant new trick, but it stops twice a day. Robot B does only one plain job, but it never stops. Which one does a business buy? Almost always Robot B. A robot that stops costs money in lost output, in repair calls, and in trust. People stop relying on a machine that keeps failing.</p>
+
+          <h3>Maintenance</h3>
+          <p>Good robots are built to be looked after. Parts that wear out, like belts and grippers, are easy to replace. Sensors are checked on a routine. A <strong>preventive</strong> plan fixes small problems before they become big ones, just as you service a car before it breaks down.</p>
+
+          <h3>Why standards and safety zones exist</h3>
+          <p>A robot can move fast and with great force. A <strong>safety standard</strong> is a shared rule that says how a robot must behave around people. A common idea is the <strong>safety zone</strong>: a space where the robot works, kept apart from people, often with a fence or a light curtain. If a person enters, the robot slows or stops. Standards exist because every maker cannot invent their own rules. Shared rules keep workers safe and let machines work together.</p>
+
+          <div class="callout danger">
+            <div class="callout__head"><i class="bi bi-shield-exclamation"></i> Safety first</div>
+            <p>Never treat safety as an extra. It is the first requirement, not the last. A robot that is not safe around people should not run near them at all.</p>
+          </div>
+
+          <h2>The jobs and skills in industry</h2>
+
+          <p>Robotics is a team sport. A single robot may need seven kinds of engineer. Each role uses different parts of this book. The good news is that you do not need to master all of them. You pick one path and grow deep.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Role</th><th>What they do</th><th>Built by chapters</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Robotics engineer</td><td>Designs how the whole robot senses, decides and acts.</td><td>1, 3, 11, 15</td></tr>
+                <tr><td>Controls engineer</td><td>Makes joints move smoothly and precisely.</td><td>7, 8, 11, 15, 18</td></tr>
+                <tr><td>Integration engineer</td><td>Joins parts and software into one working system.</td><td>10, 12, 14, 22</td></tr>
+                <tr><td>Test engineer</td><td>Proves the robot works, and finds how it fails.</td><td>2, 13, 22</td></tr>
+                <tr><td>Field service engineer</td><td>Installs, fixes and maintains robots on site.</td><td>6, 12, 21, 22</td></tr>
+                <tr><td>Perception engineer</td><td>Builds the "eyes": cameras, lidar and vision code.</td><td>4, 16, 17, 19</td></tr>
+                <tr><td>Mechanical designer</td><td>Designs the frame, joints and grippers.</td><td>5, 6, 9, 20</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 23.2 — Common robotics roles and the chapters that build their skills. Chapter numbers follow this book's contents.</p>
+
+          <p>Read the table with hope. If you enjoy building frames, you are on the mechanical path. If you love writing code that sees, you are on perception. If you like making everything fit together, you are an integration engineer. All paths are needed, and all start with the same basics.</p>
+
+          <h2>A full worked example: a robot for a small shop?</h2>
+
+          <p>Let us apply everything to a real decision. It is the most useful skill in this chapter, so we will go slowly.</p>
+
+          <p><strong>The situation.</strong> A small shop owner packs about 200 online orders a day. Each order is a few items placed in a box, sealed and labelled. Two workers do this, each costing $28,000 a year. Packing is dull and repetitive. The owner wonders: should I buy a packing robot?</p>
+
+          <h3>Step 1 — Check the four D reasons</h3>
+          <p>Is the job dull? Yes, very. Dirty or dangerous? No. Needs super-human repeatability? Not really. So the case rests on "dull". That is a fair start, but it is not enough on its own.</p>
+
+          <h3>Step 2 — Check the five success criteria</h3>
+          <ol>
+            <li><strong>Clear repetitive task.</strong> Yes, packing is repetitive. Good.</li>
+            <li><strong>Structured environment.</strong> Partly. The box and items vary, so it is not as tidy as a factory line.</li>
+            <li><strong>Strong ROI.</strong> Unknown yet. We will calculate it.</li>
+            <li><strong>Reliability.</strong> Unknown, and a big risk for a small shop with no repair staff.</li>
+            <li><strong>Safe design.</strong> Yes, a packing robot works in a fixed cell, away from people. Good.</li>
+          </ol>
+
+          <h3>Step 3 — Estimate the money</h3>
+          <p>The two workers together cost $56,000 a year. Suppose a packing robot could do the work of one worker, saving about $28,000 a year. The robot costs $60,000 to buy and install. It also needs $4,000 a year in maintenance and software fees. There is no in-house repair team, so a breakdown could stop packing for a day.</p>
+
+          <div class="formula"><span class="label">Payback period</span> Payback = Total cost &divide; Net yearly saving</div>
+
+          <ol>
+            <li>Yearly saving from one worker: $28,000.</li>
+            <li>Less yearly maintenance: $28,000 &minus; $4,000 = $24,000 net.</li>
+            <li>Up-front cost: $60,000.</li>
+            <li>Payback = $60,000 &divide; $24,000 = 2.5 years.</li>
+          </ol>
+
+          <h3>Step 4 — Test uptime</h3>
+          <p>The 2.5 years assumes the robot works nearly all the time. But a small shop has no spare robot and no engineer. If uptime is only 80 percent, the real saving drops to about $19,200 a year, and payback stretches to about 3.1 years. If a breakdown also delays orders, the owner may lose customers. That hidden cost is not in the formula.</p>
+
+          <h3>Step 5 — Reach a reasoned decision</h3>
+          <p>Here is the honest answer. The four D reason is real and the payback is close to a typical target. But two criteria are weak: the environment is only partly structured, and reliability is risky with no support on site. A wise small shop would <strong>not</strong> buy a full packing robot yet. Instead, it might start with one simple robot for one step, such as taping boxes, or rent a robot through RaaS to test it without a large payment. If that step proves reliable, it can grow. This is how professionals decide: not by the cleverest machine, but by the best fit.</p>
+
+          <h2>Common beginner assumptions to drop</h2>
+
+          <p>New students of robotics often carry a few quiet beliefs that lead them wrong. Let us name them, so you can set them down.</p>
+
+          <ul>
+            <li><strong>"The fanciest robot wins."</strong> Not true. Clients buy reliability and payback, not cleverness. A plain robot that never stops often beats a brilliant one that does.</li>
+            <li><strong>"AI solves everything."</strong> AI helps a robot decide, but it does not fix a weak gripper, a low battery, or a bad environment. The body and the place matter just as much as the brain.</li>
+            <li><strong>"Robots will replace all jobs."</strong> The honest picture is a shift, not a wipe-out. Robots take on dull, dirty and dangerous tasks. New jobs appear too: building, testing, integrating and fixing robots. The mix changes over time.</li>
+            <li><strong>"Humanoid means general purpose today."</strong> A humanoid shape suggests flexibility, but today's units do narrow jobs, mostly moving and inspecting. Do not assume it can do anything a person can.</li>
+            <li><strong>"If the demo works, the product works."</strong> A demo runs once. A product runs for years. The distance between them is reliability, and it is the hardest part.</li>
+          </ul>
+
+          <div class="callout warn">
+            <div class="callout__head"><i class="bi bi-exclamation-triangle-fill"></i> Watch out</div>
+            <p>Beware of impressive videos. Ask three plain questions instead: What exact job does it do? How often does it stop? Who fixes it when it breaks? Those answers tell you if it is real.</p>
+          </div>
+
+          <h2>How professionals do it</h2>
+
+          <p>When you build a robot in a classroom, it works on a clean bench for a few minutes. In industry, a robot must work in the real world for years. The difference changes the job in several ways.</p>
+
+          <h3>Systems integration is most of the work</h3>
+          <p>A <strong>system</strong> is many parts working as one: robots, sensors, cameras, conveyors, software, databases and people. <strong>Systems integration</strong> is the work of making them all fit and communicate. It is usually the largest part of a real project. Getting one robot to move is a small job. Getting it to work with the whole factory is the big one.</p>
+
+          <h3>Field testing</h3>
+          <p>Professionals test in the real place, not just in the workshop. They run the robot for long periods and watch what breaks. Real floors change, real lighting shifts, and real people behave in surprising ways. Field testing finds the problems a lab hides.</p>
+
+          <h3>Standards and documentation</h3>
+          <p>Industry follows shared <strong>standards</strong> so machines are safe and compatible. Engineers also write everything down: how to install, how to test, how to fix. Good documentation means the robot still works when the original engineer has moved on.</p>
+
+          <h3>Working with non-engineers</h3>
+          <p>Robots serve people who are not engineers: nurses, farmers, warehouse staff. Professionals listen to these users. The best robot is not the one an engineer admires. It is the one a tired worker can use easily and trust. Explaining clearly is part of the job.</p>
+
+          <div class="callout note">
+            <div class="callout__head"><i class="bi bi-info-circle-fill"></i> Note</div>
+            <p>Notice how much of this is not maths or code. Communication, testing, writing and patience decide whether a robot project succeeds. Technical skill opens the door; these skills carry the project.</p>
+          </div>
+
+          <h2>Try it yourself</h2>
+
+          <p>These exercises turn this chapter into skill. You need no robot, only clear thinking and a little maths. Work from easy to harder.</p>
+
+          <ol>
+            <li><strong>Find a four D job near you.</strong> Look around your home, school or work. Name one dull, one dirty and one dangerous task. For each, write one sentence on whether a robot could help. Hint: delivery wristbands and cleaning come up often.</li>
+            <li><strong>Score a robot idea.</strong> Pick any robot you have seen in the news. Score it from one to five on the five success criteria. Add the five scores. Hint: low totals explain why promising robots stay in pilots.</li>
+            <li><strong>Do a mini ROI analysis.</strong> Choose a task you know, such as washing dishes or cleaning an office. Estimate the yearly cost of a person doing it. Estimate a robot's cost and maintenance. Compute the payback period with the formula in this chapter. Hint: write the net yearly saving before you divide.</li>
+            <li><strong>Map a warehouse.</strong> On paper, draw a simple warehouse like Figure 23.2. Mark shelf rows, a packing station and a charging dock. Add three robots and plan their routes so they do not block each other. Hint: one-way lanes reduce jams.</li>
+            <li><strong>Choose your role.</strong> Using Table 23.2, pick the job that excites you most. List two chapters in this book that build its skills. Write one sentence on why it suits you. Hint: there is no wrong answer, only your interest.</li>
+          </ol>
+
+          <h2>Going deeper (optional)</h2>
+
+          <p>Curious readers can look up a real reliability number called <strong>availability</strong>. It means the same as uptime but is often written as a target, such as "99.9 percent". Engineers compare the cost of reaching that last tenth of a percent against the money it saves. You will find this thinking in Chapter 22 when you plan a project like a professional. It is a gentle bridge from this chapter to your own work.</p>
+
+          <section class="takeaways">
+            <h2><i class="bi bi-pin-angle-fill"></i> Key takeaways</h2>
+            <ul>
+              <li><i class="bi bi-check2-circle"></i> Robots earn a place where a job is dull, dirty, dangerous, or needs super-human repeatability.</li>
+              <li><i class="bi bi-check2-circle"></i> Industries from factories to farms each have a typical robot and a key challenge.</li>
+              <li><i class="bi bi-check2-circle"></i> Five criteria decide success: clear task, structured place, strong ROI, high uptime and safe design.</li>
+              <li><i class="bi bi-check2-circle"></i> Payback period is total cost divided by net yearly saving.</li>
+              <li><i class="bi bi-check2-circle"></i> Uptime, not brilliance, drives real value; a robot that stops stops saving.</li>
+              <li><i class="bi bi-check2-circle"></i> Today's humanoid wins are transport and inspection, not delicate assembly.</li>
+              <li><i class="bi bi-check2-circle"></i> Integration, testing and clear communication are most of the job.</li>
+            </ul>
+          </section>
+
+          <section class="quiz">
+            <div class="quiz__head"><i class="bi bi-patch-question-fill"></i> Check your understanding</div>
+            <details>
+              <summary><span class="q-num">Q1.</span><span>What are the four D reasons a job suits a robot?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Dull, dirty, dangerous, and delicate or repeatable beyond human limits.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q2.</span><span>Why do factory robots work so well on an assembly line?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> The factory is structured. Parts arrive in the same place every time, so the robot can repeat a fixed motion accurately.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q3.</span><span>What is the hard problem for warehouse mobile robots?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Navigation and fleet coordination: each robot must know where it is and avoid people and other robots, while the whole group shares the floor.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q4.</span><span>Name two success criteria and explain one of them.</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Any two of: clear repetitive task, structured environment, strong ROI, reliability and uptime, safe design. For example, uptime means the robot works most of the time; a robot that keeps stopping earns nothing.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q5.</span><span>A robot costs $50,000 and saves $20,000 net a year. What is the payback period?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> $50,000 &divide; $20,000 = 2.5 years.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q6.</span><span>What kind of work do today's industrial humanoids mostly do?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Transport and inspection in controlled or semi-separated zones, such as moving totes or material. They do not yet do delicate assembly.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q7.</span><span>Why is reliability more important than cleverness?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> A robot that stops often loses output, needs repairs, and loses people's trust. A simple robot that runs almost all the time keeps saving money, so businesses usually prefer it.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q8.</span><span>What is RaaS and why would a small business use it?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> RaaS is Robot as a Service: the customer rents a robot instead of buying it, and the supplier maintains it. It lowers the up-front cost and risk, which suits small or changing tasks.</div>
+            </details>
+          </section>
+
+        </article>
+
+        <nav class="pager" id="pager" aria-label="Chapter navigation"></nav>
+      </div>
+    </main>
+  </div>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/book.js"></script>
+</body>
+</html>

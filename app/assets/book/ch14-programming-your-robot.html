@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>try{var __t=null;try{__t=localStorage.getItem("mr-theme")}catch(e){}if(__t!=="dark"&&__t!=="light"){try{var __m=document.cookie.match(/(?:^|;\s*)mr-theme=(dark|light)/);__t=__m?__m[1]:null}catch(e){__t=null}}if(__t!=="dark"&&__t!=="light"){try{var __w=String(window.name||"").match(/mr-theme=(dark|light)/);__t=__w?__w[1]:null}catch(e){}}if(__t!=="dark"&&__t!=="light"&&window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches){__t="dark"}if(__t==="dark"||__t==="light")document.documentElement.setAttribute("data-theme",__t)}catch(e){}</script>
+  <title>Chapter 14: Programming Your Robot — Master Robotics</title>
+  <meta name="description" content="Learn robot programming from zero: write and upload your first Arduino-style program, use loops and if-statements, read inputs and outputs, and fix common errors.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="vendor/bootstrap-icons/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/prose.css">
+  <link rel="stylesheet" href="assets/css/mobile.css">
+</head>
+<body data-file="ch14-programming-your-robot.html">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="topbar" id="topbar"></header>
+  <div class="progress-bar" id="progressBar"></div>
+
+  <div class="layout">
+    <div class="sidebar__backdrop" id="navBackdrop"></div>
+    <nav class="sidebar" id="sidebar" aria-label="Book contents"></nav>
+
+    <main class="main" id="main">
+      <div class="container">
+
+        <header class="chapter-head">
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="index.html">Home</a>
+            <i class="bi bi-chevron-right"></i>
+            <a href="index.html#software">Part 4 &middot; Software and Control</a>
+            <i class="bi bi-chevron-right"></i>
+            <span>Chapter 14</span>
+          </nav>
+          <span class="chapter-kicker"><i class="bi bi-code-slash"></i> Part 4 &middot; Software and Control</span>
+          <h1>Programming Your Robot</h1>
+          <p class="lede">Hardware gives a robot a body. A program gives it behaviour. In this chapter you will write your first real robot code, upload it, and watch an idea turn into movement.</p>
+          <div class="chapter-meta">
+            <span><i class="bi bi-clock"></i> ~26 min read</span>
+            <span><i class="bi bi-bar-chart"></i> Beginner</span>
+            <span><i class="bi bi-list-check"></i> Chapter 14 of 30</span>
+          </div>
+          <div class="goals">
+            <h2>What you will learn</h2>
+            <ul>
+              <li><i class="bi bi-check-circle-fill"></i> Write and upload a simple robot program.</li>
+              <li><i class="bi bi-check-circle-fill"></i> Use loops and if-statements to control behaviour.</li>
+              <li><i class="bi bi-check-circle-fill"></i> Read and fix a basic error message.</li>
+            </ul>
+          </div>
+        </header>
+
+        <article class="article">
+
+          <p class="lead">Imagine you have finished building a small robot car. The wheels are on, the motors are wired, the battery is charged. You flip the switch — and nothing happens. The robot just sits there, silent. Nothing is broken. The robot simply has no instructions yet.</p>
+
+          <p>A program is what turns a silent pile of parts into a machine that moves. It is the difference between a body and a living creature. In this chapter you stop being only a builder and become a programmer too.</p>
+
+          <p>You do not need any prior coding experience. We start from the very first idea: what is a program? Then we add, step by step, every tool you need to make a robot behave. By the end you will have written a complete obstacle-avoiding robot, line by line, in your own words.</p>
+
+          <h2>What a program really is</h2>
+
+          <p>A <strong>program</strong> is a list of instructions that a computer runs in order, from top to bottom. That is the whole idea. Each instruction tells the robot to do one small thing. The computer reads the first line, does it, then reads the next line, and so on.</p>
+
+          <p>Here is the part that surprises beginners: the robot has no common sense. It does not know that hitting a wall is bad. It does not know that a motor should not spin forever. It does exactly what you wrote — nothing more, nothing less.</p>
+
+          <p>If you write "go forward", it goes forward, even into a wall. If you forget to tell it to stop, it never stops. The robot is a very obedient, very literal servant. Your job is to give it clear orders.</p>
+
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> The key idea</div>
+            <p>A program is a precise list of steps. The robot follows every step exactly. If the behaviour is wrong, the instructions were wrong — not the robot.</p>
+          </div>
+
+          <h3>Instructions are run in order</h3>
+
+          <p>Order matters. Read these two lists and notice how different they feel:</p>
+
+          <ol>
+            <li>Spin the left wheel forward.</li>
+            <li>Spin the right wheel backward.</li>
+          </ol>
+
+          <p>That pair makes the robot turn. Now swap them:</p>
+
+          <ol>
+            <li>Spin the right wheel backward.</li>
+            <li>Spin the left wheel forward.</li>
+          </ol>
+
+          <p>The robot still turns, because both wheels move at nearly the same time. But some orders are not forgiving. "Drive forward" then "read the distance" gives you different information than "read the distance" then "drive forward". One robot looks before it moves. The other moves first and looks later. On a real robot, that difference can mean a bump or a safe stop.</p>
+
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> In simple words</div>
+            <p>A program is a recipe. The robot is a cook who follows it exactly, in order, and never improvises. Write a clear recipe and you get a clear result.</p>
+          </div>
+
+          <h2>The two parts of every Arduino program</h2>
+
+          <p>Most beginner robots use a small board, like an Arduino. An Arduino program is called a <strong>sketch</strong>. Every sketch, no matter how big, has two special sections: <code>setup()</code> and <code>loop()</code>.</p>
+
+          <figure class="figure">
+            <div class="figure__box">
+              <svg viewBox="0 0 460 400" width="100%" role="img" aria-label="A flowchart showing setup running once, then a loop that reads inputs, decides, acts, and repeats forever">
+                <rect x="130" y="16" width="200" height="44" rx="10" fill="#e8eeff" stroke="#2d5bff" stroke-width="2"></rect>
+                <text x="230" y="43" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#1c2230">Power on / reset</text>
+
+                <rect x="130" y="88" width="200" height="44" rx="10" fill="#f0e9fd" stroke="#7a4ddb" stroke-width="2"></rect>
+                <text x="230" y="115" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#1c2230">setup() runs once</text>
+
+                <rect x="130" y="160" width="200" height="44" rx="10" fill="#e2f6ef" stroke="#0f9d78" stroke-width="2"></rect>
+                <text x="230" y="187" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#1c2230">loop(): READ inputs</text>
+
+                <rect x="130" y="232" width="200" height="44" rx="10" fill="#e2f6ef" stroke="#0f9d78" stroke-width="2"></rect>
+                <text x="230" y="259" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#1c2230">DECIDE (if / else)</text>
+
+                <rect x="130" y="304" width="200" height="44" rx="10" fill="#e2f6ef" stroke="#0f9d78" stroke-width="2"></rect>
+                <text x="230" y="331" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#1c2230">ACT (motors, lights)</text>
+
+                <line x1="230" y1="60" x2="230" y2="88" stroke="#7b849b" stroke-width="2" marker-end="url(#a14)"></line>
+                <line x1="230" y1="132" x2="230" y2="160" stroke="#7b849b" stroke-width="2" marker-end="url(#a14)"></line>
+                <line x1="230" y1="204" x2="230" y2="232" stroke="#7b849b" stroke-width="2" marker-end="url(#a14)"></line>
+                <line x1="230" y1="276" x2="230" y2="304" stroke="#7b849b" stroke-width="2" marker-end="url(#a14)"></line>
+
+                <path d="M130 326 L60 326 L60 182 L130 182" fill="none" stroke="#7b849b" stroke-width="2" stroke-dasharray="6 6" marker-end="url(#a14)"></path>
+                <text x="52" y="255" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#7b849b" transform="rotate(-90 52 255)">repeat forever</text>
+
+                <defs>
+                  <marker id="a14" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+                    <path d="M0,0 L9,4.5 L0,9 z" fill="#7b849b"></path>
+                  </marker>
+                </defs>
+              </svg>
+            </div>
+            <figcaption>Figure 14.1 — How a robot program runs. The top block happens once. The loop block repeats forever, reading, deciding and acting many times each second.</figcaption>
+          </figure>
+
+          <h3>setup() — the part that runs once</h3>
+
+          <p><code>setup()</code> runs one time, right after the board powers on or resets. It is the place for preparation. You tell the board which pins are inputs and which are outputs. You start the serial connection. You set starting values. Then setup finishes and never runs again.</p>
+
+          <p>Think of it as the pre-flight checklist of an aeroplane. You do it once, carefully, before anything moves.</p>
+
+          <h3>loop() — the part that runs forever</h3>
+
+          <p><code>loop()</code> runs over and over, forever, until you remove the power. When it reaches the last line, it jumps straight back to the first line and starts again. This is the <strong>robot loop</strong> you met in Chapter 1: sense, decide, act, repeat.</p>
+
+          <p>This is why the design fits robots so perfectly. You do not write "do this, then finish". You write "do this, then do it again". The board takes care of the repeating for you.</p>
+
+          <div class="callout note">
+            <div class="callout__head"><i class="bi bi-info-circle-fill"></i> Note</div>
+            <p>If you forget to write <code>loop()</code>, your program might still build, but the robot will do nothing after setup. If you forget <code>setup()</code>, it may not build at all. Both parts must exist, even if one is empty.</p>
+          </div>
+
+          <h2>Variables: named boxes for your robot's numbers</h2>
+
+          <p>A robot constantly handles values: the distance to a wall, the speed of a motor, whether a button is pressed. Before you can use a value, you need somewhere to keep it. That somewhere is a <strong>variable</strong>.</p>
+
+          <p>A variable is a named box that holds one value. You give the box a name, put a value inside, and later you can read it or change it. The name is for you, the human. The robot only cares about the value inside.</p>
+
+          <p>Good names make code easy to read. <code>distance</code> is a good name. <code>d</code> is a bad name — you will forget what it meant next week.</p>
+
+          <h3>The four simple types</h3>
+
+          <p>In Arduino code you say what kind of value a box holds. This helps the board store it correctly. Four types cover almost everything a beginner needs.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Type</th><th>Holds</th><th>Robot example</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>int</code></td><td>A whole number, like 5 or 42</td><td>Distance to a wall in centimetres: <code>int distance = 27;</code></td></tr>
+                <tr><td><code>float</code></td><td>A number with a decimal point, like 0.5</td><td>Motor speed as a fraction: <code>float speed = 0.75;</code></td></tr>
+                <tr><td><code>bool</code></td><td>True or false, nothing else</td><td>Is the bumper pressed? <code>bool pressed = false;</code></td></tr>
+                <tr><td><code>String</code></td><td>Text, inside double quotes</td><td>A message to print: <code>String name = "rover";</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 14.1 — The four variable types a beginner uses most. Choose the type that matches the kind of value you are storing.</p>
+
+          <h3>Creating and changing a variable</h3>
+
+          <p>To create a variable you write the type, then the name, then a value. This is called <strong>declaring</strong> the variable. After that you can change it whenever you like.</p>
+
+          <div class="code">
+            <div class="code__bar">
+              <span class="code__dots"><span></span><span></span><span></span></span>
+              <span class="code__lang">Arduino C++</span>
+              <button class="code__copy" type="button"><i class="bi bi-clipboard"></i> Copy</button>
+            </div>
+            <pre><code>int distance = 0;        // a whole number, starts at 0
+float speed = 0.5;       // half speed
+bool wallAhead = false;  // no wall seen yet
+String label = "SONAR";  // text in quotes
+
+distance = 42;           // now the box holds 42
+wallAhead = distance &lt; 30;  // true, because 42 is not less than 30? it is false!
+</code></pre>
+          </div>
+
+          <p>Read the last line carefully. <code>distance &lt; 30</code> asks a question. Because distance is 42, the answer is false. So <code>wallAhead</code> becomes <code>false</code>. The single equals sign means "put this value in the box". We will meet the double equals sign soon, and the difference matters a lot.</p>
+
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> Tip</div>
+            <p>Give variables honest names. <code>distanceToWall</code> tells you everything. <code>x</code> tells you nothing. Your future self will thank you when the code grows long.</p>
+          </div>
+
+          <h2>Reading the world and moving it: inputs and outputs</h2>
+
+          <p>A robot spends its life doing two jobs: reading inputs and writing outputs. An <strong>input</strong> is information coming in from a sensor. An <strong>output</strong> is an action going out to a motor, light or buzzer. The functions below are the basic tools for both.</p>
+
+          <h3>Digital and analog — two kinds of signal</h3>
+
+          <p>A <strong>digital</strong> signal has only two states: on or off, high or low, true or false. A button is digital — it is pressed or not pressed. An <strong>analog</strong> signal can have many values in a range, like a light level that is dim, medium or bright.</p>
+
+          <h3>Reading inputs</h3>
+
+          <p><code>digitalRead(pin)</code> reads a digital input. It answers with <code>HIGH</code> or <code>LOW</code>. Use it for buttons and switches — anything that is simply on or off.</p>
+
+          <p><code>analogRead(pin)</code> reads an analog input. It gives a number, usually from 0 to 1023. Use it for light sensors, knobs and other parts that give a range.</p>
+
+          <h3>Writing outputs</h3>
+
+          <p><code>digitalWrite(pin, value)</code> sets a digital output to <code>HIGH</code> or <code>LOW</code>. Use it to switch an LED on or off, or to make a motor turn at full speed in one direction.</p>
+
+          <p><code>analogWrite(pin, value)</code> sets an analog output using a trick called <strong>PWM</strong>, short for Pulse Width Modulation. It does not really give you a smooth range of voltage. Instead, it switches the pin on and off very fast. By changing how long it stays on, it fakes a middle value. Think of a light switch flicked so quickly that the room looks half bright.</p>
+
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> In simple words</div>
+            <p>Digital is a light switch: on or off. Analog is a dimmer knob: many levels. <code>analogWrite</code> gives a motor a speed between stopped and full using fast on-off switching.</p>
+          </div>
+
+          <p>With <code>analogWrite</code>, the value runs from 0 to 255. Zero means off. 255 means full speed. 128 means about half. That is how you make a robot move slowly and gently instead of always slamming into full speed.</p>
+
+          <h3>Pins must be prepared first</h3>
+
+          <p>Before you read or write a pin, you must tell the board whether it is an input or an output. You do this once in <code>setup()</code> using <code>pinMode(pin, mode)</code>.</p>
+
+          <div class="code">
+            <div class="code__bar">
+              <span class="code__dots"><span></span><span></span><span></span></span>
+              <span class="code__lang">Arduino C++</span>
+              <button class="code__copy" type="button"><i class="bi bi-clipboard"></i> Copy</button>
+            </div>
+            <pre><code>// --- inside setup(), runs once ---
+pinMode(2, INPUT);    // pin 2 reads a button
+pinMode(3, INPUT);    // pin 3 reads the distance sensor
+pinMode(9, OUTPUT);   // pin 9 drives an LED
+pinMode(10, OUTPUT);  // pin 10 drives the left motor
+pinMode(11, OUTPUT);  // pin 11 drives the right motor</code></pre>
+          </div>
+
+          <p>If you forget <code>pinMode</code>, the pin behaves in a default way that may not match your wiring. The robot may read nonsense or fail to drive a motor. Setting the mode is a small habit that saves big confusion.</p>
+
+          <h2>Making decisions: if and else</h2>
+
+          <p>A robot that only runs fixed instructions is not very clever. The power comes when it can choose. The tool for choosing is the <strong>if-statement</strong>. It asks a question, and does something only when the answer is true.</p>
+
+          <p>Here is the shape in plain words: "if this is true, do that." In code it looks like this:</p>
+
+          <div class="code">
+            <div class="code__bar">
+              <span class="code__dots"><span></span><span></span><span></span></span>
+              <span class="code__lang">Arduino C++</span>
+              <button class="code__copy" type="button"><i class="bi bi-clipboard"></i> Copy</button>
+            </div>
+            <pre><code>int distance = analogRead(3);
+
+if (distance &lt; 30) {
+  turnLeft();          // wall is close, so turn
+}
+
+if (distance &lt; 30) {
+  turnLeft();
+} else {
+  goForward();         // otherwise keep going
+}</code></pre>
+          </div>
+
+          <p>The first block does nothing when the wall is far. The second block always does one of the two actions, because <code>else</code> covers every other case. Most robot logic uses the second shape, because a robot always needs to be doing something.</p>
+
+          <h3>Comparison operators</h3>
+
+          <p>The question inside an if-statement uses a <strong>comparison operator</strong>. These are the symbols that compare two values. This table is worth remembering.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Operator</th><th>Means</th><th>Example that is true</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>==</code></td><td>is equal to</td><td><code>speed == 0</code></td></tr>
+                <tr><td><code>&lt;</code></td><td>is less than</td><td><code>distance &lt; 30</code></td></tr>
+                <tr><td><code>&gt;</code></td><td>is greater than</td><td><code>battery &gt; 20</code></td></tr>
+                <tr><td><code>&lt;=</code></td><td>is less than or equal to</td><td><code>speed &lt;= 255</code></td></tr>
+                <tr><td><code>&gt;=</code></td><td>is greater than or equal to</td><td><code>count &gt;= 3</code></td></tr>
+                <tr><td><code>!=</code></td><td>is not equal to</td><td><code>mode != 0</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 14.2 — The comparison operators. The two-equals check says "compare". The one-equals says "store".</p>
+
+          <div class="callout danger">
+            <div class="callout__head"><i class="bi bi-shield-exclamation"></i> Danger</div>
+            <p>Do not mix up <code>=</code> and <code>==</code>. A single <code>=</code> stores a value. A double <code>==</code> compares two values. Writing <code>if (x = 5)</code> by mistake stores 5 in <code>x</code> instead of comparing. The robot then behaves strangely, and the error is hard to see. This is one of the most common beginner bugs.</p>
+          </div>
+
+          <h3>Combining conditions with and / or</h3>
+
+          <p>Sometimes one question is not enough. You may want two things to be true at once, or either of two things to be true. You join conditions with <code>&amp;&amp;</code> for AND, and <code>||</code> for OR.</p>
+
+          <p><code>&amp;&amp;</code> (AND) means both sides must be true. <code>||</code> (OR) means at least one side must be true. A real robot example:</p>
+
+          <div class="code">
+            <div class="code__bar">
+              <span class="code__dots"><span></span><span></span><span></span></span>
+              <span class="code__lang">Arduino C++</span>
+              <button class="code__copy" type="button"><i class="bi bi-clipboard"></i> Copy</button>
+            </div>
+            <pre><code>// only turn if the wall is close AND the path on the left is open
+if (frontDistance &lt; 30 &amp;&amp; leftDistance &gt; 40) {
+  turnLeft();
+}
+
+// stop if the bumper is pressed OR the battery is almost empty
+if (bumperPressed || batteryLow) {
+  stopMotors();
+}</code></pre>
+          </div>
+
+          <p>Read the first one aloud: "If the wall in front is close, and the left side has room, then turn left." That single line is a small piece of machine judgement. This is how robots make choices.</p>
+
+          <h2>Loops: doing things again and again</h2>
+
+          <p>A robot repeats actions constantly. You could copy the same line a hundred times, but that would be silly and hard to change. Instead you use a <strong>loop</strong>. A loop repeats a block of code. There are three kinds you will use most.</p>
+
+          <h3>for loop — repeat a known number of times</h3>
+
+          <p>Use a <code>for</code> loop when you know in advance how many times to repeat. For example, blink a light five times, or sweep a servo through ten steps.</p>
+
+          <div class="code">
+            <div class="code__bar">
+              <span class="code__dots"><span></span><span></span><span></span></span>
+              <span class="code__lang">Arduino C++</span>
+              <button class="code__copy" type="button"><i class="bi bi-clipboard"></i> Copy</button>
+            </div>
+            <pre><code>// blink the LED 5 times
+for (int i = 0; i &lt; 5; i++) {
+  digitalWrite(9, HIGH);  // LED on
+  delay(200);             // wait 200 ms
+  digitalWrite(9, LOW);   // LED off
+  delay(200);
+}</code></pre>
+          </div>
+
+          <p>The line <code>for (int i = 0; i &lt; 5; i++)</code> creates a counter <code>i</code> that starts at 0. It repeats while <code>i</code> is less than 5, and adds 1 to <code>i</code> after each pass. So the block runs 5 times, with <code>i</code> equal to 0, 1, 2, 3, 4.</p>
+
+          <h3>while loop — repeat while a condition holds</h3>
+
+          <p>Use a <code>while</code> loop when you do not know the number of repeats ahead of time. You repeat as long as a condition stays true. This is useful for "keep doing this until something changes".</p>
+
+          <div class="code">
+            <div class="code__bar">
+              <span class="code__dots"><span></span><span></span><span></span></span>
+              <span class="code__lang">Arduino C++</span>
+              <button class="code__copy" type="button"><i class="bi bi-clipboard"></i> Copy</button>
+            </div>
+            <pre><code>// spin up while the button is held down
+while (digitalRead(2) == HIGH) {
+  analogWrite(10, 200);   // keep the motor running
+}
+analogWrite(10, 0);       // button released, stop</code></pre>
+          </div>
+
+          <div class="callout warn">
+            <div class="callout__head"><i class="bi bi-exclamation-triangle-fill"></i> Watch out</div>
+            <p>If the condition in a <code>while</code> loop never becomes false, the loop never ends. The robot freezes and ignores everything else. Always make sure something inside the loop can change the condition. A frozen robot often means a runaway <code>while</code> loop.</p>
+          </div>
+
+          <h3>The forever loop()</h3>
+
+          <p>The <code>loop()</code> function is itself a forever loop. You write its contents once, and the board repeats them endlessly. You never need to write "repeat forever" yourself — the board does it for you. That is why the main behaviour of a robot lives inside <code>loop()</code>.</p>
+
+          <p>The difference is simple. A <code>for</code> loop runs a set number of times. A <code>while</code> loop runs until a condition changes. The <code>loop()</code> function runs until the power is cut. Master these three and you can shape any robot behaviour.</p>
+
+          <div class="formula"><span class="label">Loop rate</span> loops per second = 1000 &divide; (time for one loop in milliseconds)</div>
+
+          <p>This small formula tells you how fast your robot thinks. If one full loop takes 10 milliseconds, the robot loops 100 times per second. If one loop takes 500 milliseconds, it loops only twice per second — far too slow to dodge a moving obstacle. We will use this idea again when we talk about <code>delay()</code>.</p>
+
+          <h2>Functions: naming a block of code</h2>
+
+          <p>As your code grows, you will repeat the same group of lines many times. Perhaps you have five lines that make the robot turn left. Writing those five lines everywhere is messy and easy to get wrong. The answer is a <strong>function</strong>.</p>
+
+          <p>A function is a named block of code. You give the block a name, and afterwards you can run the whole block just by writing its name. That is called <strong>calling</strong> the function.</p>
+
+          <div class="code">
+            <div class="code__bar">
+              <span class="code__dots"><span></span><span></span><span></span></span>
+              <span class="code__lang">Arduino C++</span>
+              <button class="code__copy" type="button"><i class="bi bi-clipboard"></i> Copy</button>
+            </div>
+            <pre><code>// the definition: write the block once and give it a name
+void turnLeft() {
+  analogWrite(10, 0);     // left motor off
+  analogWrite(11, 180);   // right motor forward
+  delay(300);             // let it turn for a moment
+}
+
+// later, in loop(), run the whole block with one short line
+turnLeft();</code></pre>
+          </div>
+
+          <p>The word <code>void</code> means "this function gives back no value". It just does a job. The empty parentheses mean it needs no information to start. When you write <code>turnLeft();</code> in your main code, all five lines run.</p>
+
+          <h3>Why functions make code readable</h3>
+
+          <p>Compare two versions of the same robot. One repeats the turning lines six times. The other defines <code>turnLeft()</code> once and calls it six times. The second version is shorter, easier to read, and much easier to fix. If you decide the turn should last longer, you change one number in one place instead of hunting through the whole file.</p>
+
+          <p>Functions also give your code a vocabulary. When you read <code>turnLeft(); goForward(); stopMotors();</code>, you understand the robot's behaviour at a glance. That is the goal of good code.</p>
+
+          <h2>Comments: notes for your future self</h2>
+
+          <p>A <strong>comment</strong> is a note inside the code that the robot ignores completely. Comments are only for humans. In Arduino code there are two ways to write one.</p>
+
+          <div class="code">
+            <div class="code__bar">
+              <span class="code__dots"><span></span><span></span><span></span></span>
+              <span class="code__lang">Arduino C++</span>
+              <button class="code__copy" type="button"><i class="bi bi-clipboard"></i> Copy</button>
+            </div>
+            <pre><code>// This whole line is a comment. The robot skips it.
+
+int distance = 0;   // A comment can also sit at the end of a line.
+
+/* This is a longer comment.
+   It can cover several lines.
+   Use it to explain a whole section. */</code></pre>
+          </div>
+
+          <p>Two slashes <code>//</code> comment out the rest of that line. Slash-star <code>/* ... */</code> comments out everything between the markers, across many lines.</p>
+
+          <p>Why bother? Because in three weeks you will not remember why you wrote a strange number. A comment like <code>// 30 cm is the safe stopping gap</code> explains it instantly. Comments are a gift to your future self, who will have forgotten everything.</p>
+
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> Tip</div>
+            <p>Comment the <em>why</em>, not the <em>what</em>. <code>// turn left</code> above <code>turnLeft();</code> wastes a line. <code>// turn left because the right side is blocked</code> tells you something the code cannot.</p>
+          </div>
+
+          <h2>The serial monitor: your window into the robot</h2>
+
+          <p>How do you know what your robot is thinking? You cannot see the value inside a variable just by looking at the board. The answer is the <strong>serial monitor</strong>. It is a window in your computer that shows messages sent from the robot.</p>
+
+          <p>Think of it as a one-way chat from the robot to you. The robot sends a line of text, and it appears on your screen. This is the single most useful debugging tool a beginner has.</p>
+
+          <p>You start it once in <code>setup()</code>, then send messages with <code>Serial.print()</code> or <code>Serial.println()</code>.</p>
+
+          <div class="code">
+            <div class="code__bar">
+              <span class="code__dots"><span></span><span></span><span></span></span>
+              <span class="code__lang">Arduino C++</span>
+              <button class="code__copy" type="button"><i class="bi bi-clipboard"></i> Copy</button>
+            </div>
+            <pre><code>void setup() {
+  Serial.begin(9600);   // start the chat at 9600 bits per second
+}
+
+void loop() {
+  int distance = analogRead(3);
+
+  Serial.print("Distance: ");   // print text, no line break
+  Serial.println(distance);     // print the value, then start a new line
+
+  delay(500);
+}</code></pre>
+          </div>
+
+          <p><code>Serial.print()</code> prints and stays on the same line. <code>Serial.println()</code> prints and then jumps to the next line. Used together, the example above prints something like <code>Distance: 42</code> every half second. You can watch the number change as you move your hand in front of the sensor.</p>
+
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> In simple words</div>
+            <p>The serial monitor is the robot talking to you. When you are confused about what the robot sees, make it print the values. The problem usually becomes obvious at once.</p>
+          </div>
+
+          <h2>Structuring robot code: read, decide, act</h2>
+
+          <p>Before the worked example, fix one habit in your mind. Nearly every good robot loop follows the same three-part shape you learned in Chapter 1.</p>
+
+          <ol>
+            <li><strong>Read</strong> all the inputs you need first. Read the distance. Read the bumper. Read the battery.</li>
+            <li><strong>Decide</strong> what to do, using if-statements based on those readings.</li>
+            <li><strong>Act</strong> on the decision — set motor speeds, lights or sounds.</li>
+          </ol>
+
+          <p>Then let <code>loop()</code> start again. Always read before you decide, and decide before you act. If you act first and read later, your robot is always reacting to yesterday's information, and it will feel clumsy and slow.</p>
+
+          <div class="callout note">
+            <div class="callout__head"><i class="bi bi-info-circle-fill"></i> Note</div>
+            <p>Professionals call this pattern the <strong>sense-decide-act</strong> loop. It is the same idea in Chapter 1, now written in code. Keep it in this order and your programs stay clear and easy to debug.</p>
+          </div>
+
+          <h2>A full worked example: an obstacle-avoiding robot</h2>
+
+          <p>Now we build a complete program together. Our robot has two motors and one forward-facing distance sensor. The goal: drive forward, but turn away before hitting anything. We build it in five small steps, so you can see how a program grows.</p>
+
+          <h3>Step 1 — say what the robot must do</h3>
+
+          <p>In plain words: "Drive forward. If something is closer than 30 cm, turn right for a moment, then keep going. Never stop reading the distance." Every program should start with a sentence like this. It is your contract with yourself.</p>
+
+          <h3>Step 2 — plan the pins</h3>
+
+          <p>We choose pins and write them down so we never get confused. The distance sensor is on analog pin 3. The left motor is on pin 10, the right motor on pin 11. This plan goes into <code>setup()</code>.</p>
+
+          <h3>Step 3 — write the first simple version</h3>
+
+          <p>Start small. This version reads the distance and decides. It uses a named constant for the threshold, so the number has a meaning.</p>
+
+          <div class="code">
+            <div class="code__bar">
+              <span class="code__dots"><span></span><span></span><span></span></span>
+              <span class="code__lang">Arduino C++</span>
+              <button class="code__copy" type="button"><i class="bi bi-clipboard"></i> Copy</button>
+            </div>
+            <pre><code>const int SENSOR_PIN = 3;      // distance sensor input
+const int LEFT_MOTOR = 10;     // left motor output
+const int RIGHT_MOTOR = 11;    // right motor output
+const int SAFE_GAP = 30;       // cm: turn if closer than this
+
+void setup() {
+  pinMode(SENSOR_PIN, INPUT);
+  pinMode(LEFT_MOTOR, OUTPUT);
+  pinMode(RIGHT_MOTOR, OUTPUT);
+  Serial.begin(9600);          // open the chat to your computer
+}
+
+void loop() {
+  int distance = analogRead(SENSOR_PIN);  // 1. READ
+
+  if (distance &lt; SAFE_GAP) {              // 2. DECIDE
+    analogWrite(LEFT_MOTOR, 180);         // 3. ACT: turn right
+    analogWrite(RIGHT_MOTOR, 0);
+  } else {
+    analogWrite(LEFT_MOTOR, 180);         // 3. ACT: go forward
+    analogWrite(RIGHT_MOTOR, 180);
+  }
+}</code></pre>
+          </div>
+
+          <p>This already works, but it has a flaw. The moment the wall is far again, the robot snaps straight back to full forward. It will jitter at the 30 cm boundary. Real robots need a little smoothing.</p>
+
+          <h3>Step 4 — improve with functions and a turn timer</h3>
+
+          <p>We tidy the code using functions, and we make the turn last a short fixed time using <code>delay()</code>. Functions keep the loop readable; the delay makes the turn deliberate.</p>
+
+          <div class="code">
+            <div class="code__bar">
+              <span class="code__dots"><span></span><span></span><span></span></span>
+              <span class="code__lang">Arduino C++</span>
+              <button class="code__copy" type="button"><i class="bi bi-clipboard"></i> Copy</button>
+            </div>
+            <pre><code>const int SENSOR_PIN = 3;
+const int LEFT_MOTOR = 10;
+const int RIGHT_MOTOR = 11;
+const int SAFE_GAP = 30;
+const int CRUISE = 180;        // normal forward speed
+
+void goForward() {
+  analogWrite(LEFT_MOTOR, CRUISE);
+  analogWrite(RIGHT_MOTOR, CRUISE);
+}
+
+void turnRight() {
+  analogWrite(LEFT_MOTOR, CRUISE);   // left wheel forward
+  analogWrite(RIGHT_MOTOR, 0);       // right wheel stopped
+}
+
+void setup() {
+  pinMode(SENSOR_PIN, INPUT);
+  pinMode(LEFT_MOTOR, OUTPUT);
+  pinMode(RIGHT_MOTOR, OUTPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  int distance = analogRead(SENSOR_PIN);   // READ
+  Serial.println(distance);                // report what we saw
+
+  if (distance &lt; SAFE_GAP) {               // DECIDE
+    turnRight();                           // ACT
+    delay(300);                            // keep turning briefly
+  } else {
+    goForward();                           // ACT
+  }
+}</code></pre>
+          </div>
+
+          <h3>Step 5 — walk through the code line by line</h3>
+
+          <ol>
+            <li><strong>The constants.</strong> The first five lines give names to fixed values: the pins, the safe gap and the cruise speed. Names beat mystery numbers.</li>
+            <li><strong>The functions.</strong> <code>goForward()</code> and <code>turnRight()</code> each hold one small behaviour. The loop reads like a story because of them.</li>
+            <li><strong>setup().</strong> It sets the sensor as an input, the motors as outputs, and opens the serial monitor. Each line runs once.</li>
+            <li><strong>Read the distance.</strong> <code>analogRead(SENSOR_PIN)</code> gives a number. We store it in <code>distance</code>.</li>
+            <li><strong>Report it.</strong> <code>Serial.println(distance)</code> sends the number to your screen so you can watch it live.</li>
+            <li><strong>Decide.</strong> The if-statement compares <code>distance</code> with <code>SAFE_GAP</code>.</li>
+            <li><strong>Act.</strong> Close wall: turn for 300 ms. Clear path: drive forward. Then <code>loop()</code> starts again.</li>
+          </ol>
+
+          <p>You have just written a real robot behaviour. It senses, decides and acts, forever. Every robot vacuum, delivery bot and warehouse machine does a more advanced version of exactly this.</p>
+
+          <h2>Time and speed: why delays can freeze your robot</h2>
+
+          <p>Look back at Step 4. We used <code>delay(300)</code> to make the turn last. <code>delay()</code> pauses the whole program for that many milliseconds. It is simple and useful. But it has a serious downside: while the robot is delayed, it does nothing else.</p>
+
+          <p>During those 300 milliseconds the robot cannot read the distance. It cannot check the battery. It cannot hear a stop button. It is blind, deaf and frozen. Engineers call this <strong>blocking</strong> code, because it blocks everything else. A <code>delay(1000)</code> freezes the robot for a whole second — a very long time on a moving robot.</p>
+
+          <div class="callout warn">
+            <div class="callout__head"><i class="bi bi-exclamation-triangle-fill"></i> Watch out</div>
+            <p>Long delays are one of the most common beginner mistakes. They feel harmless on a bench, but on a real robot they mean missed readings and late reactions. Use short delays, and learn the non-blocking trick below for anything longer.</p>
+          </div>
+
+          <h3>The idea of non-blocking code with millis()</h3>
+
+          <p><code>millis()</code> gives the number of milliseconds since the board powered on. It keeps counting up in the background, all the time, whether you read it or not. That lets you ask a clever question: "Has enough time passed yet?" — without ever pausing.</p>
+
+          <p>Instead of "stop for 300 ms", you say "remember the time the turn started, and keep checking whether 300 ms have gone by". While you check, you can keep reading sensors. Nothing is frozen.</p>
+
+          <div class="code">
+            <div class="code__bar">
+              <span class="code__dots"><span></span><span></span><span></span></span>
+              <span class="code__lang">Arduino C++</span>
+              <button class="code__copy" type="button"><i class="bi bi-clipboard"></i> Copy</button>
+            </div>
+            <pre><code>// BEFORE (blocking): the robot is blind for 300 ms
+turnRight();
+delay(300);
+
+// AFTER (non-blocking): keep watching the world while turning
+unsigned long turnStarted = millis();   // note the start time
+
+// later, still inside loop():
+if (millis() - turnStarted &lt; 300) {
+  turnRight();          // still within the turn window
+} else {
+  goForward();          // turn finished, carry on
+}</code></pre>
+          </div>
+
+          <p>Both versions turn for 300 milliseconds. The difference is that the non-blocking version never stops reading the world. On a fast robot, that is the difference between reacting in time and crashing.</p>
+
+          <div class="formula"><span class="label">Loop rate</span> rate (Hz) = 1000 &divide; loop_time_ms</div>
+
+          <p>Use this to check your robot's thinking speed. A loop with no delay might take 5 ms, giving 200 loops per second — fast and responsive. Add <code>delay(500)</code> and the same loop does 2 per second — sluggish and unsafe. Keep your loop time small.</p>
+
+          <h2>Reading and fixing errors</h2>
+
+          <p>Errors are normal. Every programmer, beginner and expert, sees them all the time. The skill is not avoiding errors; it is reading them calmly and fixing them quickly. Most errors you meet as a beginner come from the compiler.</p>
+
+          <h3>What a compiler error means</h3>
+
+          <p>Before your code can run, a tool called the <strong>compiler</strong> reads it and translates it into the robot's language. If the compiler finds something it cannot understand, it stops and prints an error message. That message usually has two useful parts: a line number, and a description.</p>
+
+          <p>The line number tells you where to look. Sometimes the real mistake is on the line before, because the compiler only noticed it later. Start at the first error shown, fix it, then build again. Later errors are often caused by the first one.</p>
+
+          <h3>The three most common errors</h3>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Error</th><th>What it looks like</th><th>The fix</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Missing semicolon</td><td><code>expected ';' before '}'</code></td><td>Add the <code>;</code> at the end of the statement named.</td></tr>
+                <tr><td>Wrong spelling or case</td><td><code>'digitialWrite' was not declared</code></td><td>Fix the spelling and the capital letters. <code>digitalWrite</code> is not <code>DigitalWrite</code>.</td></tr>
+                <tr><td>Missing brace</td><td><code>expected '}' at end of input</code></td><td>Count your <code>{ }</code> pairs and add the missing one.</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 14.3 — The three errors beginners meet most. Almost every early error is one of these three.</p>
+
+          <h3>A broken snippet and its fix</h3>
+
+          <p>Here is a program with two mistakes. Read it and try to spot them before looking at the fix. Remember: the robot is a literal reader, and the compiler is even stricter.</p>
+
+          <div class="code">
+            <div class="code__bar">
+              <span class="code__dots"><span></span><span></span><span></span></span>
+              <span class="code__lang">Arduino C++</span>
+              <button class="code__copy" type="button"><i class="bi bi-clipboard"></i> Copy</button>
+            </div>
+            <pre><code>void setup() {
+  pinMode(10, OUTPUT)
+}
+
+void loop() {
+  digitialWrite(10, HIGH);
+}</code></pre>
+          </div>
+
+          <p>The errors: the <code>pinMode</code> line is missing its semicolon, and <code>digitialWrite</code> is misspelled. Here is the fixed version:</p>
+
+          <div class="code">
+            <div class="code__bar">
+              <span class="code__dots"><span></span><span></span><span></span></span>
+              <span class="code__lang">Arduino C++</span>
+              <button class="code__copy" type="button"><i class="bi bi-clipboard"></i> Copy</button>
+            </div>
+            <pre><code>void setup() {
+  pinMode(10, OUTPUT);       // semicolon added
+}
+
+void loop() {
+  digitalWrite(10, HIGH);    // spelling fixed
+}</code></pre>
+          </div>
+
+          <h3>A step-by-step debugging routine</h3>
+
+          <p>When something is wrong, follow these steps in order. Do not skip around or change many things at once.</p>
+
+          <ol>
+            <li><strong>Read the first error.</strong> Note the line number and the exact words. Do not panic at a long list; fix the top one first.</li>
+            <li><strong>Look at that line and the one above.</strong> The cause is often just before where the compiler complains.</li>
+            <li><strong>Check the three usual suspects.</strong> Missing semicolon, wrong spelling or case, missing brace.</li>
+            <li><strong>Fix one thing.</strong> Change a single item, then build again. One change at a time tells you what worked.</li>
+            <li><strong>If it still fails,</strong> comment out the last few lines you added, confirm it builds, then add them back in small pieces to find the culprit.</li>
+            <li><strong>Once it builds,</strong> upload it and open the serial monitor. Use prints to see what the robot actually reads.</li>
+          </ol>
+
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> Tip</div>
+            <p>The error message is your friend, not your enemy. Read it slowly. It almost always tells you exactly what kind of mistake it found and roughly where. The skill is patience, not cleverness.</p>
+          </div>
+
+          <h2>Common mistakes beginners make</h2>
+
+          <p>Every programmer has made all of these. Knowing them in advance saves you a lot of head-scratching.</p>
+
+          <ul>
+            <li><strong>Using long blocking delays.</strong> <code>delay(2000)</code> freezes the robot for two seconds. It cannot sense or react. Use short delays, or get into the habit of <code>millis()</code>.</li>
+            <li><strong>Magic numbers with no names.</strong> Writing <code>if (distance &lt; 30)</code> everywhere leaves everyone wondering what 30 means. Name it: <code>const int SAFE_GAP = 30;</code>.</li>
+            <li><strong>No comments.</strong> Code you cannot understand two weeks later is code you cannot fix. Add a short comment wherever the reason is not obvious.</li>
+            <li><strong>Ignoring the serial monitor.</strong> Beginners guess at what the robot sees. Printing the values shows you the truth in seconds.</li>
+            <li><strong>Copy-pasting without understanding.</strong> Code you copied but do not understand will break the moment you need to change it. Type examples out and read every line.</li>
+            <li><strong>Acting before reading.</strong> Writing motor commands at the top of <code>loop()</code> and reading sensors at the bottom means your robot always reacts to stale information.</li>
+            <li><strong>Mixing up <code>=</code> and <code>==</code>.</strong> Store versus compare. This bug produces no error message and strange behaviour, so it is easy to miss.</li>
+          </ul>
+
+          <h2>How professionals do it</h2>
+
+          <p>The professional's code looks cleaner than the beginner's, but it is built from the same pieces you just learned. What changes is discipline and a few strong habits.</p>
+
+          <h3>State machines</h3>
+
+          <p>As behaviour grows, a long chain of if-statements becomes hard to follow. Professionals use a <strong>state machine</strong>. The robot is always in exactly one state — for example DRIVING, TURNING or STOPPED. Each state has its own rules for what to do and when to switch. This keeps a complex robot understandable, and you will meet it properly in Chapter 15.</p>
+
+          <h3>Code style that others can read</h3>
+
+          <p>Professionals follow a consistent style: clear names, small functions, one job per function, and comments where the reason matters. Code is read far more often than it is written, so making it easy to read is a real skill, not a luxury.</p>
+
+          <h3>Version control</h3>
+
+          <p>Professionals keep every version of their code in a system called <strong>version control</strong>, usually Git. Each change is saved with a short message. If a new idea breaks the robot, they can return to a working version in seconds. It also lets a team work on the same code safely.</p>
+
+          <h3>Testing on real hardware</h3>
+
+          <p>A program can be perfect on the computer and still misbehave on the real robot, because real sensors are noisy and real motors are not identical. Professionals test on hardware early, then again after every change. This idea is sometimes called hardware-in-the-loop testing.</p>
+
+          <h3>Watchdogs and safe behaviour</h3>
+
+          <p>A <strong>watchdog</strong> is a safety timer. If the program ever freezes or crashes, the watchdog notices that it stopped checking in, and it restarts the board. Professionals also design safe behaviour for failure: if a sensor dies, the robot stops rather than driving blind. A safe robot is one that fails in a safe way.</p>
+
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> The key idea</div>
+            <p>Professional code is not smarter code. It is clearer code, tested more often, and written so that the next person — including future you — can understand and trust it.</p>
+          </div>
+
+          <h2>Try it yourself</h2>
+
+          <p>These exercises go from easy to harder. If you have a board, try them for real. If not, write the code and trace it line by line on paper — that is excellent practice too.</p>
+
+          <ol>
+            <li><strong>Blink on and off.</strong> Write a program that turns an LED on for half a second, then off for half a second, forever. Hint: use <code>digitalWrite</code> and <code>delay(500)</code> inside <code>loop()</code>.</li>
+            <li><strong>Add a condition.</strong> Use a button and an LED. Turn the LED on only while the button is pressed. Hint: <code>if (digitalRead(2) == HIGH) { ... }</code>.</li>
+            <li><strong>Name your numbers.</strong> Take exercise 2 and replace every raw pin number and delay with a named <code>const int</code>. Hint: <code>const int BUTTON_PIN = 2;</code>.</li>
+            <li><strong>Turn with a function.</strong> Write a <code>turnLeft()</code> function that spins one motor and stops the other, then call it from <code>loop()</code> when a distance reading is small. Hint: <code>analogWrite</code> with 0 and 180.</li>
+            <li><strong>Print then fix.</strong> Deliberately remove a semicolon and a brace from your working program, build it, and read the errors. Write down what each message told you, then fix both. Hint: the compiler usually names the line where it first got confused.</li>
+          </ol>
+
+          <h2>Going deeper: from blocking to event-driven</h2>
+
+          <p>This next idea is optional, but it is the doorway to professional control. Instead of writing "do this, then wait", advanced robot code is <strong>event-driven</strong>. The loop runs extremely fast, and on every pass it simply checks: is it time to do the next thing? Is a new reading ready? Has nothing changed for a while? Nothing ever blocks, so the robot stays responsive at all times. The <code>millis()</code> trick you just learned is the first step on this path, and state machines are the next.</p>
+
+          <section class="takeaways">
+            <h2><i class="bi bi-pin-angle-fill"></i> Key takeaways</h2>
+            <ul>
+              <li><i class="bi bi-check2-circle"></i> A program is a list of instructions the robot runs in order, with no common sense of its own.</li>
+              <li><i class="bi bi-check2-circle"></i> Every Arduino sketch has <code>setup()</code>, which runs once, and <code>loop()</code>, which runs forever.</li>
+              <li><i class="bi bi-check2-circle"></i> A variable is a named box that holds a value; the type says what kind of value.</li>
+              <li><i class="bi bi-check2-circle"></i> Inputs are read with <code>digitalRead</code> and <code>analogRead</code>; outputs are written with <code>digitalWrite</code> and <code>analogWrite</code>.</li>
+              <li><i class="bi bi-check2-circle"></i> Use <code>if</code> / <code>else</code> to choose, and loops to repeat. Name reusable blocks as functions.</li>
+              <li><i class="bi bi-check2-circle"></i> Long <code>delay()</code> calls freeze the robot; <code>millis()</code> lets it keep sensing while it waits.</li>
+              <li><i class="bi bi-check2-circle"></i> Read the first compiler error, fix one thing, and rebuild. Print values to the serial monitor to see the truth.</li>
+            </ul>
+          </section>
+
+          <section class="quiz">
+            <div class="quiz__head"><i class="bi bi-patch-question-fill"></i> Check your understanding</div>
+            <details>
+              <summary><span class="q-num">Q1.</span><span>What is a program, in one plain sentence?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> A program is a list of instructions that a computer runs in order, from top to bottom.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q2.</span><span>What is the difference between <code>setup()</code> and <code>loop()</code>?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> <code>setup()</code> runs once, right after power-on, for preparation. <code>loop()</code> runs over and over forever, and holds the robot's sense-decide-act behaviour.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q3.</span><span>Which variable type would you use to store whether a bumper is pressed?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> A <code>bool</code>, because the answer is only true or false.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q4.</span><span>Why is <code>analogWrite</code> described as a trick?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Because the pin cannot truly output a middle voltage. It switches on and off very fast (PWM), and the motor feels the average. That fakes a speed between off and full.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q5.</span><span>Why must you call <code>pinMode</code> before using a pin?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> To tell the board whether the pin is an input or an output. Without it, the pin uses a default that may not match your wiring, causing wrong readings or no output.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q6.</span><span>What is the difference between a <code>for</code> loop and a <code>while</code> loop?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> A <code>for</code> loop repeats a known number of times. A <code>while</code> loop repeats while a condition stays true, which is useful when you do not know the count in advance.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q7.</span><span>Why is <code>delay(1000)</code> dangerous on a moving robot?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> It blocks the whole program. For one second the robot cannot read sensors or react to anything. On a moving robot that can mean a missed obstacle or a crash. <code>millis()</code> waits without freezing.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q8.</span><span>A compiler says <code>expected ';' before '}'</code> on line 7. What do you do first?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Go to line 7, and also check the line just above it. A statement is probably missing its semicolon. Add it, then build again before changing anything else.</div>
+            </details>
+          </section>
+
+        </article>
+
+        <nav class="pager" id="pager" aria-label="Chapter navigation"></nav>
+      </div>
+    </main>
+  </div>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/book.js"></script>
+</body>
+</html>

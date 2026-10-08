@@ -1,0 +1,31 @@
+name: master_robotics_app
+description: "Master Robotics book as a fully offline mobile app (WebView bundle)."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.12.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  webview_flutter: ^4.13.0
+  url_launcher: ^6.3.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/book/
+    - assets/book/assets/
+    - assets/book/assets/css/
+    - assets/book/assets/js/
+    - assets/book/vendor/
+    - assets/book/vendor/bootstrap-icons/
+    - assets/book/vendor/bootstrap-icons/fonts/
+

@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>try{var __t=null;try{__t=localStorage.getItem("mr-theme")}catch(e){}if(__t!=="dark"&&__t!=="light"){try{var __m=document.cookie.match(/(?:^|;\s*)mr-theme=(dark|light)/);__t=__m?__m[1]:null}catch(e){__t=null}}if(__t!=="dark"&&__t!=="light"){try{var __w=String(window.name||"").match(/mr-theme=(dark|light)/);__t=__w?__w[1]:null}catch(e){}}if(__t!=="dark"&&__t!=="light"&&window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches){__t="dark"}if(__t==="dark"||__t==="light")document.documentElement.setAttribute("data-theme",__t)}catch(e){}</script>
+  <title>Chapter 26: Whole-Body Control and MPC — Master Robotics</title>
+  <meta name="description" content="Task-space control, nullspace, hierarchical QP whole-body control and real-time MPC loops explained plainly with code.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="vendor/bootstrap-icons/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/prose.css">
+  <link rel="stylesheet" href="assets/css/mobile.css">
+</head>
+<body data-file="ch26-whole-body-control-mpc.html">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="topbar" id="topbar"></header>
+  <div class="progress-bar" id="progressBar"></div>
+
+  <div class="layout">
+    <div class="sidebar__backdrop" id="navBackdrop"></div>
+    <nav class="sidebar" id="sidebar" aria-label="Book contents"></nav>
+
+    <main class="main" id="main">
+      <div class="container">
+
+        <header class="chapter-head">
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="index.html">Home</a>
+            <i class="bi bi-chevron-right"></i>
+            <a href="index.html#advanced">Part 7 &middot; Advanced Foundations</a>
+            <i class="bi bi-chevron-right"></i>
+            <span>Chapter 26</span>
+          </nav>
+          <span class="chapter-kicker"><i class="bi bi-diagram-3"></i> Part 7 &middot; Advanced Foundations</span>
+          <h1>Chapter 26: Whole-Body Control and MPC</h1>
+          <p class="lede">You will command many joints as one body, stack tasks by rank, and run MPC inside tight time budgets.</p>
+          <div class="chapter-meta">
+            <span><i class="bi bi-clock"></i> ~30 min read</span>
+            <span><i class="bi bi-bar-chart"></i> Advanced</span>
+            <span><i class="bi bi-list-check"></i> Chapter 26 of 30</span>
+          </div>
+          <div class="goals">
+            <h2>What you will learn</h2>
+            <ul>
+              <li><i class="bi bi-check-circle-fill"></i> Explain task-space control and nullspace in plain words</li>
+              <li><i class="bi bi-check-circle-fill"></i> Describe hierarchical QP for whole-body control</li>
+              <li><i class="bi bi-check-circle-fill"></i> Explain MPC loop and real-time budgets</li>
+            </ul>
+          </div>
+        </header>
+
+        <article class="article">
+          <h2>1. Why PID alone is not enough</h2>
+          <p>Picture a humanoid carrying a tray of drinks. Its feet must stay planted firmly. Its hands must keep the tray level. Its knees must bend without falling over. One joint cannot solve this alone.</p>
+          <p>A plain <strong>PID</strong> drives each joint to its own target. It worked well in <a href="ch15-control-systems.html">control basics</a>. But it sees no whole-body balance. It also fights contact forces blindly. The robot wobbles and drops the tray.</p>
+          <p><strong>Inverse dynamics</strong> fixes this with a body model. It asks what forces create a wanted motion. It then commands those torques at once. Think of a crew rowing together, not six solo boats.</p>
+          <h3>From joints to jobs</h3>
+          <p><strong>Task-space control</strong> commands the job, not joints. You say "keep the hand here". The math picks all joint moves. You stop hand-tuning twelve loops by feel.</p>
+          <p>This builds on <a href="ch16-kinematics.html">kinematics</a> and <a href="ch25-advanced-math-for-robotics.html">Chapter 25 math</a>. Poses come from SE(3). Best moves come from QP solvers. Now we stack many jobs at once.</p>
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> In plain English</div>
+            <p>A <strong>task</strong> is one job for the body, like "hold balance". The <strong>nullspace</strong> is the free wiggle room left after a job is done. Lower jobs may only use that free room.</p>
+          </div>
+
+          <h2>2. Task space and the nullspace idea</h2>
+          <p>Think of writing on a whiteboard. Your hand must follow the letters. That is the main task. Your elbow can still move many ways. Those extra options form the nullspace.</p>
+          <p>The robot uses the <strong>Jacobian</strong> as a translator. It turns joint speeds into hand speeds. It also turns hand forces into joint torques. One matrix links both directions at once.</p>
+          <p>Control in task space has two clear steps. First, fix the main job exactly. Second, spend leftover freedom on comfort jobs. Comfort means bent knees, low effort, or looking ahead.</p>
+          <h3>A two-job pattern you can reuse</h3>
+          <ol>
+            <li>Solve the top job: balance the body over the feet.</li>
+            <li>Freeze its result, then solve the next job inside leftovers.</li>
+            <li>Add gentle posture wishes last, with small weights.</li>
+            <li>Send the combined torques to all joints together.</li>
+          </ol>
+          <div class="formula"><span class="label">Task map</span> hand_speed = J &times; joint_speed</div>
+          <div class="formula"><span class="label">Nullspace filter</span> safe_move = (I &minus; J&sdot; J) &times; comfort_wish</div>
+          <div class="callout note">
+            <div class="callout__head"><i class="bi bi-info-circle-fill"></i> Note</div>
+            <p>J&sdot; means a safe pseudo-inverse of J. It picks the smallest joint move for a task. The filter then removes any part that would break the main job.</p>
+          </div>
+
+          <h2>3. Hierarchy: strict ranks versus soft wishes</h2>
+          <p>Some tasks must never lose. Balance beats waving hello. Feet contact beats pretty posture. These are <strong>strict</strong> ranks. A lower task cannot touch them at all.</p>
+          <p>Other tasks are <strong>soft</strong> wishes with weights. Gaze at a face scores 10 points. Save energy scores 2 points. The solver trades them off smoothly. No wish can break a strict rank.</p>
+          <p><strong>Regularization</strong> adds a tiny calm-down cost. It tells the solver to prefer small, smooth answers. Think of adding a pinch of salt. Too little does nothing, too much ruins taste.</p>
+          <figure class="figure">
+            <div class="figure__box">
+              <svg viewBox="0 0 420 190" width="100%" role="img" aria-label="Task hierarchy stack diagram">
+                <rect x="90" y="12" width="240" height="34" rx="8" fill="#1c2230" stroke="#1c2230"/>
+                <text x="210" y="34" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#ffffff">Rank 1: balance + contacts</text>
+                <rect x="90" y="52" width="240" height="34" rx="8" fill="#e8eeff" stroke="#2d5bff" stroke-width="2"/>
+                <text x="210" y="74" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#1c2230">Rank 2: hand + head tasks</text>
+                <rect x="90" y="92" width="240" height="34" rx="8" fill="#ffffff" stroke="#7b849b" stroke-width="2"/>
+                <text x="210" y="114" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#1c2230">Rank 3: posture + gaze</text>
+                <rect x="90" y="132" width="240" height="34" rx="8" fill="#e6f7f0" stroke="#0f9d78" stroke-width="2"/>
+                <text x="210" y="154" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#1c2230">Soft: save energy (small weight)</text>
+                <line x1="60" y1="29" x2="90" y2="29" stroke="#1c2230" stroke-width="2"/>
+                <line x1="60" y1="69" x2="90" y2="69" stroke="#2d5bff" stroke-width="2"/>
+                <line x1="60" y1="109" x2="90" y2="109" stroke="#7b849b" stroke-width="2"/>
+                <text x="52" y="33" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#1c2230">must</text>
+                <text x="52" y="73" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#1c2230">keep</text>
+                <text x="52" y="113" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#1c2230">nice</text>
+              </svg>
+            </div>
+            <figcaption>Figure 1. Strict ranks on top, soft wishes below. Lower rows use only leftover freedom.</figcaption>
+          </figure>
+
+          <h2>4. Worked example: reach while balancing</h2>
+          <p>A humanoid must reach a shelf and stay upright. The shelf target is 10 cm forward. The feet must not slide at all. We solve this in strict order.</p>
+          <h3>Step 1: lock the feet</h3>
+          <p>Rank one says foot speed equals zero. It also caps push forces inside friction cones. Suppose each foot may push up to 300 N. The solver keeps forces inside this safe cone.</p>
+          <h3>Step 2: move the hand in leftovers</h3>
+          <p>Rank two asks for 10 cm forward hand motion. The nullspace filter removes foot-breaking parts. Say the raw wish needs knee twist 5&deg;. The filter trims it to 1&deg;. Balance survives the reach.</p>
+          <h3>Step 3: spend the rest on comfort</h3>
+          <ol>
+            <li>Keep knees slightly bent for shock safety.</li>
+            <li>Point the head toward the shelf target.</li>
+            <li>Minimize total torque with a small weight.</li>
+          </ol>
+          <p>This pattern is called <strong>HQP</strong>, or hierarchical QP. Each rank is one QP puzzle. Lower ranks inherit equality locks from above. Research teams report a 1.2 m/s walk with an 800 Hz QPOASES loop and a 100 Hz planner, as one lab example.</p>
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> Tip</div>
+            <p>Test hierarchy with a freeze check. Command the hand while watching foot force. If feet move, your rank lock leaks. Fix locks before tuning weights.</p>
+          </div>
+
+          <h2>5. One QP for the whole body</h2>
+          <p><strong>Whole-body control</strong> solves joints and contacts together. The variable is &xi; = [accelerations, contact forces]. Accelerations move the body mass. Forces push against the ground safely.</p>
+          <p>Equality rows enforce physics and locked tasks. Inequality rows enforce friction, torque caps, and joint stops. The cost blends task errors plus small regularization. One solve returns all commands at once.</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>QP piece</th><th>What it says</th><th>Plain example</th></tr></thead>
+              <tbody>
+                <tr><td>Variable &xi;</td><td>Joint accels + forces</td><td>All answers in one list</td></tr>
+                <tr><td>Equality</td><td>Physics must hold</td><td>Feet stay still</td></tr>
+                <tr><td>Inequality</td><td>Limits must hold</td><td>Push inside friction cone</td></tr>
+                <tr><td>Cost</td><td>Task error + calm</td><td>Reach well, stay smooth</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <h3>Why this beats separate loops</h3>
+          <p>Separate loops fight over shared joints every tick. One QP sees all fights at once. It picks a trade both loops accept. Contacts stay legal by construction, not luck.</p>
+          <div class="code">
+            <div class="code__bar">
+              <span class="code__dots"><span></span><span></span><span></span></span>
+              <span class="code__lang">Python</span>
+              <button class="code__copy" type="button"><i class="bi bi-clipboard"></i> Copy</button>
+            </div>
+            <pre><code>import numpy as np
+
+# Task weights: balance is strict (locked), others are soft wishes.
+W_balance = 1000.0
+W_hand = 50.0
+W_posture = 1.0
+W_reg = 0.01
+
+def qp_cost(xi, err_balance, err_hand, err_posture):
+    return (W_balance * err_balance**2
+            + W_hand * err_hand**2
+            + W_posture * err_posture**2
+            + W_reg * float(xi @ xi))
+
+def mpc_loop(steps=5, dt=0.01):
+    x = measure_state()          # sensors -&gt; body state
+    x_warm = last_solution()     # warm-start from prior tick
+    for k in range(steps):       # short horizon plan
+        xi = solve_one_qp(x, x_warm)  # accels + forces, Ax &lt;= b
+        x = predict(x, xi, dt)   # model rolls one step ahead
+        x_warm = xi              # next tick starts nearby
+    cmd = first_step_only()      # play one frame, then replan
+    send_torques(cmd)
+    return cmd</code></pre>
+          </div>
+
+          <h2>6. The MPC loop and real-time budgets</h2>
+          <p><strong>MPC</strong> plans a short movie and plays one frame. Then it measures again and replans. This loop loves fresh data. It forgives bumps, slips, and pushes well.</p>
+          <p>Real robots run two clocks at once. A fast whole-body QP runs at 800 Hz to 1 kHz. A slower planner runs near 100 Hz over seconds. The fast loop tracks, the slow loop dreams ahead.</p>
+          <p><strong>Warm-start</strong> reuses the last answer as a guess. Most ticks change only a little. The solver then finishes in far fewer steps. <strong>Cascaded-fidelity MPC</strong> uses a rough far future and a sharp near future.</p>
+          <h3>A budget you can copy</h3>
+          <ol>
+            <li>Measure and estimate state: under 0.2 ms.</li>
+            <li>Solve the whole-body QP: under 0.8 ms at 1 kHz.</li>
+            <li>Update the slow SQP plan in the background at 100 Hz.</li>
+            <li>If a tick overruns, replay a safe fallback torque.</li>
+          </ol>
+          <p>A <strong>kino-dynamics planner</strong> mixes motion shape with force needs. It sketches where mass should go. The HQP then makes forces obey physics. Together they walk fast without falling.</p>
+          <div class="callout warn">
+            <div class="callout__head"><i class="bi bi-exclamation-triangle-fill"></i> Warning</div>
+            <p>Never let planning steal the fast loop budget. Run the slow planner on another thread. The 1 kHz loop must always answer on time.</p>
+          </div>
+
+          <h2>7. Touch gently: impedance, admittance, force</h2>
+          <p>Position control says "go there no matter what". That breaks cups and fingers. <strong>Impedance control</strong> acts like a soft spring instead. You set stiffness and damping, not just a spot.</p>
+          <p><strong>Admittance control</strong> flips the logic for stiff arms. It feels the push, then moves away gently. Think of a heavy door with a kind motor. Push harder and it yields more.</p>
+          <p>True <strong>force control</strong> tracks a push target directly. Polish with 10 N, neither 5 nor 20. It needs a clean force sensor. It also needs friction limits from the QP.</p>
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> Key idea</div>
+            <p>Pick stiffness for the job, not the motor. Hard for milling, soft for handshakes. The QP still guards contacts and torque caps.</p>
+          </div>
+
+          <h2>8. Common mistakes</h2>
+          <ul>
+            <li><strong>Soft balance.</strong> Balance as a low weight drifts and falls. Lock it as a strict rank instead.</li>
+            <li><strong>No regularization.</strong> Zero calm cost gives jerky answers. Add a tiny weight on &xi; always.</li>
+            <li><strong>Friction ignored.</strong> Feet slide when cones are missing. Add cone limits before fast walks.</li>
+            <li><strong>Cold starts only.</strong> Solving from zero each tick wastes time. Warm-start from the last &xi;.</li>
+            <li><strong>Planner blocks control.</strong> A 10 ms plan stalls a 1 ms loop. Split threads and cap solve time.</li>
+          </ul>
+
+          <h2>9. How professionals do it</h2>
+          <p>Pro teams split rates on purpose. The HQP runs at 800 Hz with qpOASES. The SQP planner runs near 100 Hz behind it. Shared memory passes fresh plans without locks.</p>
+          <p>They log solve time, task errors, and cone margins live. A red tick triggers a safe freeze posture. They replay logs in simulation first. Only clean logs earn hardware time.</p>
+          <p>They test pushes early and often. A stick shove checks balance ranks fast. Force plots must stay inside cones. Terms live in the <a href="glossary.html">glossary</a> so new hires ramp quickly.</p>
+
+          <h2>10. Try it yourself</h2>
+          <ol>
+            <li><strong>List three tasks in rank order.</strong> Use a tray-carrying humanoid. <em>Hint: feet first, tray second, gaze last.</em></li>
+            <li><strong>Spot the nullspace.</strong> Hand draws circles, elbow floats freely. <em>Hint: elbow room is the nullspace.</em></li>
+            <li><strong>Set a 1 kHz budget.</strong> Split 1.0 ms across sense, solve, send. <em>Hint: give the QP at most 0.8 ms.</em></li>
+            <li><strong>Pick soft or strict.</strong> Label gaze, balance, and energy saving. <em>Hint: only balance is strict here.</em></li>
+          </ol>
+
+          <h2>Going deeper (optional): cascaded-fidelity MPC</h2>
+          <p>One model cannot do everything. A full dynamics model is honest but slow. A simple centroidal model is fast but rough. <strong>Cascaded-fidelity MPC</strong> uses both: a rough planner looks far ahead with the simple model, and a sharp tracker fixes the next steps with the full model.</p>
+          <p>Think of a road trip. The rough map picks the cities for the week. The sharp map steers each turn today. If the sharp tracker falls behind, the rough planner replans from the true spot. This split is why humanoids now walk at 1.2 m/s and survive 60 N shoves: the planner in <a href="ch25-advanced-math-for-robotics.html">Chapter 25</a> maths runs near 100 Hz while the whole-body QP in this chapter runs near 800 Hz.</p>
+          <div class="formula"><span class="label">Two-rate idea</span> slow planner (simple model, long horizon) &rarr; fast tracker (full model, short horizon)</div>
+          <div class="callout warn">
+            <div class="callout__head"><i class="bi bi-exclamation-triangle-fill"></i> Watch out</div>
+            <p>The two layers must agree on contacts. If the planner assumes the left foot is planted while the tracker lifts it, the robot falls. Always check contact timing first when a cascade misbehaves.</p>
+          </div>
+
+          <section class="takeaways">
+            <h2><i class="bi bi-pin-angle-fill"></i> Key takeaways</h2>
+            <ul>
+              <li><i class="bi bi-check2-circle"></i> Task space commands jobs, and nullspace holds leftover freedom.</li>
+              <li><i class="bi bi-check2-circle"></i> Strict ranks protect balance; soft weights trade comfort goals.</li>
+              <li><i class="bi bi-check2-circle"></i> One HQP solves accelerations and contact forces together.</li>
+              <li><i class="bi bi-check2-circle"></i> Fast QP plus slow planner hits real-time budgets.</li>
+              <li><i class="bi bi-check2-circle"></i> Warm-starts and time caps keep 1 kHz loops alive.</li>
+              <li><i class="bi bi-check2-circle"></i> Impedance sets softness; force control tracks a push.</li>
+            </ul>
+          </section>
+
+          <section class="quiz">
+            <div class="quiz__head"><i class="bi bi-patch-question-fill"></i> Check your understanding</div>
+            <details>
+              <summary><span class="q-num">Q1.</span><span>What is task-space control in one line?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Command the job goal and let math pick joints.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q2.</span><span>What may use the nullspace?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Only lower tasks that leave top jobs intact.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q3.</span><span>Strict rank or soft weight for balance?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Strict rank, so nothing can trade it away.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q4.</span><span>What lives inside whole-body variable xi?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Joint accelerations plus contact forces.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q5.</span><span>Why warm-start each MPC tick?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Last answer is close, so solve finishes faster.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q6.</span><span>Impedance or position control for a handshake?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Impedance, with low stiffness for a soft touch.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q7.</span><span>Why does MPC warm-start each cycle from the last plan?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> The shifted old plan is already close to the answer, so the solver finishes inside the 1 ms budget instead of starting blind.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q8.</span><span>What breaks when planner and tracker disagree on contacts?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> The tracker pushes on a foot the planner thinks is in the air, or vice versa, and the robot falls. Contact timing must match.</div>
+            </details>
+          </section>
+        </article>
+
+        <nav class="pager" id="pager" aria-label="Chapter navigation"></nav>
+      </div>
+    </main>
+  </div>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/book.js"></script>
+</body>
+</html>

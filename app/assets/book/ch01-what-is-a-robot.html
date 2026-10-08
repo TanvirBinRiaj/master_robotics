@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>try{var __t=null;try{__t=localStorage.getItem("mr-theme")}catch(e){}if(__t!=="dark"&&__t!=="light"){try{var __m=document.cookie.match(/(?:^|;\s*)mr-theme=(dark|light)/);__t=__m?__m[1]:null}catch(e){__t=null}}if(__t!=="dark"&&__t!=="light"){try{var __w=String(window.name||"").match(/mr-theme=(dark|light)/);__t=__w?__w[1]:null}catch(e){}}if(__t!=="dark"&&__t!=="light"&&window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches){__t="dark"}if(__t==="dark"||__t==="light")document.documentElement.setAttribute("data-theme",__t)}catch(e){}</script>
+  <title>Chapter 1: What Is a Robot? A Simple Start — Master Robotics</title>
+  <meta name="description" content="A plain-English start to robotics. Learn what makes a machine a robot, the three parts every robot shares, and where you already meet robots in daily life.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="vendor/bootstrap-icons/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/prose.css">
+  <link rel="stylesheet" href="assets/css/mobile.css">
+</head>
+<body data-file="ch01-what-is-a-robot.html">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="topbar" id="topbar"></header>
+  <div class="progress-bar" id="progressBar"></div>
+
+  <div class="layout">
+    <div class="sidebar__backdrop" id="navBackdrop"></div>
+    <nav class="sidebar" id="sidebar" aria-label="Book contents"></nav>
+
+    <main class="main" id="main">
+      <div class="container">
+
+        <header class="chapter-head">
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="index.html">Home</a>
+            <i class="bi bi-chevron-right"></i>
+            <a href="index.html#foundations">Part 1 &middot; Foundations</a>
+            <i class="bi bi-chevron-right"></i>
+            <span>Chapter 1</span>
+          </nav>
+          <span class="chapter-kicker"><i class="bi bi-rocket-takeoff"></i> Part 1 &middot; Foundations</span>
+          <h1>What Is a Robot? A Simple Start</h1>
+          <p class="lede">Before you build anything, you need a clear idea of what a robot really is. By the end of this chapter, you will be able to explain a robot in one simple sentence — and you will start seeing robots everywhere.</p>
+          <div class="chapter-meta">
+            <span><i class="bi bi-clock"></i> ~18 min read</span>
+            <span><i class="bi bi-bar-chart"></i> Beginner</span>
+            <span><i class="bi bi-list-check"></i> Chapter 1 of 30</span>
+          </div>
+          <div class="goals">
+            <h2>What you will learn</h2>
+            <ul>
+              <li><i class="bi bi-check-circle-fill"></i> Say what makes a machine a robot, using your own words.</li>
+              <li><i class="bi bi-check-circle-fill"></i> Name the three big parts every robot shares.</li>
+              <li><i class="bi bi-check-circle-fill"></i> Spot robots in daily life and explain what job each one does.</li>
+            </ul>
+          </div>
+        </header>
+
+        <article class="article">
+
+          <p class="lead">Look around you right now. Maybe there is a phone in your hand, a washing machine in the next room, or a car parked outside. None of those is a robot. So what is? Let us find out with very simple words.</p>
+
+          <h2>A robot in one sentence</h2>
+
+          <p>Here is the shortest useful definition:</p>
+
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> The key idea</div>
+            <p>A <strong>robot</strong> is a machine that can sense its world, decide what to do, and then act on that decision — without a person controlling every move.</p>
+          </div>
+
+          <p>Read that slowly. Three small ideas hide inside it: <strong>sense</strong>, <strong>decide</strong>, <strong>act</strong>. Every machine we call a robot does all three. If a machine is missing even one of them, it is usually just a tool, not a robot.</p>
+
+          <p>Your washing machine senses almost nothing. It follows a fixed timer and stops. It cannot notice that the door is still open. So we call it a machine, not a robot.</p>
+
+          <p>A car that drives itself senses the road, decides when to slow down, and acts by pressing the brakes. It does all three. That is why people call it a robot on wheels.</p>
+
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> In simple words</div>
+            <p>Sense means "feel the world". Decide means "choose what to do". Act means "move or do something". A robot does all three by itself.</p>
+          </div>
+
+          <h2>The three parts every robot shares</h2>
+
+          <p>No matter how simple or how fancy, a robot is built from three groups of parts. You can think of them as a body, a brain, and a set of senses.</p>
+
+          <figure class="figure">
+            <div class="figure__box">
+              <svg viewBox="0 0 640 240" width="100%" role="img" aria-label="A robot made of three parts: sensors, a controller, and actuators, connected in a loop">
+                <rect x="24" y="86" width="150" height="68" rx="12" fill="#e2f6ef" stroke="#0f9d78" stroke-width="2"></rect>
+                <text x="99" y="116" text-anchor="middle" font-family="Inter, sans-serif" font-size="15" font-weight="700" fill="#0f9d78">Sensors</text>
+                <text x="99" y="136" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#4a5266">the senses</text>
+
+                <rect x="245" y="86" width="150" height="68" rx="12" fill="#e8eeff" stroke="#2d5bff" stroke-width="2"></rect>
+                <text x="320" y="116" text-anchor="middle" font-family="Inter, sans-serif" font-size="15" font-weight="700" fill="#2d5bff">Controller</text>
+                <text x="320" y="136" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#4a5266">the brain</text>
+
+                <rect x="466" y="86" width="150" height="68" rx="12" fill="#f0e9fd" stroke="#7a4ddb" stroke-width="2"></rect>
+                <text x="541" y="116" text-anchor="middle" font-family="Inter, sans-serif" font-size="15" font-weight="700" fill="#7a4ddb">Actuators</text>
+                <text x="541" y="136" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#4a5266">the muscles</text>
+
+                <line x1="174" y1="120" x2="245" y2="120" stroke="#7b849b" stroke-width="2" marker-end="url(#ar)"></line>
+                <line x1="395" y1="120" x2="466" y2="120" stroke="#7b849b" stroke-width="2" marker-end="url(#ar)"></line>
+                <path d="M541 154 C541 205 99 205 99 154" fill="none" stroke="#7b849b" stroke-width="2" stroke-dasharray="6 6" marker-end="url(#ar)"></path>
+                <text x="320" y="222" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#7b849b">feedback: the robot checks what happened</text>
+                <defs>
+                  <marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+                    <path d="M0,0 L9,4.5 L0,9 z" fill="#7b849b"></path>
+                  </marker>
+                </defs>
+              </svg>
+            </div>
+            <figcaption>Figure 1.1 — The three parts of a robot. Sensors give it senses, the controller is its brain, and actuators are its muscles. The dashed line shows the robot checking its own work.</figcaption>
+          </figure>
+
+          <h3>1. Sensors — the senses</h3>
+          <p>A <strong>sensor</strong> is a part that measures something about the world and turns it into a signal the robot can use. Your eyes sense light. A robot's sensor might sense distance, light, heat, touch or sound.</p>
+          <p>Example: a small distance sensor on the front of a robot sends out a sound that people cannot hear. When the sound bounces back off a wall, the sensor measures how long it took. From that time, the robot works out how far away the wall is.</p>
+
+          <h3>2. The controller — the brain</h3>
+          <p>The <strong>controller</strong> is the small computer that reads the sensors and decides what to do next. It runs a program: a list of instructions written by a person. The controller is where the "decide" step happens.</p>
+          <p>Example: the controller reads the distance. If the number says "the wall is close", it decides to turn the wheels. If the number says "the path is clear", it decides to keep going.</p>
+
+          <h3>3. Actuators — the muscles</h3>
+          <p>An <strong>actuator</strong> is a part that creates movement. Most actuators are <strong>motors</strong>: devices that spin when electricity flows through them. A wheel on a motor can drive a robot forward. A robot arm uses motors at each joint to lift and turn.</p>
+          <p>Example: the controller sends electricity to two motors. Each motor spins a wheel. The robot rolls forward. That is the "act" step.</p>
+
+          <div class="callout note">
+            <div class="callout__head"><i class="bi bi-info-circle-fill"></i> Note</div>
+            <p>The dashed arrow in Figure 1.1 is very important. The robot does not just act and stop. It keeps sensing what happened, and it adjusts. This loop is called <strong>feedback</strong>, and you will study it in depth in Chapter 15.</p>
+          </div>
+
+          <h2>A robot is a loop, not a line</h2>
+
+          <p>Many beginners imagine a straight line: sense, then decide, then act, then finish. Real robots work in a circle that never stops.</p>
+
+          <ol>
+            <li><strong>Sense.</strong> Read the sensors. "How far is the wall?"</li>
+            <li><strong>Decide.</strong> Compare what you read with what you want. "The wall is close; I wanted clear space."</li>
+            <li><strong>Act.</strong> Move. "Turn the wheels to the left."</li>
+            <li><strong>Repeat.</strong> Go back to step one, many times every second.</li>
+          </ol>
+
+          <p>A robot that repeats this loop hundreds of times each second can react quickly and smoothly. A robot that pauses between loops feels slow and clumsy. The speed of this loop is one thing that separates a cheap toy from a professional machine.</p>
+
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> Tip</div>
+            <p>When you study any robot — a toy or an expensive one — ask the same three questions. What can it sense? How does it decide? What can it move? You will understand it quickly.</p>
+          </div>
+
+          <h2>Robots are already around you</h2>
+
+          <p>You do not need a factory to meet a robot. They are hidden in daily life. Table 1.1 shows a few, with the job each one does.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Robot</th><th>What it senses</th><th>What it decides</th><th>What it does</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Robot vacuum</td><td>Walls, dirt, drops like stairs</td><td>Where to clean next</td><td>Moves and sucks up dust</td></tr>
+                <tr><td>Self-driving car (helper mode)</td><td>Lanes, cars, people, signs</td><td>Speed and steering</td><td>Turns, brakes, accelerates</td></tr>
+                <tr><td>Warehouse robot</td><td>Shelves, markers, people</td><td>Which route is free</td><td>Carries goods across the floor</td></tr>
+                <tr><td>Drone</td><td>Height, tilt, position</td><td>How to stay level</td><td>Spins its rotors to hover</td></tr>
+                <tr><td>Surgical robot arm</td><td>Position, surgeon's commands</td><td>Where to move the tip</td><td>Moves tiny tools very steadily</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 1.1 — Every row follows the same pattern: sense, decide, act.</p>
+
+          <h2>A short story: where robots came from</h2>
+
+          <p>Robots feel modern, but the idea is old. The word "robot" was first used in a play in 1920. It came from an old word meaning "forced work". Even then, people were dreaming of machines that could work for us. For most of history, those dreams stayed on paper. Then, in the middle of the twentieth century, three things arrived at once and made real robots possible.</p>
+
+          <ol>
+            <li><strong>Cheap electricity and motors.</strong> Machines could finally move on their own power.</li>
+            <li><strong>Small computers.</strong> Machines could finally make decisions without a person.</li>
+            <li><strong>Better sensors.</strong> Machines could finally notice what was around them.</li>
+          </ol>
+
+          <p>The first working industrial robot, called Unimate, started lifting hot metal parts in a car factory in 1961. It could not see, and it did exactly one repeated move all day. Yet it had the same three parts you just learned: a sensor to know when it was in position, a controller to decide, and motors to act. Everything since then has been an improvement in degree, not in kind.</p>
+
+          <p>Look at the table below. Each row shows how one new idea widened what robots could do. You will study every one of these ideas later in the book.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>When</th><th>New idea</th><th>What it unlocked</th><th>Where you learn it</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>1960s</td><td>Programmable industrial arm</td><td>Repeating one job, perfectly, all day</td><td>Chapters 7 and 16</td></tr>
+                <tr><td>1970s</td><td>Computer vision and the first mobile robots</td><td>Robots that could see and move about</td><td>Chapters 10 and 17</td></tr>
+                <tr><td>1980s</td><td>Stronger, faster microcontrollers</td><td>Fast decisions inside small machines</td><td>Chapters 11 and 15</td></tr>
+                <tr><td>2000s</td><td>Cheap sensors and batteries</td><td>Robots in homes and warehouses</td><td>Chapters 12 and 20</td></tr>
+                <tr><td>2010s</td><td>Robot software frameworks</td><td>Teams building big systems together</td><td>Chapter 18</td></tr>
+                <tr><td>2020s</td><td>Machine learning on robot data</td><td>Robots that improve from experience</td><td>Chapters 19 and 21</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 1.2 — How robots grew, one idea at a time. The same loop runs through every row.</p>
+
+          <div class="callout note">
+            <div class="callout__head"><i class="bi bi-info-circle-fill"></i> Note</div>
+            <p>Nothing in this history breaks the rule from earlier. Every robot, from Unimate to a modern humanoid, still senses, decides and acts. History only changed how well each step is done.</p>
+          </div>
+
+          <h2>What a robot is not</h2>
+
+          <p>It is just as useful to know what a robot is <em>not</em>. This clears up a lot of confusion.</p>
+
+          <h3>A robot is not the same as a remote-controlled toy</h3>
+          <p>If you hold a controller and press a button for every move, the toy is not deciding anything. You are. Remove the "decide" step and it stops being a robot. It becomes a remote-controlled machine.</p>
+
+          <h3>A robot is not the same as an artificial intelligence</h3>
+          <p><strong>Artificial intelligence</strong>, or AI, is software that can learn or make smart choices. AI can live inside a robot's controller and help it decide. But AI is only the thinking part. A robot also needs a body that senses and moves. AI without a body is just a program. A body without AI is a machine. A robot is both.</p>
+
+          <h3>A robot is not alive</h3>
+          <p>A robot can look alive — it may walk, react and even seem to have feelings. But it has no wishes of its own. Every robot does only what its program, its sensors and its motors allow. It follows rules, not desires.</p>
+
+          <div class="callout warn">
+            <div class="callout__head"><i class="bi bi-exclamation-triangle-fill"></i> Watch out</div>
+            <p>People often say "robot" when they mean a machine, or "AI" when they mean a robot. In this book we will be exact. A robot senses, decides and acts. AI is one possible way to decide.</p>
+          </div>
+
+          <h2>A tiny preview: how a robot decides</h2>
+
+          <p>You will write real code later, but here is a taste. This is the kind of simple instruction a controller follows. It reads a distance, then chooses a direction.</p>
+
+          <div class="code">
+            <div class="code__bar">
+              <span class="code__dots"><span></span><span></span><span></span></span>
+              <span class="code__lang">Pseudo-code</span>
+              <button class="code__copy" type="button"><i class="bi bi-clipboard"></i> Copy</button>
+            </div>
+            <pre><code>distance = read_distance_sensor()
+
+if distance &lt; 30:          # wall is closer than 30 cm
+    turn_left()            # avoid it
+else:
+    go_forward()           # path is clear
+
+repeat forever             # the robot loop</code></pre>
+          </div>
+
+          <p>Read it in plain English: "Measure the wall. If it is very close, turn. If not, go straight. Do this forever." That is a complete robot behaviour, even though it is only five lines. Every robot, simple or advanced, is built from ideas like this one.</p>
+
+          <h2>The loop with real numbers</h2>
+
+          <p>It is easy to say "the loop runs fast". Let us make that idea concrete, because numbers turn a feeling into a design choice you can test.</p>
+
+          <p>Suppose the robot loop runs 50 times every second. That is written as <strong>50&nbsp;Hz</strong>. In each run, it senses, decides and acts once. Now suppose the robot is driving forward at 0.5 metres per second and a wall suddenly appears 0.4 metres ahead.</p>
+
+          <div class="formula">Time to the wall = distance &divide; speed = 0.4 m &divide; 0.5 m/s = 0.8 s</div>
+
+          <p>The robot has 0.8 seconds, or 800 milliseconds, to notice the wall and stop. At 50&nbsp;Hz it gets a fresh sensor reading every 1 &divide; 50 = 0.02 seconds, that is, every 20 milliseconds. So it can check the wall about 40 times before reaching it. That is plenty of chances to react.</p>
+
+          <p>Now make the motor weaker and the robot slower, or the loop slower. If the loop ran only 5 times a second, it would check every 200 milliseconds — only 4 chances before the crash. The robot would feel clumsy and unsafe. Same parts, same code, very different result.</p>
+
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> The key idea</div>
+            <p>The loop rate is a real design number, not a detail. A faster loop means the robot reacts sooner. Professionals always write down the loop rate they need before they write code.</p>
+          </div>
+
+          <p>This is why a beginner's car and a professional warehouse robot, which share the same three steps, feel completely different. The professional measures the loop rate, chooses parts that can keep up, and tests the reaction time on purpose. You will meet these numbers again in Chapter 15, when you study control systems.</p>
+
+          <h2>Why this matters for your journey</h2>
+
+          <p>You may feel that professional robotics is far away. It is closer than it looks. The professional engineer and the beginner are doing the same three things: sensing, deciding, acting. The difference is only scale, precision and care.</p>
+
+          <p>A beginner builds a small car that avoids a wall. A professional builds a warehouse robot that avoids people and moves a thousand boxes a day. Same loop. More sensors, faster decisions, stronger actuators, and much more testing.</p>
+
+          <p>So your first job is not to learn everything. Your first job is to master the loop. Everything in this book grows from the three words you just learned: <strong>sense</strong>, <strong>decide</strong>, <strong>act</strong>.</p>
+
+          <h2>The many shapes of a robot</h2>
+
+          <p>Robots do not all look like people or like toys. Engineers group them by the job they do and by how they move. Knowing these groups helps you choose the right design later.</p>
+
+          <h3>Robot arms (manipulators)</h3>
+          <p>A <strong>manipulator</strong> is an arm with joints and a gripper, bolted to the ground or to a moving base. It reaches, lifts and places things. Factory welding arms and surgical arms are manipulators. They are excellent at repeating one task with great accuracy.</p>
+
+          <h3>Mobile robots</h3>
+          <p>A <strong>mobile robot</strong> moves itself from place to place. It may roll on wheels or tracks, or walk on legs. A delivery robot that carries food and a warehouse robot that moves shelves are mobile robots. Their hard problem is not reaching — it is knowing where they are and not hitting things.</p>
+
+          <h3>Humanoid robots</h3>
+          <p>A <strong>humanoid</strong> is built to look and move like a person, with two arms, two legs and a head. The idea is to work in spaces built for humans, using tools made for human hands. Today they are mostly in early industrial pilots, moving goods in factories and warehouses. They are impressive but still expensive and limited, as you will see in Chapter 23.</p>
+
+          <h3>Drones and aerial robots</h3>
+          <p>A <strong>drone</strong> flies. Its actuators are spinning rotors, and its hardest job is staying level and steady while the air pushes it around. Drones inspect roofs, map land and deliver small packages.</p>
+
+          <h3>Wearable, medical and service robots</h3>
+          <p>Some robots help the human body directly. A rehabilitation exoskeleton helps a person walk again. A surgical robot copies a surgeon's hand with more steadiness. A service robot cleans floors or guides visitors in a building.</p>
+
+          <h3>Swarm and field robots</h3>
+          <p>A <strong>swarm</strong> is many small robots working as a team. <strong>Field robots</strong> work outdoors on farms, mines and building sites, where mud, dust, rain and uneven ground make everything harder.</p>
+
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> In simple words</div>
+            <p>Arms reach. Mobile robots travel. Humanoids copy people. Drones fly. Service robots help us directly. Swarms work as a team. Very different bodies — the same sense, decide, act loop inside.</p>
+          </div>
+
+          <h2>A worked example: designing a robot on paper</h2>
+
+          <p>Before you buy a single part, professionals describe the robot on paper. Let us do it together for a simple task, so you can see how the three words turn into a real design.</p>
+
+          <p><strong>The task:</strong> "I want a small robot that drives around a room and never hits the furniture."</p>
+
+          <ol>
+            <li><strong>Write the goal as a job.</strong> Drive on a flat floor, in a room, without touching walls or furniture.</li>
+            <li><strong>Add numbers.</strong> Room up to 4 m &times; 4 m. Floor is flat and hard. Robot fits inside a 20 cm &times; 20 cm square. It must stop before getting closer than 10 cm to anything. It should run for 30 minutes on one charge.</li>
+            <li><strong>Choose the senses.</strong> It needs to know how far the nearest obstacle is. One forward-facing distance sensor is enough to start.</li>
+            <li><strong>Choose the brain.</strong> A small microcontroller board reads the sensor and decides where to go.</li>
+            <li><strong>Choose the muscles.</strong> Two motors with wheels, one on each side. Spinning them at different speeds steers the robot. A small caster wheel at the back stops it tipping.</li>
+            <li><strong>Choose the energy.</strong> A rechargeable battery pack that can run two small motors and the board for at least 30 minutes.</li>
+            <li><strong>Write the behaviour.</strong> Sense the distance. If it is less than 10 cm, stop and turn. Otherwise, go forward. Repeat forever.</li>
+            <li><strong>Plan the first test.</strong> Prop the wheels off the bench, run the code, and check the motors turn the right way before the robot ever touches the floor.</li>
+          </ol>
+
+          <p>Look at what just happened. A vague wish — "a robot that avoids things" — became a list of concrete parts, numbers and tests. No technical skill was needed. Only clear thinking. That is the first real engineering skill, and you will practise it properly in the next chapter.</p>
+
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> Tip</div>
+            <p>Numbers make a plan real. "It should be fast" is a wish. "It should travel 0.5 metres per second" is a plan you can build and test.</p>
+          </div>
+
+          <h2>Common mistakes beginners make</h2>
+
+          <p>Every engineer starts as a beginner. Knowing the usual traps saves you weeks of frustration.</p>
+
+          <ul>
+            <li><strong>Confusing a robot with a remote-controlled car.</strong> If you drive it completely by hand, you have built a fun machine, but not a robot. Add the "decide" step.</li>
+            <li><strong>Thinking a robot must look human.</strong> Most useful robots do not. A robot vacuum is a flat disc and does its job perfectly.</li>
+            <li><strong>Believing AI and robots are the same.</strong> AI is only one part of the brain. A robot also needs a body that senses and moves.</li>
+            <li><strong>Skipping the paper plan.</strong> Buying parts before you know your numbers wastes money and time.</li>
+            <li><strong>Forgetting the loop.</strong> Builders often test a robot once and stop. A real robot repeats sense-decide-act many times every second.</li>
+          </ul>
+
+          <h2>How professionals think about this</h2>
+
+          <p>Professionals still use the same three words, but they add rigour. They write down exactly what the robot must sense (and how accurately), how fast it must decide (the loop rate), and how strongly it must act (torque and grip). They define measurable requirements and test each one.</p>
+
+          <p>They also think about failure. What if a sensor breaks? What if the battery runs low? What if a person walks in front of the robot? A professional design has safe behaviour for each case. You will meet these ideas again in Chapters 3 and 15.</p>
+
+          <h2>The small set of words you will reuse</h2>
+
+          <p>Robotics has its own vocabulary, but you do not need many words to begin. These six carry you a long way. You will meet each one again in later chapters, so it is worth learning them now.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Word</th><th>Plain meaning</th><th>Everyday picture</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Sensor</td><td>A part that measures the world</td><td>Your eyes and ears</td></tr>
+                <tr><td>Actuator</td><td>A part that makes movement</td><td>Your muscles</td></tr>
+                <tr><td>Controller</td><td>A small computer that decides</td><td>Your brain</td></tr>
+                <tr><td>Feedback</td><td>Checking what happened after acting</td><td>Seeing where your hand went</td></tr>
+                <tr><td>Autonomy</td><td>Working without a person in charge</td><td>Driving yourself home</td></tr>
+                <tr><td>Degree of freedom</td><td>One independent way a robot can move</td><td>Bending one knee</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 1.3 — Six words that unlock the whole book.</p>
+
+          <p>Notice that the first three words are the three parts you already learned. The others describe how those parts work together. A machine with high autonomy and good feedback feels smart and safe. A machine with weak feedback feels clumsy, no matter how strong its motors are.</p>
+
+          <p>If you remember only one thing from this chapter, remember the loop: <strong>sense, decide, act, repeat</strong>. Every other idea in this book is built on top of it. Keep that sentence in your mind as you turn the page, and robotics will feel like one connected story instead of a pile of separate facts.</p>
+
+          <h2>Try it yourself</h2>
+
+          <p>You learn robotics with your hands and your head. These small exercises need no parts at all — only observation and clear thinking.</p>
+
+          <ol>
+            <li><strong>Find five robots at home or nearby.</strong> For each one, write what it senses, how it decides, and what it moves. Hint: a phone's automatic brightness is not a robot, but a robot vacuum is.</li>
+            <li><strong>Turn a tool into a "robot" on paper.</strong> Pick a simple machine, such as a fan or a toaster. Add one sensor and a decision rule. What would it do differently? Hint: a fan that senses a person and speeds up.</li>
+            <li><strong>Write your own definition.</strong> In one sentence, explain a robot to a friend who has never heard the word. Do not use the words "robot" or "machine".</li>
+            <li><strong>Plan a paper robot.</strong> Choose any simple job, such as "water my plant" or "sort my socks". List what it must sense, decide and move. Add at least two numbers to make it real.</li>
+            <li><strong>Spot the missing part.</strong> Think of a device that senses and acts but never decides (for example, an automatic door). Explain what small change would turn it into a robot.</li>
+          </ol>
+
+          <section class="takeaways">
+            <h2><i class="bi bi-pin-angle-fill"></i> Key takeaways</h2>
+            <ul>
+              <li><i class="bi bi-check2-circle"></i> A robot is a machine that can sense, decide and act on its own.</li>
+              <li><i class="bi bi-check2-circle"></i> Every robot has three parts: sensors, a controller and actuators.</li>
+              <li><i class="bi bi-check2-circle"></i> A robot works in a repeating loop, not a straight line.</li>
+              <li><i class="bi bi-check2-circle"></i> A remote-controlled machine is not a robot, because it does not decide for itself.</li>
+              <li><i class="bi bi-check2-circle"></i> AI is only the deciding part. A robot also needs a body.</li>
+              <li><i class="bi bi-check2-circle"></i> Beginners and professionals use the same loop — only the scale changes.</li>
+            </ul>
+          </section>
+
+          <section class="quiz">
+            <div class="quiz__head"><i class="bi bi-patch-question-fill"></i> Check your understanding</div>
+            <details>
+              <summary><span class="q-num">Q1.</span><span>What three things must a machine do to be called a robot?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> It must sense its world, decide what to do, and act on that decision without a person controlling every move.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q2.</span><span>Name the three main parts of a robot and the job each one does.</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Sensors are the senses (they measure the world). The controller is the brain (it decides). Actuators are the muscles (they create movement, usually motors).</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q3.</span><span>Your washing machine has a timer and follows a fixed program. Why do we not call it a robot?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> It barely senses anything and does not decide based on the world. It only follows a fixed plan, so it is a machine, not a robot.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q4.</span><span>A friend says "AI and robots are the same thing." How would you correct them kindly?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> AI is only the deciding part — the software that helps make choices. A robot also needs a body with sensors and actuators, so AI alone is not a robot.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q5.</span><span>A bear-shaped toy sings a song when you press its belly. Is it a robot? Why or why not?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> No. You are the one deciding when it sings. It does not sense the world and choose by itself, so it is a toy, not a robot.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q6.</span><span>Why is the sense-decide-act loop a circle and not a straight line?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Because after acting, the robot must sense again to see what changed, then decide again. This repeats many times each second so the robot can react smoothly.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q7.</span><span>Name two different robot shapes and the kind of job each is best at.</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Any reasonable pair, for example: a manipulator arm is best at repeating a precise reach-and-place task; a mobile robot is best at carrying things across a large area.</div>
+            </details>
+          </section>
+
+        </article>
+
+        <nav class="pager" id="pager" aria-label="Chapter navigation"></nav>
+      </div>
+    </main>
+  </div>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/book.js"></script>
+</body>
+</html>

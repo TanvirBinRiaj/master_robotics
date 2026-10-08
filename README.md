@@ -67,3 +67,14 @@ real files, contains the required structural pieces, and has no emojis.
 
 See `_build/WRITING-GUIDE.md`. The core promise: a reader weak in English can
 understand every page without help.
+
+## Mobile app (offline, Android)
+
+Fully offline Android wrapper of the book in `app/` (WebView + bundled assets).
+See `app/README.md` for details. Build:
+
+```bash
+python3 tool/sync_book.py
+flutter pub get
+flutter build apk --release
+```

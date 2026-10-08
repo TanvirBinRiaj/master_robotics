@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>try{var __t=null;try{__t=localStorage.getItem("mr-theme")}catch(e){}if(__t!=="dark"&&__t!=="light"){try{var __m=document.cookie.match(/(?:^|;\s*)mr-theme=(dark|light)/);__t=__m?__m[1]:null}catch(e){__t=null}}if(__t!=="dark"&&__t!=="light"){try{var __w=String(window.name||"").match(/mr-theme=(dark|light)/);__t=__w?__w[1]:null}catch(e){}}if(__t!=="dark"&&__t!=="light"&&window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches){__t="dark"}if(__t==="dark"||__t==="light")document.documentElement.setAttribute("data-theme",__t)}catch(e){}</script>
+  <title>Chapter 10: Sensors: Giving Robots Senses — Master Robotics</title>
+  <meta name="description" content="How robots feel the world. Learn what a sensor really does, the main sensor families, why noise ruins single readings, how filtering fixes them, and how to pick the right sensor for a task.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="vendor/bootstrap-icons/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/prose.css">
+  <link rel="stylesheet" href="assets/css/mobile.css">
+</head>
+<body data-file="ch10-sensors.html">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="topbar" id="topbar"></header>
+  <div class="progress-bar" id="progressBar"></div>
+
+  <div class="layout">
+    <div class="sidebar__backdrop" id="navBackdrop"></div>
+    <nav class="sidebar" id="sidebar" aria-label="Book contents"></nav>
+
+    <main class="main" id="main">
+      <div class="container">
+
+        <header class="chapter-head">
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="index.html">Home</a>
+            <i class="bi bi-chevron-right"></i>
+            <a href="index.html#electronics">Part 3 &middot; Electronics and Power</a>
+            <i class="bi bi-chevron-right"></i>
+            <span>Chapter 10</span>
+          </nav>
+          <span class="chapter-kicker"><i class="bi bi-cpu"></i> Part 3 &middot; Electronics and Power</span>
+          <h1>Sensors: Giving Robots Senses</h1>
+          <p class="lede">A robot with no senses is blind, deaf and numb. This chapter shows you how sensors turn the physical world into numbers a robot can use — and why a single reading is almost never the whole truth.</p>
+          <div class="chapter-meta">
+            <span><i class="bi bi-clock"></i> ~24 min read</span>
+            <span><i class="bi bi-bar-chart"></i> Beginner</span>
+            <span><i class="bi bi-list-check"></i> Chapter 10 of 30</span>
+          </div>
+          <div class="goals">
+            <h2>What you will learn</h2>
+            <ul>
+              <li><i class="bi bi-check-circle-fill"></i> Name common sensor types and what they measure.</li>
+              <li><i class="bi bi-check-circle-fill"></i> Explain the idea of signal and noise.</li>
+              <li><i class="bi bi-check-circle-fill"></i> Pick a sensor for a simple task.</li>
+            </ul>
+          </div>
+        </header>
+
+        <article class="article">
+
+          <p class="lead">Close your eyes for five seconds. Put your hand near a warm cup. Now touch the table edge. Without seeing anything, you just measured temperature and touch. Your body has senses, and a robot needs the same. This chapter is about how we give a machine those senses — and how to trust the numbers it reports.</p>
+
+          <p>Part 3 of the book is about the electronics that bring a robot to life. Sensors are where that knowledge pays off. Almost every sensor turns a physical change into an electrical change. A light gets brighter, so a current grows. A wheel turns, so a voltage flips up and down. The robot reads that electrical change and calls it information.</p>
+
+          <p>Read this chapter slowly. Sensors are the doorway between the real world and your program. If the doorway is noisy, everything the robot does afterwards goes wrong. Master this chapter and the rest of robotics becomes far easier.</p>
+
+          <h2>What a sensor really does</h2>
+
+          <p>A <strong>sensor</strong> is a device that measures one physical quantity and turns it into a signal a circuit can read. That is the whole job. Pick a quantity — distance, light, temperature, touch, rotation, magnetic field — and a sensor turns it into electricity.</p>
+
+          <p>Think of a thermometer on a wall. Room heat pushes a liquid up a tube. Your eye reads where the liquid stops. A robot's temperature sensor does the same, but it pushes electrons instead of liquid, and a computer reads the number.</p>
+
+          <p>Every sensor has two ends. One end faces the world and feels the quantity. The other end faces the circuit and produces an electrical signal. The signal might be a voltage, a current, or a stream of digital bits. The circuit does not care about heat or light; it only sees the signal.</p>
+
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> The key idea</div>
+            <p>A sensor is a translator. It converts a physical quantity into an electrical signal. The robot never feels the world directly — it only ever reads the signal.</p>
+          </div>
+
+          <p>This one idea explains most sensor problems. If the translation is imperfect, the robot gets a false picture. Much of this chapter is about making that translation as honest as possible.</p>
+
+          <h3>The three jobs a sensor can do</h3>
+
+          <p>Although sensors measure many things, they usually serve one of three purposes on a robot:</p>
+
+          <ul>
+            <li><strong>Measure the world.</strong> How far is the wall? How bright is the room? How warm is the motor? These readings describe the environment.</li>
+            <li><strong>Measure the robot itself.</strong> How fast is the wheel turning? How tilted is the body? Which way is north? These readings describe the robot's own state.</li>
+            <li><strong>Detect an event.</strong> Has the bumper touched something? Has the arm reached its limit? Did a person cross the beam? These readings are yes-or-no facts.</li>
+          </ul>
+
+          <p>Knowing which job a sensor does helps you read its datasheet later. The datasheet is the manufacturer's instruction sheet, and it describes exactly what the sensor is built to sense.</p>
+
+          <h2>Analogue and digital sensors</h2>
+
+          <p>Sensors come in two broad families, and the difference matters for how you connect and read them.</p>
+
+          <h3>Analogue sensors</h3>
+
+          <p>An <strong>analogue sensor</strong> produces a signal that can take any value in a range. A temperature sensor might output 0.5 volts when cold and 1.8 volts when warm, with every value in between possible. As the room warms, the voltage slides smoothly up. There is no jump; it is a continuous dial.</p>
+
+          <p>To read it, the controller uses an <strong>ADC</strong>, an analogue-to-digital converter. The ADC samples the smooth voltage and chops it into a number. A 10-bit ADC gives 1,024 steps. A 12-bit ADC gives 4,096 steps. More bits means finer steps.</p>
+
+          <h3>Digital sensors</h3>
+
+          <p>A <strong>digital sensor</strong> produces a signal that is already a number or a simple on/off state. A rotary encoder sends a stream of pulses as a wheel turns. A digital temperature chip sends the reading as bits. A limit switch is simply open or closed — like a light switch.</p>
+
+          <p>Digital sensors are easier to read, because the controller does not convert anything. They are also often less troubled by small electrical noise, because a value does not drift slowly; it is either a clean 0 or a clean 1.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th></th><th>Analogue sensor</th><th>Digital sensor</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Signal type</td><td>Continuous voltage or current</td><td>Bits, pulses or on/off</td></tr>
+                <tr><td>Example</td><td>Thermistor, LDR, potentiometer</td><td>Rotary encoder, limit switch, IMU chip</td></tr>
+                <tr><td>How read</td><td>Through an ADC pin</td><td>Through a digital pin or data bus</td></tr>
+                <tr><td>Effect of small noise</td><td>Small wobble in the value</td><td>Usually ignored; state stays clean</td></tr>
+                <tr><td>Best for</td><td>Smooth quantities you want in detail</td><td>Counts, events and exact states</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 10.1 — The two families of sensors and how you read each one.</p>
+
+          <h2>Raw values and meaningful units</h2>
+
+          <p>When you first read a sensor, you usually get a <strong>raw value</strong>: a bare number with no physical meaning. An analogue pin might report 512. An encoder might report 3,240 pulses. Neither number tells you anything until you convert it.</p>
+
+          <p><strong>Calibration</strong> turns raw values into meaningful units. Meaningful units are things you can picture: centimetres, degrees Celsius, degrees per second. Calibration finds the link between the raw number and the real quantity.</p>
+
+          <p>Here is the simplest kind of calibration. Suppose you know two facts. Sensor in ice water at 0 degrees Celsius reports a raw value of 200. Sensor in boiling water at 100 degrees reports 900. Two points define a straight line.</p>
+
+          <div class="formula"><span class="label">Linear calibration</span> real value = (raw &minus; raw&#8202;min) &times; (max &minus; min) &divide; (raw&#8202;max &minus; raw&#8202;min) + min</div>
+
+          <p>Put the numbers in. With raw = 550, you get:</p>
+
+          <div class="formula"><span class="label">Worked calibration</span> (550 &minus; 200) &times; (100 &minus; 0) &divide; (900 &minus; 200) + 0 = 350 &times; 100 &divide; 700 = 50 &deg;C</div>
+
+          <p>So a raw reading of 550 becomes 50 degrees Celsius. That is the difference between a mystery number and real information. A program that compares raw values to thresholds is fragile. A program that works in real units is far easier to reason about.</p>
+
+          <div class="callout warn">
+            <div class="callout__head"><i class="bi bi-exclamation-triangle-fill"></i> Watch out</div>
+            <p>Cheap sensors vary. Two identical models can report slightly different raw values for the same real quantity. If your task needs accuracy, calibrate each sensor yourself rather than trusting the factory number printed on the box.</p>
+          </div>
+
+          <h2>A tour of the sensor families</h2>
+
+          <p>You do not need to memorise every sensor ever made. You need to recognise the common families and know what each one is good at. Table 10.2 is your reference. Read it once now, then return to it when you plan a project.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Sensor</th><th>Measures</th><th>How it works, simply</th><th>Robot use</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Ultrasonic distance</td><td>Distance to a surface</td><td>Sends a sound pulse; times the echo</td><td>Stopping before a wall</td></tr>
+                <tr><td>Infrared (IR) reflectance</td><td>Nearby objects, light and dark surfaces</td><td>Light bounces back to a detector</td><td>Line following, edge detection</td></tr>
+                <tr><td>Light sensor (LDR / photodiode)</td><td>Light level</td><td>Material changes resistance with light</td><td>Finding a charger, day/night</td></tr>
+                <tr><td>Temperature (thermistor / TMP36)</td><td>Heat</td><td>Resistance or voltage changes with heat</td><td>Motor overheat warning</td></tr>
+                <tr><td>Tactile / limit switch</td><td>Touch or contact</td><td>A physical click closes a circuit</td><td>Bumpers, arm end stops</td></tr>
+                <tr><td>Potentiometer</td><td>Angle or position (short range)</td><td>A slider taps a voltage divider</td><td>Simple joint feedback, dials</td></tr>
+                <tr><td>Rotary encoder</td><td>Rotation count and speed</td><td>Slots interrupt a light beam</td><td>Wheel odometry, motor speed</td></tr>
+                <tr><td>Hall / reed switch</td><td>Magnetic field or magnet nearby</td><td>A magnet flips an internal sensor</td><td>Wheel speed, door open/closed</td></tr>
+                <tr><td>IMU (accel + gyro)</td><td>Tilt, acceleration, spin</td><td>Tiny moving mass and vibrating element</td><td>Balance, turning, no-GPS motion</td></tr>
+                <tr><td>Magnetometer</td><td>Earth's magnetic field</td><td>Measures field direction like a compass</td><td>Heading reference</td></tr>
+                <tr><td>GPS</td><td>Position on Earth</td><td>Times signals from satellites</td><td>Outdoor navigation</td></tr>
+                <tr><td>Camera</td><td>Light as an image grid</td><td>Millions of tiny light sensors</td><td>Seeing objects, colours, people</td></tr>
+                <tr><td>LiDAR</td><td>Distance, scanned in a fan</td><td>Laser pulse; times the reflection</td><td>Mapping, self-driving cars</td></tr>
+                <tr><td>Current sensor</td><td>Electrical current in a wire</td><td>Measures the magnetic field around a wire</td><td>Detecting motor stall or grip</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 10.2 — The sensor families you will meet again and again.</p>
+
+          <div class="callout note">
+            <div class="callout__head"><i class="bi bi-info-circle-fill"></i> Note</div>
+            <p>Do not be overwhelmed. For most small beginner robots, four sensors do almost everything: an ultrasonic distance sensor, a pair of IR sensors, an encoder on each wheel, and an IMU for tilt. Learn these first.</p>
+          </div>
+
+          <h2>How the key sensors work</h2>
+
+          <p>You now know what each family does. Let us open the lid on the most important ones, so the idea is not a mystery. You do not need the engineering maths — you need a clear mental picture. Here they are, one at a time.</p>
+
+          <h3>Ultrasonic distance: timing an echo</h3>
+
+          <p>An <strong>ultrasonic sensor</strong> measures distance by shouting and listening for the echo. It sends out a burst of sound too high for people to hear. The sound travels forward, hits a surface, and bounces back. The sensor measures how long the round trip took.</p>
+
+          <p>Sound travels at a known speed, about 343 metres per second in air at room temperature. The sound goes out and comes back, so the distance to the wall is half the total journey.</p>
+
+          <figure class="figure">
+            <div class="figure__box">
+              <svg viewBox="0 0 560 220" width="100%" role="img" aria-label="An ultrasonic sensor sends a sound pulse to a wall and times the echo returning">
+                <rect x="24" y="80" width="90" height="60" rx="10" fill="#e8eeff" stroke="#2d5bff" stroke-width="2"></rect>
+                <text x="69" y="106" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#2d5bff">Sensor</text>
+                <text x="69" y="124" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#4a5266">sonar</text>
+                <rect x="470" y="60" width="46" height="100" fill="#eef1f7" stroke="#7b849b" stroke-width="2"></rect>
+                <text x="493" y="115" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#4a5266">Wall</text>
+                <line x1="120" y1="96" x2="462" y2="96" stroke="#0f9d78" stroke-width="2" marker-end="url(#ar2)"></line>
+                <text x="300" y="88" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#0f9d78">outgoing pulse</text>
+                <line x1="462" y1="126" x2="120" y2="126" stroke="#7a4ddb" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#ar3)"></line>
+                <text x="300" y="145" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#7a4ddb">returning echo</text>
+                <text x="300" y="185" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#1c2230">distance = speed of sound &times; time &divide; 2</text>
+                <defs>
+                  <marker id="ar2" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#0f9d78"></path></marker>
+                  <marker id="ar3" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#7a4ddb"></path></marker>
+                </defs>
+              </svg>
+            </div>
+            <figcaption>Figure 10.1 — An ultrasonic sensor measures time of flight. It hears the echo and works out how far the wall is.</figcaption>
+          </figure>
+
+          <div class="formula"><span class="label">Ultrasonic distance</span> distance = speed of sound &times; time &divide; 2</div>
+
+          <p>Suppose the echo returns after 6 milliseconds. Speed of sound is 343 m/s, and 6 ms is 0.006 s. Then distance = 343 &times; 0.006 &divide; 2 = about 1.03 metres. Half the journey goes one way; half comes back, so we divide by two.</p>
+
+          <h3>IR reflectance: light that bounces back</h3>
+
+          <p>An <strong>infrared reflectance sensor</strong> shines a beam of infrared light downward and watches how much bounces back up. Infrared is light just below red, invisible to your eye. A pale surface bounces a lot back. A dark surface swallows most of it. The sensor reports the difference.</p>
+
+          <p>This is why IR reflectance is perfect for line following. Paint a black line on a white floor and the sensor sees two clearly different levels. It does not measure distance well, though — it only knows "bright" or "dark" very close by.</p>
+
+          <h3>Rotary encoder: counting the slots</h3>
+
+          <p>A <strong>rotary encoder</strong> counts how far something turns. Inside, a disc with slots spins between a light and a detector. Each time a slot passes, the beam is interrupted and the detector sends a pulse. The controller counts pulses.</p>
+
+          <p>Count the pulses in one second and you know the speed. Count the total and you know how far the wheel has rolled. An encoder is one of the most useful sensors on a wheeled robot, because it measures the robot's own motion.</p>
+
+          <h3>IMU: a tiny mass that feels motion</h3>
+
+          <p>An <strong>IMU</strong>, short for inertial measurement unit, usually contains an <strong>accelerometer</strong> and a <strong>gyroscope</strong>. The accelerometer senses acceleration, including the constant pull of gravity, so it can tell which way is down. The gyroscope senses how fast the robot is rotating.</p>
+
+          <p>Picture a small ball held by tiny springs inside the chip. When the robot speeds up or tilts, the ball shifts, and the electronics measure that shift. A smartphone uses the same chip to know when you turn the screen. A balancing robot uses it to stay upright.</p>
+
+          <h3>LiDAR: laser time of flight, many times a second</h3>
+
+          <p><strong>LiDAR</strong> works like an ultrasonic sensor but with laser light. Light travels far faster than sound, so the timing electronics must be extremely precise. In return, LiDAR sends out many beams in a fan and builds a map of distances around the robot.</p>
+
+          <p>Self-driving cars and mapping robots use LiDAR because it gives a dense, accurate picture of the surroundings. Lasers travel in straight lines and give sharp readings, which is why they cost much more than sonar.</p>
+
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> In simple words</div>
+            <p>Ultrasonic shouts and times the echo. IR shines light and sees the bounce. An encoder counts slots as something spins. An IMU feels a tiny weight move and knows the robot's tilt and spin. LiDAR is a laser that times its own echo, thousands of times each second.</p>
+          </div>
+
+          <h2>Signal and noise</h2>
+
+          <p>Now we reach the idea that separates beginners from engineers: <strong>signal and noise</strong>. The signal is the real information you want. Noise is the random garbage mixed in with it. Every real sensor has both.</p>
+
+          <p>Imagine asking a friend across a noisy room how old they are. They shout "thirty". You might hear "thirteen" or "forty". The person is the signal. The crowd is the noise. You would not trust one shout; you would ask again and combine the answers.</p>
+
+          <p>A sensor is the same. Read it once and you get signal plus a dose of noise. The number on your screen wobbles even when nothing has changed. A distance sensor sitting perfectly still might report 42 cm, then 39 cm, then 45 cm, then 41 cm. The wall did not move. The readings are noisy.</p>
+
+          <h3>Where noise comes from</h3>
+
+          <p>Noise is not one thing. It sneaks in from several places, and each has its own cure.</p>
+
+          <ul>
+            <li><strong>Electrical noise.</strong> Motors, long wires and nearby radios add small voltages that the sensor picks up. Twisting wires and keeping them short helps.</li>
+            <li><strong>Vibration.</strong> A shaking robot gives shaky readings. The ground, the motors and the wheels all add movement.</li>
+            <li><strong>Reflected and angled surfaces.</strong> A soft curtain or a slanted wall can send an echo in a strange direction, so the distance reading jumps.</li>
+            <li><strong>Ambient light.</strong> Bright sunlight or a strong lamp can confuse an IR sensor that only expects its own light.</li>
+            <li><strong>Heat drift.</strong> As electronics warm up, their readings creep slowly even when the measured quantity is steady.</li>
+          </ul>
+
+          <h3>Why one reading misleads you</h3>
+
+          <p>This is the most important warning in the chapter. If your robot decides on a single reading, one burst of noise can make it do the wrong thing. A robot vacuum that trusts one false "no wall" reading drives into the sofa. A line robot that trusts one bad shot veers off the track.</p>
+
+          <p>The cure is to reduce noise before you decide. We do that with <strong>filtering</strong>: a small recipe that smooths a stream of readings. You will meet three simple filters, and they are enough for most beginner robots.</p>
+
+          <h3>Three simple filters</h3>
+
+          <p>A <strong>filter</strong> is a rule that turns a rough stream of readings into a smoother one. You do not need heavy maths to start. These three will carry you a long way.</p>
+
+          <ol>
+            <li><strong>Averaging.</strong> Take a batch of readings, for example ten, and compute their mean. Noise partly cancels because high values pull down against low values. The downside is that averaging a fixed batch can be slow to update.</li>
+            <li><strong>Moving average.</strong> Keep the last few readings in a short list. Each time a new reading arrives, drop the oldest and add the new one, then average the list. This tracks change while still smoothing noise.</li>
+            <li><strong>Median filter.</strong> Sort the last few readings and take the middle one. This is excellent against short spikes, like a single wild reading of 200 cm among steady readings of 40 cm. The spike is simply ignored.</li>
+          </ol>
+
+          <h3>A worked moving-average example</h3>
+
+          <p>Let us run a moving average by hand. Suppose the true distance to the wall is 40 cm, and the sensor is noisy. Here are six readings, taken one after another:</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Reading number</th><th>New reading (cm)</th><th>Last 3 readings</th><th>Moving average (cm)</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>1</td><td>42</td><td>42</td><td>42.0</td></tr>
+                <tr><td>2</td><td>37</td><td>42, 37</td><td>39.5</td></tr>
+                <tr><td>3</td><td>44</td><td>42, 37, 44</td><td>41.0</td></tr>
+                <tr><td>4</td><td>39</td><td>37, 44, 39</td><td>40.0</td></tr>
+                <tr><td>5</td><td>41</td><td>44, 39, 41</td><td>41.3</td></tr>
+                <tr><td>6</td><td>38</td><td>39, 41, 38</td><td>39.3</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 10.3 — A three-point moving average. The raw readings jump between 37 and 44, but the smoothed value stays close to the true 40 cm.</p>
+
+          <p>Look at the last column. The raw readings bounce around noisily, but the moving average hovers near 40, the true value. Your program can now compare a calm number to a threshold instead of chasing wild jumps.</p>
+
+          <figure class="figure">
+            <div class="figure__box">
+              <svg viewBox="0 0 560 220" width="100%" role="img" aria-label="A noisy signal zig-zagging around a steady filtered line">
+                <line x1="60" y1="180" x2="520" y2="180" stroke="#7b849b" stroke-width="1.5"></line>
+                <line x1="60" y1="20" x2="60" y2="180" stroke="#7b849b" stroke-width="1.5"></line>
+                <text x="30" y="30" font-family="Inter, sans-serif" font-size="11" fill="#4a5266">value</text>
+                <text x="500" y="198" font-family="Inter, sans-serif" font-size="11" fill="#4a5266">time</text>
+                <polyline points="60,90 95,60 130,120 165,70 200,130 235,80 270,125 305,72 340,118 375,78 410,122 445,84 480,110 515,88" fill="none" stroke="#7a4ddb" stroke-width="2" opacity="0.85"></polyline>
+                <polyline points="60,90 130,88 200,90 270,89 340,90 410,91 480,89 515,90" fill="none" stroke="#0f9d78" stroke-width="3"></polyline>
+                <rect x="300" y="14" width="14" height="4" fill="#7a4ddb"></rect>
+                <text x="320" y="20" font-family="Inter, sans-serif" font-size="11" fill="#4a5266">raw (noisy)</text>
+                <rect x="300" y="30" width="14" height="4" fill="#0f9d78"></rect>
+                <text x="320" y="36" font-family="Inter, sans-serif" font-size="11" fill="#4a5266">filtered (smooth)</text>
+              </svg>
+            </div>
+            <figcaption>Figure 10.2 — The purple line is the raw sensor reading, jumping around the truth. The green line is the same data after filtering.</figcaption>
+          </figure>
+
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> Tip</div>
+            <p>Filtering always trades speed for calm. A longer average is smoother but reacts later. Start with a small window, such as three to five readings, and make it longer only if you still see too much wobble.</p>
+          </div>
+
+          <h2>Accuracy, precision, resolution and more</h2>
+
+          <p>When you compare sensors, you need words that describe their quality. These five terms appear on every datasheet. Learn them once and you will never be confused again.</p>
+
+          <h3>Accuracy</h3>
+
+          <p><strong>Accuracy</strong> is how close a reading is to the true value. If the room is truly 25 degrees and the sensor says 25.2, it is accurate. Accuracy is about being right, not being fine.</p>
+
+          <h3>Precision</h3>
+
+          <p><strong>Precision</strong> is how repeatable the readings are. A precise sensor gives nearly the same answer each time you measure the same thing. A sensor can be precise but wrong — always reporting 27 when the truth is 25.</p>
+
+          <h3>Resolution</h3>
+
+          <p><strong>Resolution</strong> is the smallest change the sensor can detect. A 10-bit ADC over a 0 to 5 volt range has a resolution of about 0.0049 volts per step. Resolution is the size of the finest step on the ruler, not how correct the ruler is.</p>
+
+          <div class="formula"><span class="label">ADC resolution</span> step size = full range &divide; (2<sup>bits</sup>)</div>
+
+          <p>For a 10-bit ADC across 5 volts: 5 &divide; 1024 = 0.0049 volts. For 12 bits: 5 &divide; 4096 = 0.0012 volts. More bits means finer steps and a smaller resolution.</p>
+
+          <h3>Range</h3>
+
+          <p><strong>Range</strong> is the span of values the sensor can measure. An ultrasonic sensor might work from 2 cm to 400 cm. Below 2 cm it may be blind; beyond 400 cm the echo fades. Always check the range before you trust a sensor for a job.</p>
+
+          <h3>Response time and sampling rate</h3>
+
+          <p><strong>Response time</strong> is how long the sensor takes to notice a change. <strong>Sampling rate</strong> is how many readings you take per second, measured in hertz. A rate of 50 Hz means fifty readings each second. A slow sensor or a slow sampling rate makes a fast robot react late.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Term</th><th>Plain meaning</th><th>Example</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Accuracy</td><td>How close to the truth</td><td>Says 25.2 when true is 25.0</td></tr>
+                <tr><td>Precision</td><td>How repeatable</td><td>Always says 25.2, never 25.9</td></tr>
+                <tr><td>Resolution</td><td>Smallest step detected</td><td>Can see a 0.5 cm change</td></tr>
+                <tr><td>Range</td><td>Values it can measure</td><td>2 cm to 400 cm</td></tr>
+                <tr><td>Response time</td><td>Delay to notice a change</td><td>Reacts within 20 ms</td></tr>
+                <tr><td>Sampling rate</td><td>Readings per second</td><td>50 Hz = 50 readings/s</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 10.4 — The quality words every datasheet uses, in plain English.</p>
+
+          <div class="callout warn">
+            <div class="callout__head"><i class="bi bi-exclamation-triangle-fill"></i> Watch out</div>
+            <p>Accuracy and precision are not the same. A cheap clock can be precise — it ticks steadily — but inaccurate, running two minutes fast every day. Do not confuse "steady" with "correct".</p>
+          </div>
+
+          <h2>Sensor fusion in simple terms</h2>
+
+          <p>One sensor alone always has a blind spot. <strong>Sensor fusion</strong> means combining several sensors so their strengths cover each other's weaknesses. Think of walking on a boat in the dark. Your eyes work badly, so you add your inner ear for balance and your feet for the deck's slope. You fuse three senses into one steady feeling.</p>
+
+          <p>A wheeled robot does the same. An encoder counts wheel turns and is great for short journeys, but it slowly drifts, and if a wheel slips it is simply wrong. An IMU feels turning and tilt instantly, but it also drifts over time. Fuse them together and the short-term accuracy of the IMU fixes the encoder's slow drift, while the encoder fixes the IMU's long-term wander. The combined estimate is better than either sensor alone.</p>
+
+          <h2>Choosing a sensor for a task</h2>
+
+          <p>Now you have the tools. When a design question arrives — which sensor should I use? — do not guess. Follow the same short method every time.</p>
+
+          <ol>
+            <li><strong>Say what to measure.</strong> Distance? Light level? Rotation? Contact? Name the quantity precisely. "Feel the world" is not a quantity.</li>
+            <li><strong>Set the range.</strong> What is the smallest and largest value you must handle? If you only care about 5 to 40 cm, you do not need a sensor that reaches 4 metres.</li>
+            <li><strong>Set the accuracy.</strong> How wrong can a reading be before the task fails? A line follower needs to know black from white, not the exact darkness.</li>
+            <li><strong>Study the environment.</strong> Indoors or outdoors? Dust, rain, glare, vibration, or hot motors? The environment kills more sensors than anything else.</li>
+            <li><strong>Check the budget.</strong> A camera is powerful but costly and heavy. A limit switch is cheap and tiny. Match the sensor to what the job truly needs.</li>
+            <li><strong>Match the interface.</strong> Does your controller have a spare analogue pin, or only a digital one? Can it speak the sensor's data bus? Check before you buy.</li>
+          </ol>
+
+          <h3>Worked example: choose a sensor to stop before a wall</h3>
+
+          <p><strong>The task:</strong> a small robot must drive forward and stop before getting closer than 10 cm to any wall.</p>
+
+          <ol>
+            <li><strong>Measure:</strong> distance to the nearest surface in front.</li>
+            <li><strong>Range:</strong> the robot should react between roughly 5 cm and 150 cm, so we need a low end near 5 cm and a high end well beyond 10 cm.</li>
+            <li><strong>Accuracy:</strong> we need to know "is it under 10 cm?" A few centimetres of error is fine. We do not need millimetre precision.</li>
+            <li><strong>Environment:</strong> an indoor flat floor, normal light, no rain. This is friendly to most sensors.</li>
+            <li><strong>Budget:</strong> low. The task is a simple hobby build.</li>
+            <li><strong>Interface:</strong> the controller has plenty of digital pins and one spare analogue pin.</li>
+          </ol>
+
+          <p>An ultrasonic distance sensor fits perfectly. Its range covers 2 to 400 cm, its accuracy suits our forgiving threshold, it works in normal indoor light, it is cheap, and it talks over standard digital pins. An IR reflectance sensor would only see a few centimetres, too short to plan a stop. A LiDAR would be far too costly and heavy for a toy car. So we choose ultrasonic — and we confirm the interface matches our board before buying.</p>
+
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> The key idea</div>
+            <p>Never ask "which sensor is best?" Ask "which sensor is best for this job, in this place, on this budget?" The right answer changes with the task.</p>
+          </div>
+
+          <h2>A full worked example: following a line</h2>
+
+          <p>Let us solve a complete, classic problem from start to finish. This is the task every robotics beginner loves: a robot that follows a black line drawn on a white floor. We will go from the principle all the way to a code idea.</p>
+
+          <p><strong>The task:</strong> keep the robot centred on a black line about 2 cm wide, on a white surface, while it drives forward.</p>
+
+          <h3>Step 1: choose the sensing principle</h3>
+
+          <p>Black and white reflect light very differently. Black paint swallows most light; white paint throws it back. So we need a sensor that shines its own light down and measures the bounce. That is the IR reflectance sensor from the tour. It works in the dark because it brings its own light.</p>
+
+          <h3>Step 2: decide how many sensors</h3>
+
+          <p>One sensor can tell black from white, but it cannot tell which side of the line the robot has drifted to. So we use two sensors side by side, a left one and a right one, with the line sitting between them when the robot is centred. This gives us direction as well as detection.</p>
+
+          <h3>Step 3: read raw values and pick a threshold</h3>
+
+          <p>Lower the robot over the white floor and note the raw reading, say 800. Place it over the black line and note that reading, say 200. Now pick a threshold in the middle, around 500. Any reading below 500 means black. Any reading above 500 means white. This threshold is the heart of the whole program.</p>
+
+          <div class="formula"><span class="label">Threshold rule</span> if raw &lt; 500 &rarr; "black"; else &rarr; "white"</div>
+
+          <h3>Step 4: turn the picture into a decision</h3>
+
+          <p>Now we know the shape of the decision. Both sensors must stay near the line. When the robot drifts right, the right sensor sees more white and the left sees black, so we steer left. These four rules are all we need:</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Left sensor</th><th>Right sensor</th><th>Meaning</th><th>Action</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>White</td><td>White</td><td>On the line, centred</td><td>Go straight</td></tr>
+                <tr><td>Black</td><td>White</td><td>Drifted to the right</td><td>Turn left</td></tr>
+                <tr><td>White</td><td>Black</td><td>Drifted to the left</td><td>Turn right</td></tr>
+                <tr><td>Black</td><td>Black</td><td>Line lost or crossing</td><td>Stop or search</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 10.5 — Four sensor combinations, four clear actions. This is the whole line-follower brain.</p>
+
+          <h3>Step 5: turn it into a code idea</h3>
+
+          <p>Here is the decision written as simple code. It reads both sensors, applies the threshold, and steers. The structure is the same sense-decide-act loop you met in Chapter 1.</p>
+
+          <div class="code">
+            <div class="code__bar">
+              <span class="code__dots"><span></span><span></span><span></span></span>
+              <span class="code__lang">Pseudo-code</span>
+              <button class="code__copy" type="button"><i class="bi bi-clipboard"></i> Copy</button>
+            </div>
+            <pre><code>THRESHOLD = 500          # raw value between black and white
+
+left_raw  = read_analog(LEFT_SENSOR)
+right_raw = read_analog(RIGHT_SENSOR)
+
+left_is_black  = left_raw  &lt; THRESHOLD
+right_is_black = right_raw &lt; THRESHOLD
+
+if left_is_black and not right_is_black:
+    turn_left()          # drifted right, correct left
+elif right_is_black and not left_is_black:
+    turn_right()         # drifted left, correct right
+elif left_is_black and right_is_black:
+    stop()               # line lost, do not guess
+else:
+    go_forward()         # centred, keep going
+
+repeat forever</code></pre>
+          </div>
+
+          <p>Notice the filtering we could add. Instead of using the raw value straight from the sensor, we could feed it through a moving average first. That would stop a single flash of glare from faking a black reading. Add the filter, and your line follower becomes far more reliable in real light.</p>
+
+          <h3>Step 6: test and tune</h3>
+
+          <p>Before driving, hold the robot over the line by hand and watch the sensor values. Confirm that black reads lower than white, and that 500 sits safely between. Then lower it and try. If it wobbles, raise the threshold slightly. If it ignores the line, lower it. Small, careful changes beat big guesses.</p>
+
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> Tip</div>
+            <p>Every project has one number like this threshold that you tune by testing. Write it once at the top of your program. Then you can adjust it in one place instead of hunting through the code.</p>
+          </div>
+
+          <h2>Common mistakes beginners make</h2>
+
+          <p>These errors appear again and again, and every one of them is avoidable once you know the pattern.</p>
+
+          <ul>
+            <li><strong>Trusting a single noisy reading.</strong> One bad sample can send the robot the wrong way. Filter your readings or read twice and compare.</li>
+            <li><strong>Skipping calibration.</strong> Raw numbers mean nothing until you convert them to real units. Calibrate before you set any threshold.</li>
+            <li><strong>Choosing the wrong range.</strong> A sensor that is blind below 2 cm cannot help you stop at 1 cm. Match the range to the job.</li>
+            <li><strong>Ignoring ambient light.</strong> A sunny window can drown an IR sensor. Shield the sensor or test in the same light the robot will meet.</li>
+            <li><strong>Forgetting the environment.</strong> Dust, water and vibration destroy sensors that are not protected. Plan for the real world, not the tidy bench.</li>
+            <li><strong>Confusing precision with accuracy.</strong> A steady reading can still be wrong. Check against a known value when it matters.</li>
+          </ul>
+
+          <h2>How professionals do it</h2>
+
+          <p>When sensors go into a real product — a factory arm, a delivery robot, a car — the thinking grows more careful. The principles are the same ones you just learned, but applied with discipline. Here is what changes.</p>
+
+          <h3>They live in the datasheet</h3>
+
+          <p>A <strong>datasheet</strong> is the manufacturer's document describing what a sensor can and cannot do: its range, accuracy, resolution, supply voltage, response time and limits. Professionals read it before buying, not after. It tells them the temperature at which the sensor fails and the field that will confuse it.</p>
+
+          <h3>They calibrate on a routine</h3>
+
+          <p>Instead of revealing one calibration at build time, they schedule <strong>calibration routines</strong>. Some run at the start of every shift. Some run automatically when a robot powers up. This catches slow drift before it causes errors.</p>
+
+          <h3>They filter and fuse every signal</h3>
+
+          <p>Raw sensor data is almost never used directly. It is filtered for noise, then fused with other sensors to produce one trustworthy estimate. Kalman filters are the famous tool for this, but even a moving average and a little logic go a long way.</p>
+
+          <h3>They keep an error budget</h3>
+
+          <p>An <strong>error budget</strong> adds up every possible source of error and checks the total still meets the requirement. If distance must be known within 5 cm and the sensor contributes 3 cm of error, the rest — mounting, vibration, drift — must stay under 2 cm. Nothing is left to chance.</p>
+
+          <h3>They add redundancy for safety</h3>
+
+          <p><strong>Redundancy</strong> means using more sensors than the bare minimum, so a failure cannot cause harm. A safety bumper on a mobile robot does not trust the distance sensor alone; it adds a physical switch that stops the wheels on contact. If one sense fails, another catches the mistake.</p>
+
+          <div class="callout danger">
+            <div class="callout__head"><i class="bi bi-shield-exclamation"></i> Safety first</div>
+            <p>For any robot that can hurt a person, never let one sensor be the only thing standing between a mistake and an injury. Add a simple, reliable backup such as an emergency stop or a bumper switch.</p>
+          </div>
+
+          <h2>Going deeper (optional)</h2>
+
+          <p>If you want one advanced idea to carry forward, let it be <strong>confidence</strong>. Professional sensor systems do not just report a value; they report how sure they are of it. A distance reading of 40 cm might come with high confidence in open space, or low confidence when the echo was weak. The robot's decisions can then lean on reliable readings and ignore doubtful ones.</p>
+
+          <h2>Try it yourself</h2>
+
+          <p>These exercises need little or no equipment. Each one turns a concept into something you have felt with your own hands, which is how engineering really sticks.</p>
+
+          <ol>
+            <li><strong>Be a sensor.</strong> Sit still with your eyes closed and have a friend tap the table at random times. Raise your hand each time you feel a tap. You are acting as a tactile sensor with a threshold. Hint: notice how a soft tap sometimes slips below your threshold.</li>
+            <li><strong>Find the noise.</strong> Take ten repeated measurements of anything — your phone's light meter app, a kitchen scale, a thermometer. Write the numbers down. How far apart are the highest and lowest? Hint: that spread is the noise you must filter.</li>
+            <li><strong>Filter by hand.</strong> Use the ten numbers from the last exercise. Compute a three-point moving average. Compare it with the raw values. Hint: the filtered line should be calmer than the raw one.</li>
+            <li><strong>Calibrate a ruler.</strong> Place a ruler against a wall. Measure the same object five times, being careless, then five times, being careful. Which set is more precise? Hint: precise means repeatable, not necessarily correct.</li>
+            <li><strong>Plan a sensor choice.</strong> Choose a task, such as "detect when my pet enters the room" or "know when my plant needs water". Run the six-step method and write down the sensor you would pick and why. Hint: start with the quantity, then the range, then the environment.</li>
+          </ol>
+
+          <h2>Where this leads next</h2>
+
+          <p>You now know what sensors are, how they turn the world into signals, and how to trust those signals. That is a huge step. Every clever robot you have admired is built on this foundation: measure honestly, filter the noise, and combine your senses.</p>
+
+          <p>Next comes the part that reads these signals and makes sense of them — the controller. In Chapter 11 you will meet microcontrollers and single-board computers. Everything you learned about sensor signals here becomes the input to that brain.</p>
+
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> Where this leads</div>
+            <p>You understand single sensors and simple fusion. Products fuse LiDAR, camera and IMU with <strong>factor graphs</strong>, then close the sim-to-real gap by calibrating the simulator to hardware. Continue with <a href="ch28-simulation-sim-to-real.html">Chapter 28: Modern Simulation and Sim-to-Real</a> and the maths behind it in <a href="ch25-advanced-math-for-robotics.html">Chapter 25</a>.</p>
+          </div>
+
+          <section class="takeaways">
+            <h2><i class="bi bi-pin-angle-fill"></i> Key takeaways</h2>
+            <ul>
+              <li><i class="bi bi-check2-circle"></i> A sensor translates a physical quantity into an electrical signal.</li>
+              <li><i class="bi bi-check2-circle"></i> Analogue sensors give a smooth value; digital sensors give bits, pulses or states.</li>
+              <li><i class="bi bi-check2-circle"></i> Raw values are meaningless until you calibrate them into real units.</li>
+              <li><i class="bi bi-check2-circle"></i> Every real sensor produces noise, so never trust one single reading.</li>
+              <li><i class="bi bi-check2-circle"></i> Filtering — averaging, moving average, median — turns noisy data into a usable value.</li>
+              <li><i class="bi bi-check2-circle"></i> Pick a sensor by matching its range, accuracy, environment and interface to your task.</li>
+              <li><i class="bi bi-check2-circle"></i> Combining sensors (sensor fusion) gives a steadier picture than any one sensor alone.</li>
+            </ul>
+          </section>
+
+          <section class="quiz">
+            <div class="quiz__head"><i class="bi bi-patch-question-fill"></i> Check your understanding</div>
+            <details>
+              <summary><span class="q-num">Q1.</span><span>In one sentence, what does a sensor do?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> It measures one physical quantity and turns it into an electrical signal that a circuit can read.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q2.</span><span>What is the difference between an analogue and a digital sensor?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> An analogue sensor outputs a smooth, continuous value read through an ADC. A digital sensor outputs bits, pulses or on/off states that are already discrete.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q3.</span><span>Why is a raw value not useful on its own?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> A raw value is just a bare number. It has no physical meaning until calibration converts it into real units such as centimetres or degrees Celsius.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q4.</span><span>Name two common sources of sensor noise.</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Any two of: electrical interference, vibration, reflected or angled surfaces, ambient light, or heat. These all add false wobble to the signal.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q5.</span><span>What is a moving average, and why does it help?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> It averages the last few readings together. Random noise partly cancels out, so the value becomes steadier, at the cost of reacting a little more slowly.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q6.</span><span>Give one reason to combine two different sensors.</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Each sensor has a weakness. Combining them — for example an encoder for short-term motion and an IMU for tilt — covers each other's blind spots and gives a steadier picture.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q7.</span><span>You must detect a black line on a white floor. Which sensor family fits, and why?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> IR reflectance sensors. They shine light down and measure how much bounces back, which differs sharply between black and white surfaces.</div>
+            </details>
+          </section>
+
+        </article>
+
+        <nav class="pager" id="pager" aria-label="Chapter navigation"></nav>
+      </div>
+    </main>
+  </div>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/book.js"></script>
+</body>
+</html>

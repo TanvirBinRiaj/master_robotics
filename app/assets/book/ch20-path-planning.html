@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>try{var __t=null;try{__t=localStorage.getItem("mr-theme")}catch(e){}if(__t!=="dark"&&__t!=="light"){try{var __m=document.cookie.match(/(?:^|;\s*)mr-theme=(dark|light)/);__t=__m?__m[1]:null}catch(e){__t=null}}if(__t!=="dark"&&__t!=="light"){try{var __w=String(window.name||"").match(/mr-theme=(dark|light)/);__t=__w?__w[1]:null}catch(e){}}if(__t!=="dark"&&__t!=="light"&&window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches){__t="dark"}if(__t==="dark"||__t==="light")document.documentElement.setAttribute("data-theme",__t)}catch(e){}</script>
+  <title>Chapter 20: Path Planning and Navigation — Master Robotics</title>
+  <meta name="description" content="How a robot decides where to go. Learn maps, localisation, SLAM, A* planning, local planners, costmaps and replanning in plain English with worked examples.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="vendor/bootstrap-icons/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/prose.css">
+  <link rel="stylesheet" href="assets/css/mobile.css">
+</head>
+<body data-file="ch20-path-planning.html">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="topbar" id="topbar"></header>
+  <div class="progress-bar" id="progressBar"></div>
+
+  <div class="layout">
+    <div class="sidebar__backdrop" id="navBackdrop"></div>
+    <nav class="sidebar" id="sidebar" aria-label="Book contents"></nav>
+
+    <main class="main" id="main">
+      <div class="container">
+
+        <header class="chapter-head">
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="index.html">Home</a>
+            <i class="bi bi-chevron-right"></i>
+            <a href="index.html#intelligence">Part 5 &middot; Robot Intelligence</a>
+            <i class="bi bi-chevron-right"></i>
+            <span>Chapter 20</span>
+          </nav>
+          <span class="chapter-kicker"><i class="bi bi-diagram-3"></i> Part 5 &middot; Robot Intelligence</span>
+          <h1>Path Planning and Navigation</h1>
+          <p class="lede">A robot that cannot find its way is just an expensive statue. This chapter shows you how a robot knows where it is, how it decides where to go, and how it dodges what it did not expect.</p>
+          <div class="chapter-meta">
+            <span><i class="bi bi-clock"></i> ~25 min read</span>
+            <span><i class="bi bi-bar-chart"></i> Intermediate</span>
+            <span><i class="bi bi-list-check"></i> Chapter 20 of 30</span>
+          </div>
+          <div class="goals">
+            <h2>What you will learn</h2>
+            <ul>
+              <li><i class="bi bi-check-circle-fill"></i> Explain the idea of a map for a robot.</li>
+              <li><i class="bi bi-check-circle-fill"></i> Describe a simple path-planning method.</li>
+              <li><i class="bi bi-check-circle-fill"></i> Understand local and global planning.</li>
+            </ul>
+          </div>
+        </header>
+
+        <article class="article">
+
+          <p class="lead">Imagine you are in a large building you have never visited. Someone says: "Take this parcel to room 214." You do not run blindly down the corridor. First you find a map on the wall. Then you figure out where you are standing. Then you trace a route. All three steps happen in your head in a few seconds. A robot has to do the same three steps with sensors and maths.</p>
+
+          <p>This chapter is about that everyday skill, translated for machines. We call it <strong>navigation</strong>: the whole job of getting a robot from where it is to where it should be, safely, in a world full of walls, people and surprises.</p>
+
+          <p>Navigation sounds hard because it is hard. The robot cannot see everything. Its wheels slip. People move. Doors open and close. Yet a good navigation system handles all of this calmly, many times every second. By the end of this chapter you will understand how.</p>
+
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> The key idea</div>
+            <p><strong>Navigation</strong> means answering three questions at once: "Where am I?", "What is around me?", and "Which way should I go next?" Every robot that moves answers these three questions.</p>
+          </div>
+
+          <h2>The navigation problem in three parts</h2>
+
+          <p>Professionals split navigation into three clean jobs. Breaking a big problem into small ones is the secret of all engineering, so let us do it here.</p>
+
+          <h3>Part one: know where you are</h3>
+          <p>This is called <strong>localisation</strong>. Localisation means working out your current position and direction on the map. If the robot thinks it is in the kitchen but is really in the hallway, every plan it makes will be wrong. So localisation comes first.</p>
+
+          <h3>Part two: know the map</h3>
+          <p>The robot needs some picture of the space around it. This picture is called the <strong>map</strong>. The map says which areas are free to cross and which are blocked by walls or furniture. Without a map, the robot cannot choose a sensible route.</p>
+
+          <h3>Part three: decide where to go</h3>
+          <p>Once the robot knows where it is and what the map looks like, it must choose a route. That choosing is called <strong>path planning</strong>. The result is a path: a line or a list of points the robot means to follow.</p>
+
+          <p>Here is the same three-part idea shown as a picture.</p>
+
+          <figure class="figure">
+            <div class="figure__box">
+              <svg viewBox="0 0 640 210" width="100%" role="img" aria-label="Three-part navigation loop: localisation, map and planning feed a controller that drives the robot, which senses again">
+                <rect x="20" y="30" width="170" height="70" rx="12" fill="#e2f6ef" stroke="#0f9d78" stroke-width="2"></rect>
+                <text x="105" y="60" text-anchor="middle" font-family="Inter, sans-serif" font-size="15" font-weight="700" fill="#0f9d78">Localisation</text>
+                <text x="105" y="82" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#4a5266">where am I?</text>
+
+                <rect x="235" y="30" width="170" height="70" rx="12" fill="#e8eeff" stroke="#2d5bff" stroke-width="2"></rect>
+                <text x="320" y="60" text-anchor="middle" font-family="Inter, sans-serif" font-size="15" font-weight="700" fill="#2d5bff">The map</text>
+                <text x="320" y="82" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#4a5266">what is around?</text>
+
+                <rect x="450" y="30" width="170" height="70" rx="12" fill="#f0e9fd" stroke="#7a4ddb" stroke-width="2"></rect>
+                <text x="535" y="60" text-anchor="middle" font-family="Inter, sans-serif" font-size="15" font-weight="700" fill="#7a4ddb">Planning</text>
+                <text x="535" y="82" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#4a5266">which way next?</text>
+
+                <rect x="235" y="140" width="170" height="56" rx="12" fill="#fff3e0" stroke="#e08a00" stroke-width="2"></rect>
+                <text x="320" y="173" text-anchor="middle" font-family="Inter, sans-serif" font-size="15" font-weight="700" fill="#b06e00">Motors move</text>
+
+                <line x1="105" y1="100" x2="105" y2="168" stroke="#7b849b" stroke-width="2"></line>
+                <line x1="105" y1="168" x2="235" y2="168" stroke="#7b849b" stroke-width="2" marker-end="url(#ar20)"></line>
+                <line x1="320" y1="100" x2="320" y2="140" stroke="#7b849b" stroke-width="2" marker-end="url(#ar20)"></line>
+                <line x1="535" y1="100" x2="535" y2="168" stroke="#7b849b" stroke-width="2"></line>
+                <line x1="535" y1="168" x2="405" y2="168" stroke="#7b849b" stroke-width="2" marker-end="url(#ar20)"></line>
+                <path d="M235 168 C180 168 180 100 60 100" fill="none" stroke="#7b849b" stroke-width="2" stroke-dasharray="6 6"></path>
+                <text x="150" y="130" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#7b849b">sensors update all three</text>
+                <defs>
+                  <marker id="ar20" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+                    <path d="M0,0 L9,4.5 L0,9 z" fill="#7b849b"></path>
+                  </marker>
+                </defs>
+              </svg>
+            </div>
+            <figcaption>Figure 20.1 — The three parts of navigation. Sensors feed all three, and the answer becomes a movement.</figcaption>
+          </figure>
+
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> In simple words</div>
+            <p>Localisation is "where am I?". The map is "what does the world look like?". Planning is "which way do I go?". Then the motors move, and the robot checks again.</p>
+          </div>
+
+          <h2>Maps: giving the robot a picture of the world</h2>
+
+          <p>A map is the robot's memory of its space. A person uses a paper map with roads and buildings. A robot uses a mathematical map with numbers. The most common kind is the <strong>grid map</strong>.</p>
+
+          <h3>The grid map: a checkerboard of cells</h3>
+          <p>A <strong>grid map</strong> chops the floor into a checkerboard of small squares called <strong>cells</strong>. Each cell is marked with one value that says how likely it is to be blocked. A free cell is easy to cross. An occupied cell holds a wall or object. You will hear engineers call this an <strong>occupancy grid</strong>, because each cell records how "occupied" that spot is.</p>
+
+          <p>Look at a tiny grid. Size zero is free, size one is a wall.</p>
+
+          <figure class="figure">
+            <div class="figure__box">
+              <svg viewBox="0 0 400 400" width="100%" role="img" aria-label="A five by five grid map with a wall of occupied cells and free cells">
+                <!-- free cells background -->
+                <g stroke="#7b849b" stroke-width="1">
+                  <rect x="40" y="40" width="320" height="320" fill="#eef1f6"></rect>
+                </g>
+                <!-- walls: column x=200 across rows -->
+                <rect x="240" y="40" width="64" height="256" fill="#1c2230"></rect>
+                <!-- one extra obstacle -->
+                <rect x="112" y="232" width="64" height="64" fill="#1c2230"></rect>
+                <!-- grid lines -->
+                <g stroke="#b7bfce" stroke-width="1.5" fill="none">
+                  <line x1="104" y1="40" x2="104" y2="360"></line>
+                  <line x1="168" y1="40" x2="168" y2="360"></line>
+                  <line x1="232" y1="40" x2="232" y2="360"></line>
+                  <line x1="296" y1="40" x2="296" y2="360"></line>
+                  <line x1="40" y1="104" x2="360" y2="104"></line>
+                  <line x1="40" y1="168" x2="360" y2="168"></line>
+                  <line x1="40" y1="232" x2="360" y2="232"></line>
+                  <line x1="40" y1="296" x2="360" y2="296"></line>
+                </g>
+                <!-- start and goal -->
+                <circle cx="72" cy="328" r="14" fill="#0f9d78"></circle>
+                <text x="72" y="333" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#ffffff">S</text>
+                <circle cx="328" cy="72" r="14" fill="#7a4ddb"></circle>
+                <text x="328" y="77" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#ffffff">G</text>
+                <rect x="40" y="40" width="320" height="320" fill="none" stroke="#7b849b" stroke-width="2"></rect>
+                <text x="200" y="388" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#4a5266">dark cells = occupied, light cells = free</text>
+              </svg>
+            </div>
+            <figcaption>Figure 20.2 — A small grid map. S is the start and G is the goal. The dark cells are walls. The robot must find a way around them.</figcaption>
+          </figure>
+
+          <h3>Occupancy values</h3>
+          <p>A cell does not have to be simply "free" or "wall". It can hold a number. A common scheme uses <code>0</code> for certainly free, <code>100</code> for certainly occupied, and <code>50</code> for "I am not sure". The robot's sensors are noisy, so "not sure" is a normal and useful value. Later maths can decide what to do with the uncertain cells.</p>
+
+          <h3>Resolution: the size of a cell</h3>
+          <p>The size of each cell is called the <strong>resolution</strong>. A resolution of 5 cm means every cell is a 5 cm &times; 5 cm square. This choice matters a lot, and it is a classic trade-off.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Cell size</th><th>Detail you see</th><th>Memory for a 20 m &times; 20 m floor</th><th>Best for</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>1 cm</td><td>Very fine, tiny objects</td><td>4,000,000 cells</td><td>Small precise work areas</td></tr>
+                <tr><td>5 cm</td><td>Good, furniture visible</td><td>160,000 cells</td><td>Indoor mobile robots</td></tr>
+                <tr><td>20 cm</td><td>Coarse, only big walls</td><td>10,000 cells</td><td>Large open warehouses</td></tr>
+                <tr><td>1 m</td><td>Very rough, whole rooms</td><td>400 cells</td><td>Outdoor route sketches</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>Notice the pattern. Halving the cell size quadruples the number of cells, because both width and height double. Fine maps see more but cost far more memory and computing time. You will calculate this exactly in a moment.</p>
+
+          <div class="callout warn">
+            <div class="callout__head"><i class="bi bi-exclamation-triangle-fill"></i> Watch out</div>
+            <p>Beginners often pick a very fine grid to "be accurate". Then the planning slows to a crawl and the memory fills up. Choose the coarsest grid that safely fits your robot's size.</p>
+          </div>
+
+          <h3>Other kinds of map</h3>
+          <p>Grids are not the only option. Here are three more, each in one line.</p>
+          <ul>
+            <li><strong>Feature maps.</strong> Store a list of landmarks, such as doorways or corners, with their positions.</li>
+            <li><strong>Roadmap graphs.</strong> Store a network of safe points joined by safe lines, like a subway map for robots.</li>
+            <li><strong>Costmaps.</strong> A grid where each cell holds a cost, not just free or blocked, so the planner can avoid bad ground.</li>
+          </ul>
+
+          <h2>Localisation: finding yourself on the map</h2>
+
+          <p>A map is useless if the robot does not know where it stands on it. Localisation is the art of answering "where am I?" using sensors. There are three simple tools, and real robots combine them.</p>
+
+          <h3>Tool one: odometry (counting wheel turns)</h3>
+          <p><strong>Odometry</strong> means guessing your position by counting how much your wheels have turned. If a wheel is 30 cm around and it turns ten times, you know you moved about 3 metres forward. Add a turn, and you can estimate your direction too. Odometry is cheap, fast and always available.</p>
+
+          <p>But odometry drifts. <strong>Drift</strong> means small errors pile up until the estimate wanders far from the truth. Wheels slip on smooth floors. The two wheels may be slightly different in size. Tiny angle errors grow with distance. After a long drive, counting wheels alone can be metres off. This is the single most important weakness to remember.</p>
+
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> Tip</div>
+            <p>Think of odometry as walking in the dark while counting your own steps. A few steps is fine. After a hundred steps, one small miscount has sent you into the wrong room.</p>
+          </div>
+
+          <h3>Tool two: landmarks and matching</h3>
+          <p>A <strong>landmark</strong> is a feature the robot can recognise, such as a corner, a pillar or a special tag on the floor. When the robot sees landmarks with its sensors, it compares what it sees with where the map says those landmarks are. That comparison corrects the drift. A fix from a landmark is like checking a street sign after walking — it tells you the truth again.</p>
+
+          <h3>Tool three: sensor fusion</h3>
+          <p>No single sensor is perfect. Odometry is smooth but drifts. A landmark matches exactly but only appears now and then. <strong>Sensor fusion</strong> means combining several imperfect clues so their strengths cover each other's weaknesses. You saw the foundations of this in Chapter 10. The result is a position estimate far better than any single sensor could give.</p>
+
+          <h3>SLAM: map and position together</h3>
+          <p>Here is a chicken-and-egg problem. To localise, you need a map. But what if you are in a brand-new building with no map at all? You cannot have a map before you know where you are, and you cannot localise without a map.</p>
+
+          <p>The solution is one of robotics' most beautiful ideas: <strong>SLAM</strong>, which stands for <strong>Simultaneous Localisation and Mapping</strong>. SLAM builds the map and tracks your position at the same time, each helping the other. As the robot moves and senses, it adds new walls to the map and uses those same walls to pin down where it is.</p>
+
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> In simple words</div>
+            <p>SLAM is like exploring a dark room while blindfolded, with a helper who shines a torch. You feel a wall, add it to your mental map, and use it to remember where you are. Map and position grow together.</p>
+          </div>
+
+          <p>The helper in real robots is not a person but the sensors and the maths. A laser scanner or camera sees walls. Odometry guesses the motion. A clever filter joins them so both the map and the position improve over time. Modern robot vacuum cleaners and warehouse robots rely on SLAM every day.</p>
+
+          <h2>Global planning: the big picture route</h2>
+
+          <p>Now the robot knows where it is and has a map. The next job is to choose a route across the whole map. This is called <strong>global planning</strong>. Global means "the whole journey", from start to goal. The robot looks at the entire map and picks a path before it moves.</p>
+
+          <h3>Turning the world into a graph</h3>
+          <p>To plan, the robot turns the map into a <strong>graph</strong>. A graph is just dots joined by lines. The dots are called <strong>nodes</strong> and the lines are called <strong>edges</strong>. In a grid map, every free cell is a node, and it connects to the cells next to it. Planning then becomes: find a chain of nodes from start to goal that avoids the walls.</p>
+
+          <h3>Cost so far and guess of the rest</h3>
+          <p>Two numbers guide every good planner. The first is the <strong>cost so far</strong>: how much effort it took to reach a cell from the start. The second is a <strong>guess of the remaining distance</strong>: how far it probably is from that cell to the goal. The planner prefers cells that score well on both. This one idea powers the famous methods below.</p>
+
+          <h3>Dijkstra: expand the cheapest first</h3>
+          <p><strong>Dijkstra's algorithm</strong> (say "DYKE-struh") searches outward from the start like a ripple in water. At each step it asks: "Which reached cell has the lowest cost so far?" It expands that cell, then looks at its neighbours, and repeats. Because it always works on the cheapest cell, the first time it reaches the goal it has found the cheapest route. Dijkstra is correct and simple, but it explores in every direction, even away from the goal. That wastes time.</p>
+
+          <h3>A* : Dijkstra with a compass</h3>
+          <p><strong>A*</strong> (say "A-star") fixes that waste. It adds a guess of the remaining distance, so the search leans toward the goal instead of spreading evenly. The trick is a famous little formula.</p>
+
+          <div class="formula"><span class="label">A* score for each cell</span> f = g + h</div>
+
+          <p>Here is what each letter means, in plain words.</p>
+          <ul>
+            <li><strong>g</strong> is the cost so far: the real effort to reach this cell from the start.</li>
+            <li><strong>h</strong> is the guess of the rest: an estimated effort from this cell to the goal.</li>
+            <li><strong>f</strong> is the total: the cell's overall score. The planner expands the smallest f first.</li>
+          </ul>
+
+          <p>The guess <strong>h</strong> is called a <strong>heuristic</strong>: a smart rule of thumb. A good heuristic never overestimates the true distance. A simple and safe one is the straight-line distance, as if the robot could fly to the goal. Because it never overestimates, A* still finds the truly cheapest path, but it wastes far less time than Dijkstra.</p>
+
+          <div class="callout note">
+            <div class="callout__head"><i class="bi bi-info-circle-fill"></i> Note</div>
+            <p>If you set <strong>h = 0</strong>, then f = g, and A* becomes plain Dijkstra. So Dijkstra is just A* with no compass. That is a neat way to remember they are the same family.</p>
+          </div>
+
+          <figure class="figure">
+            <div class="figure__box">
+              <svg viewBox="0 0 460 300" width="100%" role="img" aria-label="A star search expanding cells from the start toward the goal around a wall">
+                <!-- grid 7x5 -->
+                <g stroke="#b7bfce" stroke-width="1">
+                  <rect x="40" y="30" width="56" height="48" fill="#dff3ea"></rect>
+                  <rect x="96" y="30" width="56" height="48" fill="#dff3ea"></rect>
+                  <rect x="152" y="30" width="56" height="48" fill="#dff3ea"></rect>
+                  <rect x="208" y="30" width="56" height="48" fill="#1c2230"></rect>
+                  <rect x="264" y="30" width="56" height="48" fill="#eef1f6"></rect>
+                  <rect x="40" y="78" width="56" height="48" fill="#dff3ea"></rect>
+                  <rect x="96" y="78" width="56" height="48" fill="#dff3ea"></rect>
+                  <rect x="152" y="78" width="56" height="48" fill="#eef1f6"></rect>
+                  <rect x="208" y="78" width="56" height="48" fill="#1c2230"></rect>
+                  <rect x="264" y="78" width="56" height="48" fill="#eef1f6"></rect>
+                  <rect x="40" y="126" width="56" height="48" fill="#0f9d78"></rect>
+                  <rect x="96" y="126" width="56" height="48" fill="#eef1f6"></rect>
+                  <rect x="152" y="126" width="56" height="48" fill="#eef1f6"></rect>
+                  <rect x="208" y="126" width="56" height="48" fill="#1c2230"></rect>
+                  <rect x="264" y="126" width="56" height="48" fill="#eef1f6"></rect>
+                  <rect x="40" y="174" width="56" height="48" fill="#eef1f6"></rect>
+                  <rect x="96" y="174" width="56" height="48" fill="#eef1f6"></rect>
+                  <rect x="152" y="174" width="56" height="48" fill="#eef1f6"></rect>
+                  <rect x="208" y="174" width="56" height="48" fill="#1c2230"></rect>
+                  <rect x="264" y="174" width="56" height="48" fill="#eef1f6"></rect>
+                </g>
+                <!-- highlight goal -->
+                <rect x="264" y="30" width="56" height="48" fill="none" stroke="#7a4ddb" stroke-width="3"></rect>
+                <text x="292" y="60" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#7a4ddb">G</text>
+                <text x="68" y="156" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#ffffff">S</text>
+                <rect x="40" y="30" width="280" height="192" fill="none" stroke="#7b849b" stroke-width="2"></rect>
+                <text x="180" y="262" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#4a5266">green = expanded early, dark = wall, G = goal</text>
+                <text x="180" y="284" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#2d5bff">A* leans toward G, so it wastes fewer cells</text>
+              </svg>
+            </div>
+            <figcaption>Figure 20.3 — A* expands cells with the smallest f first. Its guess of the remaining distance pulls the search toward the goal.</figcaption>
+          </figure>
+
+          <h3>A small walkthrough around a wall</h3>
+          <p>Let us plan a path by hand on a grid. Use the map in Figure 20.2, but keep it small. The robot starts at the bottom-left corner and wants the top-right corner. A wall of cells blocks the middle. We measure distance as the number of steps. Moving straight costs 1. The guess h is the straight-line number of steps to the goal.</p>
+
+          <ol>
+            <li><strong>Begin at the start.</strong> Its g is 0, because we are already here. Its h is the straight-line steps to the goal. Add them for f.</li>
+            <li><strong>Look at the start's free neighbours.</strong> Each one gets a g of 1 so far. Compute f = g + h for each neighbour.</li>
+            <li><strong>Pick the smallest f.</strong> That neighbour looks most promising. Expand it: look at its free neighbours and score them too.</li>
+            <li><strong>Avoid the wall.</strong> Cells inside the wall are never scored. The planner simply ignores them as neighbours.</li>
+            <li><strong>Follow the lean.</strong> Cells getting closer to the goal have a smaller h, so their f is smaller. The search drifts toward the goal.</li>
+            <li><strong>Reach the goal.</strong> When the goal itself is chosen as the smallest f, stop. The path is now found.</li>
+            <li><strong>Walk it backwards.</strong> From the goal, step to the cell it came from, and keep going until you reach the start. That chain is the final path.</li>
+          </ol>
+
+          <p>That last step is easy to forget. A* records for each cell which cell it came from, called the <strong>parent</strong>. Reversing the parents from goal to start rebuilds the route. Without parents you would find the goal but not know how you got there.</p>
+
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> Tip</div>
+            <p>Try this on squared paper. Draw a wall, mark a start and a goal, then fill in a number in each free cell: g in the corner, h near the middle, f large in the centre. You will feel exactly how A* thinks.</p>
+          </div>
+
+          <h3>Other planners worth knowing</h3>
+          <p>A* is the workhorse, but other methods shine in different situations. Here are four in plain words.</p>
+          <ul>
+            <li><strong>BFS and DFS.</strong> <strong>Breadth-first search</strong> spreads evenly through the graph, and <strong>depth-first search</strong> dives down one branch first. Both ignore costs, so they suit maps where every step costs the same.</li>
+            <li><strong>RRT and RRT*.</strong> <strong>Rapidly-exploring Random Trees</strong> grow random branches from the start until one reaches the goal. They handle high-dimensional problems, like a robot arm with six joints, where a grid would be impossibly huge. RRT* adds a step that gradually improves the path.</li>
+            <li><strong>Potential fields.</strong> Imagine the goal pulls the robot like a magnet, and obstacles push it away like same-poles. The robot follows the combined force. It is simple and smooth, but it has a trap: the <strong>local minimum</strong>. The robot can reach a spot where all pushes cancel out, and it stalls far from the goal.</li>
+            <li><strong>Sampling and optimisation planners.</strong> These spray many candidate routes and keep improving the best one. They are common for smooth, car-like motion.</li>
+          </ul>
+
+          <div class="callout warn">
+            <div class="callout__head"><i class="bi bi-exclamation-triangle-fill"></i> Watch out</div>
+            <p>Potential fields feel clever but can trap a robot in a corner where the pushes balance, called a local minimum. Always check that your method can escape such spots, or add a fallback planner.</p>
+          </div>
+
+          <h2>Local planning: handling the next few metres</h2>
+
+          <p>A global path is only a plan. The real world can change while the robot drives. A person steps out. A box gets pushed into the aisle. A door that was open is now closed. The global route was correct when it was made, but it may now run straight into trouble.</p>
+
+          <p>This is the job of <strong>local planning</strong>: choosing the exact motion for the next few metres, using the freshest sensor data. Local means "right here, right now". A local planner does not think about the whole building. It thinks about the space just ahead.</p>
+
+          <h3>Choosing a safe velocity each step</h3>
+          <p>A local planner runs in a tight loop, many times each second. Every loop it looks at the robot's current speed and the nearby obstacles, then chooses a safe speed and turn for the next instant. It keeps the robot near the global path while never hitting anything. The output is not a route but a <strong>velocity command</strong>: how fast to go forward and how fast to turn.</p>
+
+          <h3>The dynamic window approach</h3>
+          <p>The <strong>dynamic window approach</strong> is a popular local planner, and its name explains it. A "window" means a small range of choices. The planner does three things each step.</p>
+
+          <ol>
+            <li><strong>Find the reachable speeds.</strong> The robot cannot instantly jump to any speed. Given its motors, it can only reach a small set of speeds in the next moment. That small set is the window.</li>
+            <li><strong>Simulate each choice.</strong> For every speed in the window, imagine driving it for a short time. Where would the robot end up? Would it hit anything? Sensors tell us about the nearby world.</li>
+            <li><strong>Score and pick.</strong> Give each imagined move a score. Reward moves that head toward the goal, keep good speed, and stay clear of obstacles. Choose the best. Send it to the motors.</li>
+          </ol>
+
+          <p>Then the loop repeats with fresh sensors. This constant re-checking is why a good robot seems calm and smooth, even in a crowd.</p>
+
+          <figure class="figure">
+            <div class="figure__box">
+              <svg viewBox="0 0 640 250" width="100%" role="img" aria-label="Global planning chooses a long route on the map, local planning adjusts the next few metres around an obstacle">
+                <rect x="20" y="30" width="280" height="190" rx="10" fill="#f7f9fc" stroke="#7b849b" stroke-width="2"></rect>
+                <text x="160" y="22" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#2d5bff">Global planning</text>
+                <path d="M50 190 L110 190 L110 90 L230 90 L230 60 L270 60" fill="none" stroke="#0f9d78" stroke-width="4" stroke-linejoin="round"></path>
+                <circle cx="50" cy="190" r="7" fill="#0f9d78"></circle>
+                <circle cx="270" cy="60" r="7" fill="#7a4ddb"></circle>
+                <rect x="90" y="120" width="40" height="80" fill="#1c2230"></rect>
+                <text x="160" y="240" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#4a5266">whole route, uses the map</text>
+
+                <rect x="340" y="30" width="280" height="190" rx="10" fill="#f7f9fc" stroke="#7b849b" stroke-width="2"></rect>
+                <text x="480" y="22" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#7a4ddb">Local planning</text>
+                <path d="M370 190 L410 190 L410 90 L520 90 L540 70" fill="none" stroke="#0f9d78" stroke-width="4" stroke-linejoin="round"></path>
+                <circle cx="370" cy="190" r="7" fill="#0f9d78"></circle>
+                <circle cx="540" cy="70" r="7" fill="#7a4ddb"></circle>
+                <circle cx="460" cy="140" r="16" fill="#e08a00"></circle>
+                <text x="460" y="145" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#ffffff">!</text>
+                <path d="M410 120 C440 100 480 100 505 85" fill="none" stroke="#e08a00" stroke-width="3" stroke-dasharray="5 5"></path>
+                <text x="480" y="240" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#4a5266">next few metres, dodges the !</text>
+              </svg>
+            </div>
+            <figcaption>Figure 20.4 — Global planning sets the long route. Local planning adapts the next few metres when something unexpected appears.</figcaption>
+          </figure>
+
+          <h3>Why you need both</h3>
+          <p>Use only global planning and the robot will blindly follow a stale route into a new obstacle. Use only local planning and the robot will head toward the goal in a straight line, unaware of a wall it cannot yet see, and get stuck in a corner. Real robots run both together, all the time. The global plan gives direction; the local plan gives safety and smoothness.</p>
+
+          <h2>Obstacle avoidance vs path planning</h2>
+
+          <p>These two ideas sound alike, but they are different, and mixing them up causes confusion. It helps to name the two styles clearly.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th></th><th>Reactive (obstacle avoidance)</th><th>Deliberative (path planning)</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Idea</td><td>Sense and swerve right now</td><td>Think ahead and choose a route</td></tr>
+                <tr><td>Uses</td><td>Current sensors only</td><td>The whole stored map</td></tr>
+                <tr><td>Speed</td><td>Fast, simple</td><td>Slower, more thinking</td></tr>
+                <tr><td>Sees</td><td>Only what is nearby</td><td>The whole journey</td></tr>
+                <tr><td>Weakness</td><td>Can get trapped in corners</td><td>Slow to react to surprises</td></tr>
+                <tr><td>Example</td><td>A bug-like dodge when someone steps out</td><td>A* finding the aisle route</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>Most real robots use both. The deliberative planner decides the big route. The reactive layer acts as a guard: if something appears suddenly, it takes over for an instant to avoid a crash, then hands control back. This hand-off is one of the most practical ideas in mobile robotics.</p>
+
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> In simple words</div>
+            <p>Reactive means "dodge now". Deliberative means "think of a route". Dodging alone makes you run in circles. Thinking alone makes you too slow. Use both.</p>
+          </div>
+
+          <h2>Costmaps: not all ground is equal</h2>
+
+          <p>A plain grid says only "free" or "wall". But the real world is richer. Smooth concrete is easy. Rough gravel is tiring. A patch near a machine might be safe but slow. A soft rug can stop a small robot. Good planners want to know not just <em>where</em> things are, but <em>how bad</em> they are.</p>
+
+          <p>A <strong>costmap</strong> is a map where every cell carries a <strong>cost</strong>: a number saying how expensive it is to cross. The planner then prefers good routes, not merely short ones. A slightly longer path on smooth ground can beat a short path through a minefield of trouble.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Ground type</th><th>Cost per cell</th><th>What it means for the planner</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Open smooth floor</td><td>1</td><td>Prefer this. Cheap and fast.</td></tr>
+                <tr><td>Rough or bumpy ground</td><td>5</td><td>Cross only if it saves much distance.</td></tr>
+                <tr><td>Near an obstacle</td><td>10</td><td>Avoid unless necessary. Leave a safety gap.</td></tr>
+                <tr><td>Wall or solid object</td><td>Infinite</td><td>Never enter. Treated as blocked.</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>Notice the clever trick near obstacles. Even free cells beside a wall get a raised cost. This gently pushes the robot toward the centre of a corridor, away from walls, which is exactly what a cautious driver does. A cost can also stand for risk, so the planner balances speed, distance and safety.</p>
+
+          <h3>Calculating grid memory</h3>
+          <p>Let us make the resolution trade-off concrete with real numbers. Suppose a warehouse floor is 20 metres by 20 metres, and we want to know how much memory the grid map needs.</p>
+
+          <div class="formula"><span class="label">Cells in a square grid</span> cells = (length &divide; cell size) &times; (width &divide; cell size)</div>
+
+          <p>First use a fine cell size of 5 cm, which is 0.05 m.</p>
+          <ol>
+            <li>Length in cells: 20 &divide; 0.05 = 400.</li>
+            <li>Width in cells: 20 &divide; 0.05 = 400.</li>
+            <li>Total cells: 400 &times; 400 = 160,000 cells.</li>
+            <li>If each cell uses one byte, that is 160,000 bytes, about 160 kilobytes.</li>
+          </ol>
+
+          <p>Now use a coarse cell size of 20 cm, which is 0.20 m.</p>
+          <ol>
+            <li>Length in cells: 20 &divide; 0.20 = 100.</li>
+            <li>Width in cells: 20 &divide; 0.20 = 100.</li>
+            <li>Total cells: 100 &times; 100 = 10,000 cells.</li>
+            <li>That is only about 10 kilobytes.</li>
+          </ol>
+
+          <p>See the gap: the fine map needs sixteen times the memory. And planning is slower too, because A* must consider all those extra cells. This is why professionals pick the coarsest safe size. If the robot is 40 cm wide, a 5 cm cell barely matters, but a 20 cm cell might let it miss a narrow gap. The robot's own size sets the sensible limit.</p>
+
+          <div class="callout danger">
+            <div class="callout__head"><i class="bi bi-shield-exclamation"></i> Danger</div>
+            <p>Never ignore the robot's footprint. If the robot is 50 cm wide but the map uses 20 cm cells, a gap that looks passable may be too narrow in reality. The planner must treat the robot as a large shape, not a dot.</p>
+          </div>
+
+          <h2>Replanning in a changing world</h2>
+
+          <p>No plan survives contact with a busy building. A fixed path made once at the start will eventually fail, because the world keeps moving. A person parks a pallet in the aisle. A colleague opens a door. A robot breaks down and blocks a corridor. A good navigation system expects this.</p>
+
+          <p><strong>Replanning</strong> means making a new route when the old one no longer works. Robots do it in a few common ways.</p>
+          <ul>
+            <li><strong>Trigger on blockage.</strong> If the local planner cannot find any safe way forward for a moment, the robot asks for a new global plan.</li>
+            <li><strong>Replan on a timer.</strong> Some robots simply rebuild the route every second or two, using the freshest map.</li>
+            <li><strong>Patch the local route.</strong> For a small skip around a box, the local planner detours and rejoins the global path without a full rebuild.</li>
+            <li><strong>Learn over time.</strong> Some systems remember that an aisle is often blocked and avoid it next time, which is a first step toward the learning ideas of Chapter 19.</li>
+          </ul>
+
+          <p>The lesson is simple: treat a plan as a good guess, not a promise. The robot must watch the world and be ready to think again.</p>
+
+          <h2>A full worked example: charger to shelf</h2>
+
+          <p>Let us walk through a complete navigation story, from start to finish, with every step shown. This is the kind of reasoning a real warehouse robot performs many times a day.</p>
+
+          <p><strong>The task:</strong> A wheeled warehouse robot rests on its charger in the corner. It must drive to a shelf on the far side of a small hall and stop in front of it. A wall divides the hall. Partway through the trip, someone moves a box into its chosen aisle.</p>
+
+          <h3>Step 1: load the map</h3>
+          <p>The robot loads its stored grid map of the hall. Each cell is 20 cm wide. Walls and shelves are marked occupied. Free floor is marked free. The charging station and the shelf are marked as special known points. The robot also loads a costmap, so cells near walls cost more than open floor.</p>
+
+          <h3>Step 2: localise</h3>
+          <p>The robot powers on but does not know exactly where it is. It reads odometry from the moment it parked, then scans the room with its laser. It matches the scanned walls against the stored map and finds the best fit. That fit is its position and heading. Because it was parked on its charger, the match is strong and the estimate is accurate to a few centimetres.</p>
+
+          <h3>Step 3: plan globally with A*</h3>
+          <p>Now it plans. Start is the charger. Goal is in front of the shelf. The robot runs A* over the free cells.</p>
+          <ol>
+            <li>Score the start cell: g = 0, h = straight-line steps to the goal, f = g + h.</li>
+            <li>Score the free neighbours: each has g = 1 plus its own h.</li>
+            <li>Expand the smallest f. The search leans toward the goal.</li>
+            <li>Ignore the wall cells and the shelf cells entirely.</li>
+            <li>Add the raised cost of cells near walls into g, so the route keeps a safe distance.</li>
+            <li>Stop when the goal cell is chosen. Walk the parents backwards to build the path.</li>
+          </ol>
+          <p>The result is a list of waypoints: a chain of points from the charger, around the dividing wall, to the shelf. This is the global route.</p>
+
+          <h3>Step 4: execute with the local planner</h3>
+          <p>The robot now follows the waypoints using its local planner and a smooth motion controller. Each moment, it checks the next metre with fresh sensors and picks a safe velocity. So far, the corridor is clear and the drive is smooth.</p>
+
+          <h3>Step 5: an unexpected box</h3>
+          <p>Halfway along, the laser sees a new obstacle: a box someone left in the aisle. It was not on the map. The local planner immediately slows and steers to one side, keeping clear. But the aisle is narrow. The detour would push the robot too close to the opposite wall, breaking the safety gap.</p>
+
+          <h3>Step 6: replan</h3>
+          <p>The local planner reports that it cannot make safe progress. The robot triggers a <strong>replan</strong>. It updates the costmap with the new box, then runs A* again from its current position. This time the route swings through a side corridor and rejoins the original path beyond the box.</p>
+
+          <h3>Step 7: arrive and verify</h3>
+          <p>The robot follows the new plan. Near the shelf, it switches from "travel" to "dock" behaviour: slow down, line up with the shelf, and stop at the exact stand-off distance. It confirms with its distance sensor that the shelf is where it expects. Then it reports: job done.</p>
+
+          <p>Look back at the whole trip. Localisation set the start. The map gave the world. A* chose the big route. The local planner handled the metres. Replanning saved the day when the world changed. Every idea in this chapter appeared once, in order. That is how a real delivery inside a warehouse actually works.</p>
+
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> The key idea</div>
+            <p>Navigation is a loop, not a one-time act. The robot localises, plans, drives, watches, and replans — over and over, until it arrives.</p>
+          </div>
+
+          <h2>Common mistakes beginners make</h2>
+
+          <p>These traps catch almost everyone. Knowing them in advance saves days of confusion.</p>
+
+          <ul>
+            <li><strong>Making the map too fine.</strong> A 1 cm grid feels accurate but bloats memory and slows planning. Choose the coarsest grid that still fits your robot safely.</li>
+            <li><strong>Trusting odometry alone.</strong> Counting wheels drifts, especially on smooth floors. Always add landmarks or sensor fusion to correct it.</li>
+            <li><strong>Planning once and never again.</strong> A fixed path fails the moment the world changes. Build in replanning from the start.</li>
+            <li><strong>Ignoring the robot's footprint.</strong> A planner that treats the robot as a dot sends it through gaps too small to fit. Plan for the whole robot shape, with a safety margin.</li>
+            <li><strong>Forgetting the turn radius.</strong> A car-like robot cannot spin on the spot. A path with sharp right angles may be impossible to drive. Check that the robot can actually follow the turns.</li>
+            <li><strong>Confusing reactive and deliberative thinking.</strong> Dodging is not planning. You need both layers, working together.</li>
+            <li><strong>Using a heuristic that overestimates.</strong> If h is too large, A* may return a longer path and claim it is best. Keep h honest.</li>
+          </ul>
+
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> Tip</div>
+            <p>Before blaming your planner, check your map and your localisation. Most "the planner is broken" problems are really "the robot did not know where it was".</p>
+          </div>
+
+          <h2>How professionals do it</h2>
+
+          <p>In industry, the same ideas grow bigger, safer and more coordinated. Here is what changes at scale.</p>
+
+          <h3>Ready-made navigation stacks</h3>
+          <p>Professionals rarely write navigation from scratch. They use tested frameworks such as the ROS navigation stack. These bring a map server, costmaps, a global planner, a local planner, and recovery behaviours, all wired together. You configure and tune them instead of inventing them.</p>
+
+          <h3>Behaviour trees</h3>
+          <p>A <strong>behaviour tree</strong> is a clear, tree-shaped way to organise robot decisions: try this, and if it fails, try that. It turns messy "if this, else that" logic into a readable structure. It is now the standard way to manage tasks like "go to shelf", "if blocked, replan", "if still stuck, call for help".</p>
+
+          <h3>Fleet coordination</h3>
+          <p>When dozens of robots share one floor, they must not fight over the same aisle. A central <strong>fleet manager</strong> assigns jobs, reserves corridors, and prevents deadlocks where two robots block each other forever. Planning becomes a team sport, not a solo one.</p>
+
+          <h3>Safety layers</h3>
+          <p>Safety is designed in layers. A software layer keeps a safe distance. A separate, simpler layer can stop the robot if the software misbehaves. Physical bumpers and e-stops are the last line. Each layer assumes the one above it may fail.</p>
+
+          <h3>Uncertainty and probabilistic methods</h3>
+          <p>Real sensors are noisy, so professionals track <strong>uncertainty</strong>: they keep not just one estimated position, but a cloud of possible positions and their likelihoods. Methods such as particle filters and probabilistic planners use this cloud to act sensibly even when the robot is unsure. This is why a good robot slows down in a crowd: its uncertainty has grown.</p>
+
+          <h3>Test tracks and simulation</h3>
+          <p>Before a robot drives in public, it drives thousands of kilometres in simulation and on a test track. Engineers inject fake people, fake failures and tricky corners, then watch what breaks. Testing beats hoping, every time.</p>
+
+          <h2>Try it yourself</h2>
+
+          <p>These exercises need only paper, a pencil and clear thinking. Do them in order and you will feel the ideas click.</p>
+
+          <ol>
+            <li><strong>Draw a grid map.</strong> On squared paper, make a 10 &times; 10 grid. Mark a wall of five cells, a start and a goal. Colour free cells light and blocked cells dark. Hint: keep the wall simple at first.</li>
+            <li><strong>Plan a path by hand with costs.</strong> On your grid, write 1 in open cells and 5 in a rough-ground patch. Find the cheapest route from start to goal by adding cell costs, not just counting steps. Hint: a longer path through cheap cells can win.</li>
+            <li><strong>Run A* on paper.</strong> Pick one small grid. In each free cell write g (steps from start), h (straight-line steps to goal), and f = g + h. Expand cells in order of smallest f. Hint: mark cells you have expanded so you do not repeat them.</li>
+            <li><strong>Design a local dodge.</strong> Take your chosen path. Now place a new obstacle in the middle. Without a full replan, sketch how the robot could detour and rejoin the path. Hint: a small S-shaped swerve is often enough.</li>
+            <li><strong>Choose a resolution.</strong> Your robot is 35 cm wide and the room is 12 m &times; 8 m. Pick a cell size, then calculate the number of cells. Justify your choice in one sentence. Hint: use the formula cells = (length &divide; size) &times; (width &divide; size).</li>
+          </ol>
+
+          <h2>Going deeper (optional)</h2>
+
+          <p>If you enjoyed this, here is one advanced idea to explore. Real planners rarely search a grid cell by cell. Instead, they build a <strong>graph of safe passages</strong>, often called a roadmap, where each node is a place the robot can safely stop and each edge is a safe route between them. Planning then runs over this much smaller graph, which is far faster. Some systems even shrink the robot to a point and grow the obstacles by the robot's width, so a single path works for any robot size. Learning these tricks will make your navigation faster and more elegant as your projects grow.</p>
+
+          <section class="takeaways">
+            <h2><i class="bi bi-pin-angle-fill"></i> Key takeaways</h2>
+            <ul>
+              <li><i class="bi bi-check2-circle"></i> Navigation answers three questions: where am I, what is around me, and which way next.</li>
+              <li><i class="bi bi-check2-circle"></i> A grid map marks each cell free or occupied; cell size is called resolution.</li>
+              <li><i class="bi bi-check2-circle"></i> Finer grids see more but cost much more memory and time.</li>
+              <li><i class="bi bi-check2-circle"></i> Odometry drifts; landmarks and sensor fusion correct it.</li>
+              <li><i class="bi bi-check2-circle"></i> SLAM builds the map and finds the robot in it at the same time.</li>
+              <li><i class="bi bi-check2-circle"></i> Global planning chooses the whole route; local planning handles the next few metres.</li>
+            </ul>
+          </section>
+
+          <section class="quiz">
+            <div class="quiz__head"><i class="bi bi-patch-question-fill"></i> Check your understanding</div>
+            <details>
+              <summary><span class="q-num">Q1.</span><span>What are the three parts of the navigation problem?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Localisation (know where you are), having a map (know what is around you), and planning (decide where to go next).</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q2.</span><span>What is an occupancy grid, in your own words?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> A map made of small square cells. Each cell holds a value saying how likely it is to be blocked by a wall or object.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q3.</span><span>Why does odometry drift, and why does it matter?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Wheels slip and small errors pile up with distance, so the position estimate slowly becomes wrong. If the robot trusts it alone, it will get lost.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q4.</span><span>What does SLAM do, and why is it clever?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> It builds the map and tracks the robot's position at the same time, each helping the other. It solves the chicken-and-egg problem of needing a map to localise.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q5.</span><span>You halve the cell size of a square grid map. How does the number of cells change?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> It quadruples. Both width and height double, so the count is multiplied by 2 &times; 2 = 4.</div>
+            </details>
+          </section>
+
+        </article>
+
+        <nav class="pager" id="pager" aria-label="Chapter navigation"></nav>
+      </div>
+    </main>
+  </div>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/book.js"></script>
+</body>
+</html>

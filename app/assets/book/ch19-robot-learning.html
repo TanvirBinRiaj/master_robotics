@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>try{var __t=null;try{__t=localStorage.getItem("mr-theme")}catch(e){}if(__t!=="dark"&&__t!=="light"){try{var __m=document.cookie.match(/(?:^|;\s*)mr-theme=(dark|light)/);__t=__m?__m[1]:null}catch(e){__t=null}}if(__t!=="dark"&&__t!=="light"){try{var __w=String(window.name||"").match(/mr-theme=(dark|light)/);__t=__w?__w[1]:null}catch(e){}}if(__t!=="dark"&&__t!=="light"&&window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches){__t="dark"}if(__t==="dark"||__t==="light")document.documentElement.setAttribute("data-theme",__t)}catch(e){}</script>
+  <title>Chapter 19: Introduction to Robot Learning and AI — Master Robotics</title>
+  <meta name="description" content="A plain-English guide to how robots learn. Understand machine learning, training versus running a model, the main learning types, and when AI is or is not the right tool.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="vendor/bootstrap-icons/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/prose.css">
+  <link rel="stylesheet" href="assets/css/mobile.css">
+</head>
+<body data-file="ch19-robot-learning.html">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="topbar" id="topbar"></header>
+  <div class="progress-bar" id="progressBar"></div>
+
+  <div class="layout">
+    <div class="sidebar__backdrop" id="navBackdrop"></div>
+    <nav class="sidebar" id="sidebar" aria-label="Book contents"></nav>
+
+    <main class="main" id="main">
+      <div class="container">
+
+        <header class="chapter-head">
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="index.html">Home</a>
+            <i class="bi bi-chevron-right"></i>
+            <a href="index.html#intelligence">Part 5 &middot; Robot Intelligence</a>
+            <i class="bi bi-chevron-right"></i>
+            <span>Chapter 19</span>
+          </nav>
+          <span class="chapter-kicker"><i class="bi bi-diagram-3"></i> Part 5 &middot; Robot Intelligence</span>
+          <h1>Introduction to Robot Learning and AI</h1>
+          <p class="lede">Robots can do more than follow rules written by hand. They can learn from examples. By the end of this chapter, you will explain machine learning in simple words and know exactly when AI is worth the trouble.</p>
+          <div class="chapter-meta">
+            <span><i class="bi bi-clock"></i> ~24 min read</span>
+            <span><i class="bi bi-bar-chart"></i> Intermediate</span>
+            <span><i class="bi bi-list-check"></i> Chapter 19 of 30</span>
+          </div>
+          <div class="goals">
+            <h2>What you will learn</h2>
+            <ul>
+              <li><i class="bi bi-check-circle-fill"></i> Explain machine learning in plain words.</li>
+              <li><i class="bi bi-check-circle-fill"></i> Tell training from running a model.</li>
+              <li><i class="bi bi-check-circle-fill"></i> Know when AI is and is not the right tool.</li>
+            </ul>
+          </div>
+        </header>
+
+        <article class="article">
+
+          <p class="lead">Up to now, every robot in this book followed rules a person wrote by hand. "If the wall is close, turn." Those rules are powerful. But some jobs have no simple rule. How do you write a rule that says "this is a cat"? You cannot. So engineers use a different idea: let the machine learn from examples. That idea is called machine learning, and it sits at the heart of modern AI.</p>
+
+          <p>Imagine a small robot arm that must pick up a red cup. You could try to write rules about colour and shape. But cups come in different sizes. The light changes. The cup may be placed at any angle. Hundreds of rules, and still the robot fails. Now imagine you show the robot a thousand pictures of cups and a thousand pictures of "not a cup" instead. The robot finds the pattern itself. That is learning.</p>
+
+          <p>In this chapter we take the mystery out of that word, "AI". We will not drown you in maths. We will build the intuition, step by step, so you can use learning as one more tool in your toolbox. And, just as important, you will learn when <em>not</em> to use it.</p>
+
+          <h2>What AI is and is not</h2>
+
+          <p>Way back in Chapter 1 you met a simple idea: a robot senses, decides and acts. AI lives inside the middle word. <strong>Artificial intelligence</strong> is software that can learn or make smart choices. It is one way a robot decides what to do.</p>
+
+          <p>That is the whole definition. Nothing about feelings. Nothing about being alive. AI is code running on a computer, just like the small loops you wrote in earlier chapters. The difference is how the code was created. Instead of a person writing every rule, the machine builds much of the behaviour from data.</p>
+
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> The key idea</div>
+            <p><strong>Artificial intelligence</strong> is software that can learn or make smart choices. It is not magic, and it is not alive. It is a tool that helps a robot decide.</p>
+          </div>
+
+          <h3>AI is not magic</h3>
+          <p>When a robot recognises your face, it feels like magic. But under the surface, a program is doing arithmetic very fast. It takes numbers from a camera, multiplies and adds them many times, and produces an answer. There is no hidden spirit. There is only maths, done quickly and on a huge scale.</p>
+
+          <h3>AI is not alive</h3>
+          <p>An AI has no wishes, no goals of its own and no fear. It does exactly what its program and its data allow. If you ask a robot arm with AI to pick up a cup, it will not suddenly decide to pick up something else out of curiosity. It has no curiosity. It has a job.</p>
+
+          <h3>AI is not the robot</h3>
+          <p>This point from Chapter 1 is worth repeating. AI is only the thinking part. A robot also needs a body: sensors to see the world and actuators to move. AI without a body is just a program on a screen. A body without AI is a machine. A robot that learns is both together.</p>
+
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> In simple words</div>
+            <p>AI = software that learns or makes smart choices. It is not alive. It is not magic. It is one way for a robot to decide what to do.</p>
+          </div>
+
+          <p>Keep those three statements in your pocket. Whenever someone says "the AI wants to..." or "the AI is afraid...", you now know better. The machine has no wants. It has inputs, a model and outputs.</p>
+
+          <h2>Rules versus learning: two ways to decide</h2>
+
+          <p>There are two broad ways to make a robot decide. The first is to write rules by hand. The second is to let it learn from examples. They are not rivals. They are tools for different jobs, and good engineers mix them.</p>
+
+          <h3>The rule-based way</h3>
+          <p>A <strong>rule</strong> is an instruction a person writes with a clear condition. You met one in Chapter 1: "if distance is less than 30 cm, turn left." The rule is exact. You can read it, test it and change it. It needs no data and no training. It just runs.</p>
+
+          <p>Example: a line-following robot. "If the left sensor sees black, turn right." That single rule can drive a robot around a track. Simple, fast and free.</p>
+
+          <h3>The learning way</h3>
+          <p><strong>Machine learning</strong> is a different approach. Instead of writing the rule, you show the machine many examples and let it find the pattern. You do not tell it "look at the red channel". It works that out from the examples. The result is a <strong>model</strong>: a piece of software that has learned the pattern.</p>
+
+          <p>Example: a robot that sorts fruit. You cannot write a rule for "ripe". But if you show the model thousands of photos labelled "ripe" and "not ripe", it learns what ripeness looks like.</p>
+
+          <figure class="figure">
+            <div class="figure__box">
+              <svg viewBox="0 0 660 300" width="100%" role="img" aria-label="Two paths to make a robot decide: hand-written rules on the left, learning from examples on the right">
+                <text x="165" y="30" text-anchor="middle" font-family="Inter, sans-serif" font-size="15" font-weight="700" fill="#2d5bff">Rules by hand</text>
+                <text x="495" y="30" text-anchor="middle" font-family="Inter, sans-serif" font-size="15" font-weight="700" fill="#0f9d78">Learning from examples</text>
+
+                <rect x="30" y="52" width="120" height="52" rx="10" fill="#e8eeff" stroke="#2d5bff" stroke-width="2"></rect>
+                <text x="90" y="76" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#1c2230">A person</text>
+                <text x="90" y="92" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#4a5266">writes rules</text>
+
+                <rect x="180" y="52" width="150" height="52" rx="10" fill="#e8eeff" stroke="#2d5bff" stroke-width="2"></rect>
+                <text x="255" y="76" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#1c2230">if dist &lt; 30,</text>
+                <text x="255" y="92" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#4a5266">turn left</text>
+
+                <line x1="150" y1="78" x2="180" y2="78" stroke="#7b849b" stroke-width="2" marker-end="url(#ar2)"></line>
+
+                <rect x="120" y="128" width="180" height="44" rx="10" fill="#eef1f6" stroke="#7b849b" stroke-width="2"></rect>
+                <text x="210" y="155" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#1c2230">The robot runs the rule</text>
+                <line x1="255" y1="104" x2="210" y2="128" stroke="#7b849b" stroke-width="2" marker-end="url(#ar2)"></line>
+
+                <text x="165" y="200" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#7b849b">Fast to build, easy to read</text>
+                <text x="165" y="218" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#7b849b">Fails when no clear rule exists</text>
+
+                <rect x="380" y="52" width="120" height="52" rx="10" fill="#e2f6ef" stroke="#0f9d78" stroke-width="2"></rect>
+                <text x="440" y="76" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#1c2230">Many</text>
+                <text x="440" y="92" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#4a5266">examples</text>
+
+                <rect x="530" y="52" width="120" height="52" rx="10" fill="#e2f6ef" stroke="#0f9d78" stroke-width="2"></rect>
+                <text x="590" y="80" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#1c2230">A model</text>
+
+                <line x1="500" y1="78" x2="530" y2="78" stroke="#7b849b" stroke-width="2" marker-end="url(#ar2)"></line>
+
+                <rect x="470" y="128" width="180" height="44" rx="10" fill="#eef1f6" stroke="#7b849b" stroke-width="2"></rect>
+                <text x="560" y="155" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#1c2230">The robot uses the model</text>
+                <line x1="590" y1="104" x2="560" y2="128" stroke="#7b849b" stroke-width="2" marker-end="url(#ar2)"></line>
+
+                <text x="495" y="200" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#7b849b">Needs data and training</text>
+                <text x="495" y="218" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#7b849b">Handles messy, unclear patterns</text>
+
+                <defs>
+                  <marker id="ar2" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+                    <path d="M0,0 L9,4.5 L0,9 z" fill="#7b849b"></path>
+                  </marker>
+                </defs>
+              </svg>
+            </div>
+            <figcaption>Figure 19.1 — Two ways to make a robot decide. On the left, a person writes the rule. On the right, the machine finds the pattern from examples.</figcaption>
+          </figure>
+
+          <h3>When each one is better</h3>
+          <p>Use rules when the job is clear and a sensor can measure it. Distance, light, colour, temperature, button presses, time — if a number describes the situation, a rule works beautifully. Use learning when the job involves patterns that are hard to describe: faces, voices, "is this object a cup", "is this fruit ripe".</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Question</th><th>Rules by hand</th><th>Learning from data</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Can you state the exact condition?</td><td>Yes — easy</td><td>Not needed</td></tr>
+                <tr><td>How much data do you need?</td><td>None</td><td>Often hundreds or thousands of examples</td></tr>
+                <tr><td>How fast to build a first version?</td><td>Minutes</td><td>Days or weeks</td></tr>
+                <tr><td>Behaviour when something new happens</td><td>Predictable</td><td>Can be surprising</td></tr>
+                <tr><td>Best for</td><td>Distances, limits, simple logic</td><td>Vision, speech, hard-to-describe patterns</td></tr>
+                <tr><td>Cost to run</td><td>Very low</td><td>Often higher (more compute)</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 19.1 — A simple comparison. Often the best design uses both: rules for the easy parts, learning for the hard parts.</p>
+
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> Tip</div>
+            <p>Always try the rule first. It is faster, cheaper and easier to trust. Move to learning only when the simple rule truly fails. You will also be able to prove that the extra effort was worth it.</p>
+          </div>
+
+          <h2>Machine learning in plain words</h2>
+
+          <p>Here is the clearest analogy in all of AI. Think of teaching a small child to recognise a cat.</p>
+
+          <p>You do not sit the child down and say, "A cat is a small furry mammal with retractable claws and a flexible spine." The child would learn nothing. Instead, you point at cats and say "cat". You point at dogs and say "not cat". After many cats and many not-cats, the child just knows. Something in their brain found the pattern.</p>
+
+          <p>Machine learning works the same way. You do not write the rule. You give many examples with the right answer attached. The machine adjusts itself until it gets the examples right. Then it can handle new examples it has never seen.</p>
+
+          <h3>Data, examples and labels</h3>
+          <p><strong>Data</strong> is just information in a form the computer can use. A photo is data. A sensor reading is data. A sound clip is data.</p>
+          <p>An <strong>example</strong> is one item in that data. One photo of one cat is one example.</p>
+          <p>A <strong>label</strong> is the correct answer attached to an example. "This photo: cat." "That photo: dog." A labelled example is like a flashcard with the answer written on the back.</p>
+
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> In simple words</div>
+            <p>Data = information. Example = one item of that information. Label = the correct answer for that item. Learning = finding the pattern that links them.</p>
+          </div>
+
+          <p>That is it. When people say "we trained a model", they mean "we showed the machine many labelled examples until it learned the pattern." No magic, no mystery — just examples and adjustment, repeated again and again.</p>
+
+          <h2>Training versus inference: the central idea</h2>
+
+          <p>This next idea is the most important in the chapter. If you remember only one thing, remember this. A learned model has two completely different lives: <strong>training</strong> and <strong>inference</strong>.</p>
+
+          <h3>Training: the long learning stage</h3>
+          <p><strong>Training</strong> is when the model learns. You feed it thousands of examples and it slowly adjusts itself to reduce its mistakes. Training is slow. It can take minutes, hours or even days. It is heavy work and it usually happens on a big computer, not on the robot. This is fine, because training happens once, before the robot ever does its job. Training can be done offline — disconnected, in a lab, overnight.</p>
+
+          <h3>Inference: using the trained model</h3>
+          <p><strong>Inference</strong> is when the trained model is used to make a real decision. A camera shows a new photo. The model says "cup" or "not cup". Inference must be fast, because the robot needs the answer right now to move. Inference happens on the robot, in the middle of the sense-decide-act loop you learned in Chapter 1.</p>
+
+          <div class="callout note">
+            <div class="callout__head"><i class="bi bi-info-circle-fill"></i> Note</div>
+            <p>Training is slow and rare. Inference is fast and constant. A robot spends all its working life doing inference. It trains for a small fraction of that time, often on a different, more powerful machine.</p>
+          </div>
+
+          <figure class="figure">
+            <div class="figure__box">
+              <svg viewBox="0 0 720 300" width="100%" role="img" aria-label="Training pipeline on the big computer feeding a trained model into the robot for fast inference">
+                <text x="60" y="30" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#2d5bff">Training (slow, offline)</text>
+                <rect x="30" y="48" width="110" height="52" rx="10" fill="#e8eeff" stroke="#2d5bff" stroke-width="2"></rect>
+                <text x="85" y="72" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#1c2230">Examples</text>
+                <text x="85" y="88" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#4a5266">+ labels</text>
+
+                <rect x="170" y="48" width="120" height="52" rx="10" fill="#e8eeff" stroke="#2d5bff" stroke-width="2"></rect>
+                <text x="230" y="79" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#1c2230">Training program</text>
+
+                <rect x="320" y="48" width="120" height="52" rx="10" fill="#e8eeff" stroke="#2d5bff" stroke-width="2"></rect>
+                <text x="380" y="72" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#1c2230">Big computer</text>
+                <text x="380" y="88" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#4a5266">hours of work</text>
+
+                <line x1="140" y1="74" x2="170" y2="74" stroke="#7b849b" stroke-width="2" marker-end="url(#ar3)"></line>
+                <line x1="290" y1="74" x2="320" y2="74" stroke="#7b849b" stroke-width="2" marker-end="url(#ar3)"></line>
+
+                <rect x="470" y="40" width="150" height="68" rx="12" fill="#f0e9fd" stroke="#7a4ddb" stroke-width="2"></rect>
+                <text x="545" y="70" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#7a4ddb">Trained model</text>
+                <text x="545" y="90" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#4a5266">the learned file</text>
+                <line x1="440" y1="74" x2="470" y2="74" stroke="#7b849b" stroke-width="2" marker-end="url(#ar3)"></line>
+                <text x="455" y="30" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#7b849b">copy once</text>
+
+                <line x1="545" y1="108" x2="545" y2="170" stroke="#7a4ddb" stroke-width="2" stroke-dasharray="6 6" marker-end="url(#ar3)"></line>
+
+                <text x="120" y="205" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#0f9d78">Inference (fast, on the robot)</text>
+                <rect x="30" y="222" width="110" height="52" rx="10" fill="#e2f6ef" stroke="#0f9d78" stroke-width="2"></rect>
+                <text x="85" y="246" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#1c2230">Camera /</text>
+                <text x="85" y="262" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#4a5266">sensor</text>
+
+                <rect x="170" y="222" width="120" height="52" rx="10" fill="#e2f6ef" stroke="#0f9d78" stroke-width="2"></rect>
+                <text x="230" y="253" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#1c2230">Model on robot</text>
+
+                <rect x="320" y="222" width="120" height="52" rx="10" fill="#e2f6ef" stroke="#0f9d78" stroke-width="2"></rect>
+                <text x="380" y="246" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#1c2230">Answer in</text>
+                <text x="380" y="262" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#4a5266">milliseconds</text>
+
+                <line x1="140" y1="248" x2="170" y2="248" stroke="#7b849b" stroke-width="2" marker-end="url(#ar3)"></line>
+                <line x1="290" y1="248" x2="320" y2="248" stroke="#7b849b" stroke-width="2" marker-end="url(#ar3)"></line>
+
+                <defs>
+                  <marker id="ar3" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+                    <path d="M0,0 L9,4.5 L0,9 z" fill="#7b849b"></path>
+                  </marker>
+                </defs>
+              </svg>
+            </div>
+            <figcaption>Figure 19.2 — The model is trained once, slowly, and then copied to the robot. On the robot it only runs inference: fast decisions in the real-time loop.</figcaption>
+          </figure>
+
+          <h3>Why the split matters</h3>
+          <p>If you mix up the two, you will design the wrong system. Training wants a powerful computer and a lot of time. Inference wants small size, low power and low delay. The robot must carry the trained model, not the training program. This is why the work you do on your laptop is training, but the tiny file you copy onto the robot is the trained model.</p>
+
+          <p>Here is the flow in plain steps:</p>
+          <ol>
+            <li><strong>Collect.</strong> Gather many examples and label them.</li>
+            <li><strong>Train.</strong> Run the training program on a big computer until the model is good.</li>
+            <li><strong>Test.</strong> Check the model on examples it has never seen.</li>
+            <li><strong>Export.</strong> Save the trained model as a small file.</li>
+            <li><strong>Deploy.</strong> Copy the file to the robot's controller.</li>
+            <li><strong>Run.</strong> The robot uses it for inference, over and over, in the loop.</li>
+          </ol>
+
+          <h2>The three main flavours of learning</h2>
+
+          <p>Not all learning is the same. Engineers group it into three big families. The names sound heavy, but the ideas are simple. Learn the picture first, then the name.</p>
+
+          <h3>1. Supervised learning — learning with answers</h3>
+          <p><strong>Supervised learning</strong> means learning from labelled examples. Every example comes with the correct answer. You show a photo and say "cup". The model guesses, compares with the label, and adjusts. This is the most common kind of learning in robotics.</p>
+          <p>Robot example: teaching a robot vacuum to spot a sock on the floor. You show it photos labelled "sock" and "not sock". After training, it warns you to pick the sock up before it tries to clean.</p>
+
+          <h3>2. Unsupervised learning — finding hidden groups</h3>
+          <p><strong>Unsupervised learning</strong> means learning from data with no labels. There is no correct answer given. The model looks for patterns, groups or oddities on its own. It is like sorting a pile of buttons without being told the categories.</p>
+          <p>Robot example: a warehouse robot records how heavy its loads are and how long each trip takes. With no labels, it notices that trips group into "light and quick" and "heavy and slow". It can then plan its day better.</p>
+
+          <h3>3. Reinforcement learning — learning by trying</h3>
+          <p><strong>Reinforcement learning</strong>, or RL, means learning by doing. The robot tries actions, and a <strong>reward</strong> tells it how well it did. Good actions bring reward; bad actions bring little or none. Over many tries, the robot learns a <strong>policy</strong>: a rule of thumb that says "in this situation, do that".</p>
+          <p>Robot example: a four-legged robot learns to walk. At first it falls constantly. Each time it moves forward without falling, it earns reward. Slowly it learns a policy that keeps it upright. No person wrote the walking rule. The robot found it by trying.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Flavour</th><th>What you give it</th><th>How it learns</th><th>Robot example</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Supervised</td><td>Examples with correct answers</td><td>Copy the pattern from the answers</td><td>Spot a sock on the floor</td></tr>
+                <tr><td>Unsupervised</td><td>Examples with no answers</td><td>Find groups and oddities</td><td>Group trips by weight</td></tr>
+                <tr><td>Reinforcement</td><td>A reward signal</td><td>Trial and error</td><td>Learn to walk on four legs</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 19.2 — The three flavours. Most robot vision uses supervised learning. Walking and control often use reinforcement learning.</p>
+
+          <h2>A neural network in plain words</h2>
+
+          <p>You will hear the words <strong>neural network</strong> a lot. Do not be afraid of them. A neural network is not a brain. It is a maths machine built from many tiny units.</p>
+
+          <p>Picture a big wall of light dimmer knobs. Each knob controls how strongly one small signal passes to the next. Now imagine thousands of these knobs connected in layers. A signal enters on the left. It passes through the knobs. An answer comes out on the right. The signal is numbers — the brightness of pixels, or sensor readings.</p>
+
+          <p>Each tiny unit does one very small job. It takes some numbers in, multiplies each by a weight, adds them up, and passes the total on. Nothing more. One unit is nearly useless. Thousands of units, connected in layers, can represent very complicated patterns.</p>
+
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> The key idea</div>
+            <p>Training a neural network is like turning thousands of tiny knobs to reduce mistakes. Each knob is a <strong>weight</strong>: how strongly one unit listens to another. The training program nudges the knobs again and again until the answers come out right.</p>
+          </div>
+
+          <p>That is the whole intuition. There is a famous method called <em>backpropagation</em> that does the nudging mathematically, but you do not need its details today. Just hold the picture: many small units, many knobs, turn them to reduce error. That is a neural network learning.</p>
+
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> In simple words</div>
+            <p>A neural network = many simple units connected, each doing a tiny sum. Training = turning thousands of tiny knobs (weights) until the mistakes get small.</p>
+          </div>
+
+          <h2>What makes a good dataset</h2>
+
+          <p>The model is only as good as the examples you feed it. Feed it poor examples, and it learns poor behaviour. This is the most common reason a project fails, and it has nothing to do with clever code.</p>
+
+          <h3>Lots of examples</h3>
+          <p>A handful of photos will not do. Patterns hide in the variation, and you need enough examples to see it. As a rough starting point, aim for hundreds of examples per class, and more if the problem is fine-grained.</p>
+
+          <h3>Varied conditions</h3>
+          <p>Your robot will work in the real world, where light changes, angles change and backgrounds change. If every training photo was taken in bright light on a clean white table, the model will fail in a dim room on a busy floor. Show it many conditions so it can generalise.</p>
+
+          <h3>Correct labels</h3>
+          <p>A wrong label teaches the wrong thing. If you accidentally label a dog as a cat, you are actively confusing the model. Careful labelling is slow, boring and absolutely essential.</p>
+
+          <h3>A separate test set</h3>
+          <p>Never judge the model on the same examples it learned from. Keep a slice of your examples hidden — the <strong>test set</strong>. Test only on those. This is the only honest way to know how it will behave on new data.</p>
+
+          <div class="callout warn">
+            <div class="callout__head"><i class="bi bi-exclamation-triangle-fill"></i> Watch out</div>
+            <p>Testing on your training data is like checking your answers against the answer sheet you already studied. Of course you score high. It tells you nothing about the real exam — or the real robot.</p>
+          </div>
+
+          <h3>Overfitting: memorising instead of learning</h3>
+          <p><strong>Overfitting</strong> is when the model memorises the training examples instead of learning the general idea. Picture a student who memorises the exact questions from last year's exam. They score 100% on that paper. Then a new paper appears with different wording, and they fail badly.</p>
+          <p>An overfitted model is that student. It looks perfect in training but collapses on new examples. The cure is more varied data, a simpler model, and always watching performance on the separate test set.</p>
+
+          <div class="formula"><span class="label">Accuracy</span> accuracy = correct guesses &divide; total guesses &times; 100%</div>
+
+          <p>Suppose your model correctly classifies 180 out of 200 test images. Accuracy is 180 &divide; 200 = 0.90, which is 90%. A quick way to check your data need: if you want at least 100 test images per class for a two-class problem, you need about 100 &times; 2 = 200 test images, plus a much larger training set. Real projects often plan for several hundred images per class.</p>
+
+          <h2>Where robots use learning</h2>
+
+          <p>Learning is not a toy idea. It is already inside real robots doing real jobs. Here are the common places you will meet it, with the chapters where this book covers them in more depth.</p>
+
+          <h3>Object recognition</h3>
+          <p>Telling one thing from another in a camera image is the classic use. "Is that a person, a box or a chair?" Vision has no clean rule, so learning wins. You met the sensor side of this in Chapter 17.</p>
+
+          <h3>Grasp selection</h3>
+          <p>A robot arm must decide where to grip a cup, a tool or a soft fruit. The best grip point changes with the shape and the angle. A learned model can look at the object and suggest a good grip. This connects to Chapter 21.</p>
+
+          <h3>Learning to walk</h3>
+          <p>A legged robot has many joints and no simple formula for staying upright. Reinforcement learning lets it practise in a simulator until it finds a policy that walks. This is one of the great successes of robot learning.</p>
+
+          <h3>Tuning control</h3>
+          <p>Even when a rule-based controller exists, its settings may need tuning. Learning can adjust those numbers to make a drone hover more smoothly or a motor track a path more precisely.</p>
+
+          <h3>Predicting human motion</h3>
+          <p>A robot working near people must guess where a person will step next. Learned models watch past motion and predict the near future, giving the robot time to move aside safely.</p>
+
+          <div class="callout note">
+            <div class="callout__head"><i class="bi bi-info-circle-fill"></i> Note</div>
+            <p>Reinforcement learning works best in simulation. In the real world, trial and error is slow — a robot may need thousands of attempts — and a bad attempt can damage the hardware or hurt someone. In a simulator, a failed attempt costs nothing and can be repeated instantly.</p>
+          </div>
+
+          <h2>The simulation-to-reality gap</h2>
+
+          <p>Here is a hard truth about robots that learn. A policy trained in a simulator often fails on the real robot. This problem is called the <strong>sim-to-real gap</strong>.</p>
+
+          <p>The reason is simple. A simulator is a model of the world, and every model is imperfect. The simulator may ignore a tiny motor delay. It may not model the friction of a worn tyre. It may miss the way a camera blurs when the robot moves. The policy learns to exploit the simulator's shortcuts. On the real robot, those shortcuts vanish and the behaviour breaks.</p>
+
+          <p>Engineers fight this gap in three ways. First, they make the simulator as realistic as they can. Second, they add variation during training — random delays, random friction, random noise — so the policy learns to cope with surprises. Third, they always test on the real robot and expect to adjust. Two more terms you will hear: <strong>domain randomisation</strong> (training with lots of random variation) and <strong>fine-tuning</strong> (a short training pass on the real machine to close the last gap).</p>
+
+          <div class="callout warn">
+            <div class="callout__head"><i class="bi bi-exclamation-triangle-fill"></i> Watch out</div>
+            <p>Never trust a simulator result alone. A robot that walks perfectly in simulation may take one step and fall in your room. Treat simulation as practice, not proof.</p>
+          </div>
+
+          <h2>Edge versus cloud</h2>
+
+          <p>Where should the model run? Your robot can run the model on board, called the <strong>edge</strong>, or it can send data to a remote computer, called the <strong>cloud</strong>, and wait for an answer. Each has honest trade-offs.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Factor</th><th>Edge (on the robot)</th><th>Cloud (remote computer)</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Speed of answer</td><td>Very fast, no network delay</td><td>Slower, adds network delay</td></tr>
+                <tr><td>Works without internet?</td><td>Yes</td><td>No</td></tr>
+                <tr><td>Computing power</td><td>Limited by the small board</td><td>Very large</td></tr>
+                <tr><td>Privacy</td><td>Data stays on the robot</td><td>Data leaves the robot</td></tr>
+                <tr><td>Power and heat</td><td>Must fit battery and cooling limits</td><td>Someone else's problem</td></tr>
+                <tr><td>Best for</td><td>Reactive, safety-critical decisions</td><td>Heavy analysis, updating models</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 19.3 — Edge and cloud. Many real robots use both: fast decisions at the edge, heavy work in the cloud.</p>
+
+          <p><strong>Latency</strong> is the time between asking a question and getting the answer. For robots, latency is critical. If a robot is walking toward a person, an answer that arrives half a second late is an answer that arrives too late. This is why the safety-critical parts of the robot's brain almost always run at the edge, close to the sensors and motors.</p>
+
+          <h2>A worked example: recognise two coloured objects</h2>
+
+          <p>Let us build a small, complete learning project from start to finish. This is exactly the kind of task a beginner can do with a camera robot. The honest twist comes at the end, so read every step.</p>
+
+          <p><strong>The task:</strong> "My robot must tell a red ball from a blue ball and push the red one."</p>
+
+          <ol>
+            <li><strong>Start with the simple rule.</strong> Before any learning, try colour thresholding from Chapter 17. The camera gives each pixel a colour. A rule like "if the red value is much higher than the blue value, it is red" may solve the whole task in five lines. Test it. If it works, stop here — you are done, and you saved weeks.</li>
+            <li><strong>Find where the rule fails.</strong> Suppose the rule breaks when the room light is warm, or when a shadow falls on the ball. The red and blue values shift, and the rule misfires. Now you have a real reason to use learning.</li>
+            <li><strong>Collect images.</strong> Point the camera at the balls in many conditions: bright, dim, different angles, different backgrounds. Save the images. Aim for several hundred at least.</li>
+            <li><strong>Label them.</strong> Mark each image "red" or "blue". This is slow work. Take your time and be accurate — wrong labels poison the model.</li>
+            <li><strong>Split the data.</strong> Hold back about 20% of the images as a test set. The model never trains on these.</li>
+            <li><strong>Train a simple classifier.</strong> On your laptop, train a small model that takes an image and outputs "red" or "blue". A tiny neural network is enough for two colours.</li>
+            <li><strong>Test honestly.</strong> Check accuracy on the hidden test set. Suppose you get 95%. That is a real result because the model has never seen those images.</li>
+            <li><strong>Deploy to the robot.</strong> Export the trained model as a small file and copy it to the robot's controller. The robot now runs inference on each camera frame in the loop.</li>
+            <li><strong>Retest on the robot.</strong> Walk the robot around the room. Watch for the sim-to-real style gap: new light, new angle, new background. If accuracy drops, collect more images from the failing situations and retrain.</li>
+          </ol>
+
+          <p>Look at the reasoning between steps. Step 1 tries the cheap tool first. Step 2 finds the specific failure that justifies learning. Step 8 keeps the model small so the robot can run it fast. Step 9 closes the loop between the lab and the real world. This is how a professional would approach it, and you just did it on paper.</p>
+
+          <div class="code">
+            <div class="code__bar">
+              <span class="code__dots"><span></span><span></span><span></span></span>
+              <span class="code__lang">Pseudo-code</span>
+              <button class="code__copy" type="button"><i class="bi bi-clipboard"></i> Copy</button>
+            </div>
+            <pre><code># Step 1: try the simple rule first (no learning)
+for pixel in camera_image:
+    if pixel.red &gt; pixel.blue * 1.3:
+        label = "red"
+    else:
+        label = "blue"
+
+# Step 8: if the rule fails, use the trained model instead
+def decide(frame):
+    guess = model.predict(frame)   # "red" or "blue"
+    if guess == "red":
+        push_forward()
+    else:
+        stop()
+    return guess                  # runs every frame, fast</code></pre>
+          </div>
+
+          <h2>When NOT to use AI</h2>
+
+          <p>This section may save you more time than any other. AI is a powerful tool, but it is not free. It adds complexity, data needs, computing cost and unpredictability. Sometimes a sensor and a rule are simply better.</p>
+
+          <p>Use a simpler solution when:</p>
+          <ul>
+            <li>A sensor can measure the thing directly. Distance, light, temperature and colour are all numbers a rule can use.</li>
+            <li>The condition is exact and stable. "Stop within 10 cm" is a rule, not a learning problem.</li>
+            <li>You need to explain and prove every decision for safety.</li>
+            <li>You have little data and no way to collect much.</li>
+            <li>The robot's computer is small and cannot run a heavy model.</li>
+            <li>You need guaranteed, repeatable behaviour every single time.</li>
+          </ul>
+
+          <p>Here is a short decision checklist. Walk through it in order.</p>
+          <ol>
+            <li><strong>Can a sensor measure it directly?</strong> If yes, use a rule. Done.</li>
+            <li><strong>Is the pattern hard to describe in words?</strong> If yes, learning may help.</li>
+            <li><strong>Can I get lots of good, varied, labelled examples?</strong> If no, learning will disappoint you.</li>
+            <li><strong>Can the robot's computer run the model fast enough?</strong> If no, shrink the model or go back to rules.</li>
+            <li><strong>Do I have a safe fallback if the model is wrong?</strong> If no, add safety limits before deploying.</li>
+            <li><strong>Only then</strong> choose learning, and keep the simple rule as a backup.</li>
+          </ol>
+
+          <div class="callout danger">
+            <div class="callout__head"><i class="bi bi-shield-exclamation"></i> Danger</div>
+            <p>Never let a learned model control a fast or powerful robot without a safety layer. A learned policy can be confident and wrong at the same time. Add hard limits that stop the robot regardless of what the model says.</p>
+          </div>
+
+          <h2>Common mistakes beginners make</h2>
+
+          <p>Almost every first learning project hits the same walls. Knowing them in advance turns a frustrating week into a short afternoon.</p>
+
+          <ul>
+            <li><strong>Too little data.</strong> A hundred images feels like a lot until the light changes. More varied examples beat a cleverer model almost every time.</li>
+            <li><strong>Testing on training data.</strong> The model looks perfect and then fails on the robot. Always keep a separate test set and trust only that score.</li>
+            <li><strong>Ignoring latency.</strong> A model that is accurate but slow is useless on a moving robot. Measure how long one inference takes, in milliseconds, and compare with your loop speed.</li>
+            <li><strong>Using AI where a sensor would do.</strong> Learning to detect a wall, when a distance sensor costs a few dollars and never fails, is wasted effort.</li>
+            <li><strong>No safety limits on a learning robot.</strong> The model can output something foolish. Wrap it with hard caps on speed, force and reach.</li>
+            <li><strong>Wrong labels.</strong> Quietly the worst mistake of all. It teaches the model the opposite of the truth, and the error is easy to miss.</li>
+          </ul>
+
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> Tip</div>
+            <p>Before you train anything, ask: "What is the dumbest rule that could work?" Build it. Measure it. Learning only earns its place if it beats that baseline by enough to matter.</p>
+          </div>
+
+          <h2>How professionals do it</h2>
+
+          <p>At industrial scale, the clever maths matters less than solid engineering around it. Professionals spend most of their time on the boring parts, because that is where projects live or die.</p>
+
+          <h3>Data pipelines</h3>
+          <p>A <strong>data pipeline</strong> is an organised way to collect, clean, label and store examples. It runs the same way every time so results can be repeated. The pipeline, not the model, is often the real product.</p>
+
+          <h3>Evaluation metrics</h3>
+          <p>Professionals do not ask "does it work?" They ask "how often, and how bad when it fails?" They track accuracy on a held-out test set, plus what happens in the worst cases. A model that is 99% right but dangerous on the last 1% is not ready.</p>
+
+          <h3>Safety shields</h3>
+          <p>A <strong>safety shield</strong> is a small rule-based layer between the learned policy and the motors. It does not learn. It simply refuses commands that break hard limits: too fast, too close to a person, too much force. The learned part suggests; the shield decides what is allowed.</p>
+
+          <h3>Model compression</h3>
+          <p>Embedded hardware is small. <strong>Model compression</strong> shrinks a trained model so it runs fast on a modest chip, with little loss in accuracy. Pros compress before they deploy, so inference stays quick on the robot.</p>
+
+          <h3>Reproducibility and MLOps</h3>
+          <p>Professionals record exactly which data, code and settings produced each model, so any result can be rebuilt later. This discipline is called <strong>MLOps</strong> — the operations side of machine learning. One line to remember: MLOps is the habit of tracking your data, models and results so the whole team can trust and repeat them.</p>
+
+          <h2>Try it yourself</h2>
+
+          <p>You can practise every idea in this chapter without buying a robot. These exercises go from easy to harder.</p>
+
+          <ol>
+            <li><strong>Design a tiny labelled dataset.</strong> Pick two everyday objects, such as a mug and a pen. Write a one-page plan: how many images, from which angles, in which lights, how you would label them, and how you would split training from test. Hint: aim for at least 100 per object and at least 20 for testing.</li>
+            <li><strong>Write the dumbest rule first.</strong> For the two-object task, write a hand rule using a single number, such as average brightness. Note two situations where it would fail. This teaches you what learning must beat. Hint: try a dark room.</li>
+            <li><strong>Spot training versus inference.</strong> Watch any demo of an AI system online. Write down which parts are training (slow, done once) and which are inference (fast, repeated). Hint: a robot pausing to think mid-task may be sending to the cloud.</li>
+            <li><strong>Estimate your data need.</strong> If you want 500 training images per class and a test set of 100 per class for a 3-class problem, use the accuracy formula and simple arithmetic to work out the total images. Hint: (500 + 100) &times; 3 = 1800.</li>
+            <li><strong>Add a safety shield on paper.</strong> Take the coloured-ball robot from the worked example. Write three hard rules the shield should enforce no matter what the model says. Hint: maximum speed, stop if a person is within 50 cm, stop if the model is unsure.</li>
+          </ol>
+
+          <h2>Going deeper (optional)</h2>
+
+          <p>If you enjoyed this chapter, one idea is worth a peek. There is a technique called <strong>transfer learning</strong>. Instead of training a model from nothing, you start with a model already trained on millions of general images, and you fine-tune it on your small dataset. It is like hiring an experienced cook and showing them only your family's favourite recipes, instead of teaching someone to cook from scratch. This is how most real vision robots are built today, because it works well even when your own data is limited.</p>
+
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> Where this leads</div>
+            <p>You know training versus inference and the sim-to-reality gap. The professional pipeline trains <strong>RL and diffusion policies</strong> in MuJoCo or Isaac Lab with domain randomization, then deploys via ONNX/TensorRT. See <a href="ch28-simulation-sim-to-real.html">Chapter 28</a> and <a href="ch30-advanced-manipulation-force.html">Chapter 30</a>.</p>
+          </div>
+
+          <section class="takeaways">
+            <h2><i class="bi bi-pin-angle-fill"></i> Key takeaways</h2>
+            <ul>
+              <li><i class="bi bi-check2-circle"></i> AI is software that can learn or make smart choices. It is not magic and not alive.</li>
+              <li><i class="bi bi-check2-circle"></i> Rules are written by hand; learning finds patterns from examples.</li>
+              <li><i class="bi bi-check2-circle"></i> Training is the slow learning stage. Inference is fast use in the real-time loop.</li>
+              <li><i class="bi bi-check2-circle"></i> Data is information, an example is one item, a label is its correct answer.</li>
+              <li><i class="bi bi-check2-circle"></i> The three flavours are supervised, unsupervised and reinforcement learning.</li>
+              <li><i class="bi bi-check2-circle"></i> Good data is many, varied and correctly labelled, with a separate test set to avoid fooling yourself.</li>
+              <li><i class="bi bi-check2-circle"></i> Try a simple rule first. Use AI only when the rule truly fails, and always add a safety layer.</li>
+            </ul>
+          </section>
+
+          <section class="quiz">
+            <div class="quiz__head"><i class="bi bi-patch-question-fill"></i> Check your understanding</div>
+            <details>
+              <summary><span class="q-num">Q1.</span><span>In one sentence, what is artificial intelligence?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Software that can learn or make smart choices. It is not magic and not alive; it is one way for a robot to decide.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q2.</span><span>What is the difference between training and inference?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Training is the slow stage where the model learns from examples, often on a big computer. Inference is using the trained model in real time on the robot, and it must be fast.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q3.</span><span>You need a robot to stop 10 cm before a wall. Should you use learning or a rule? Why?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Use a rule. A distance sensor gives a clear number, and the condition is exact. Learning would add cost and risk for no benefit.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q4.</span><span>What is a label, and why is it useful?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> A label is the correct answer attached to an example, like "cat" on a photo. It lets the model compare its guess with the truth and adjust itself.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q5.</span><span>Name the three main flavours of learning and give a robot example of each.</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Supervised (learn from labelled examples, such as spotting a sock), unsupervised (find patterns with no labels, such as grouping trips by weight), and reinforcement (learn by reward through trial and error, such as learning to walk).</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q6.</span><span>What is overfitting, and how does the school-exam analogy explain it?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Overfitting is memorising the training examples instead of learning the general idea. It is like a student who memorises last year's exam and scores 100% on it, then fails a new paper. The fix is more varied data and testing on a separate test set.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q7.</span><span>Why does reinforcement learning work best in simulation for robots?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Real-world trial and error is slow and can damage hardware or hurt people. In a simulator, failures cost nothing and can be repeated instantly. The catch is the sim-to-real gap: the policy may still fail on the real robot.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q8.</span><span>Your model scores 97% on training data and 55% on new images. What is likely wrong, and what would you change?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> It is overfitting: the model memorised the training set. Add more varied training examples, use a simpler model, check labels, and keep judging it only on the separate test set.</div>
+            </details>
+          </section>
+
+        </article>
+
+        <nav class="pager" id="pager" aria-label="Chapter navigation"></nav>
+      </div>
+    </main>
+  </div>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/book.js"></script>
+</body>
+</html>

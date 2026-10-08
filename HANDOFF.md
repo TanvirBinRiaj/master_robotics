@@ -157,3 +157,28 @@ Created **private** repo `TanvirBinRiaj/master_robotics` via
 `gh repo create master_robotics --private --source=. --push` and pushed
 all commits: https://github.com/TanvirBinRiaj/master_robotics
 (`main` tracks `origin/main`). Nothing public; working tree clean.
+
+## 12. Offline Flutter mobile app (same day)
+Converted the web book into an installable Android app that reuses the
+exact HTML/CSS/JS via WebView — fully offline, no web URL.
+
+- `app/` (Flutter 3.44, `master_robotics_app`, label "Master Robotics"):
+  `lib/main.dart` loads bundled `assets/book/index.html` with JS
+  unrestricted; external http(s) links open in the system browser;
+  Android back walks chapter history; splash/loading indicator included.
+- `tool/sync_book.py`: copies the 35 pages + css/js into
+  `app/assets/book/`, rewrites the Bootstrap-Icons CDN link to a vendored
+  local copy (`tool/vendor/`), injects app-only `tool/mobile.css`
+  (safe-area, touch targets). Web originals untouched — validator PASS.
+- Gotcha found by build inspection: this Flutter toolchain only bundles
+  top-level files of a declared asset dir, so the script auto-generates
+  explicit per-directory entries in `app/pubspec.yaml` (do not hand-edit).
+- Verified: APK contains all 43 bundle files; headless-Chromium `file://`
+  render of the bundled index shows styled layout, icons, working theme
+  toggle — zero network needed (Google Fonts degrade gracefully offline).
+- Release APK built: `app/build/app/outputs/flutter-apk/app-release.apk`
+  (~44 MB); copied to `~/Downloads/master_robotics_app.apk` (sha1 matched).
+  Docs: `app/README.md` + "Mobile app" section in root README.
+- Not done: Play-Store signing/upload, iOS build (needs macOS), app icon
+  artwork (default launcher icon). Rebuild after book edits with:
+  `python3 tool/sync_book.py && cd app && flutter build apk --release`.

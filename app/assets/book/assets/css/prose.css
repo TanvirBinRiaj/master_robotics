@@ -1,0 +1,166 @@
+/* ==========================================================================
+   Master Robotics — prose.css
+   Article typography, callouts, code, tables, formulas, quiz, pager,
+   chapter index, cover page, responsive rules, print.
+   ========================================================================== */
+
+.article { font-size: 17.5px; color: var(--text); }
+.article > p, .article > ul, .article > ol { margin: 0 0 20px; }
+.article h2 { font-size: 27px; letter-spacing: -.02em; margin: 52px 0 16px; padding-top: 8px; font-weight: 800; scroll-margin-top: calc(var(--header-h) + 20px); }
+.article h2::before { content: ""; display: block; width: 46px; height: 4px; border-radius: 4px; background: linear-gradient(90deg, var(--brand), var(--violet)); margin-bottom: 16px; }
+.article h3 { font-size: 21px; margin: 36px 0 12px; font-weight: 750; letter-spacing: -.01em; scroll-margin-top: calc(var(--header-h) + 20px); }
+.article h4 { font-size: 17px; margin: 26px 0 10px; font-weight: 750; color: var(--text-soft); }
+.article p { line-height: 1.78; }
+.article ul, .article ol { padding-left: 26px; }
+.article li { margin-bottom: 9px; }
+.article li::marker { color: var(--brand); font-weight: 700; }
+.article strong { font-weight: 750; color: var(--text); }
+.article abbr { text-decoration: underline dotted var(--text-mute); cursor: help; }
+.article hr { border: none; border-top: 1px solid var(--border); margin: 44px 0; }
+.article code { font-family: var(--font-mono); font-size: .875em; background: var(--surface-3); color: var(--brand-strong); padding: .15em .42em; border-radius: 6px; word-break: break-word; }
+.article a { text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--brand) 40%, transparent); text-underline-offset: 3px; }
+.article a:hover { text-decoration-color: var(--brand); }
+.article blockquote { margin: 26px 0; padding: 6px 0 6px 22px; border-left: 4px solid var(--brand); color: var(--text-soft); font-family: var(--font-serif); font-size: 19px; font-style: italic; }
+.article .lead { font-size: 19px; color: var(--text-soft); }
+
+/* ---------------------------- Callouts ----------------------------------- */
+.callout { border: 1px solid var(--border); border-left: 4px solid var(--brand); background: var(--surface); border-radius: var(--radius-sm); padding: 16px 20px; margin: 26px 0; box-shadow: var(--shadow-sm); }
+.callout__head { display: flex; align-items: center; gap: 9px; font-weight: 800; font-size: 13px; text-transform: uppercase; letter-spacing: .07em; margin-bottom: 8px; }
+.callout__head .bi { font-size: 17px; }
+.callout p { font-size: 16.5px; color: var(--text-soft); }
+.callout ul { font-size: 16.5px; margin-bottom: 0; }
+.callout p:last-child, .callout ul:last-child, .callout ol:last-child { margin-bottom: 0; }
+.callout.simple { border-left-color: var(--accent); background: var(--accent-soft); }
+.callout.simple .callout__head { color: var(--accent); }
+.callout.simple p, .callout.simple li { color: var(--text); }
+.callout.tip { border-left-color: var(--accent); }
+.callout.tip .callout__head { color: var(--accent); }
+.callout.note { border-left-color: var(--brand); }
+.callout.note .callout__head { color: var(--brand); }
+.callout.warn { border-left-color: var(--warn); background: var(--warn-soft); }
+.callout.warn .callout__head { color: var(--warn); }
+.callout.danger { border-left-color: var(--danger); background: var(--danger-soft); }
+.callout.danger .callout__head { color: var(--danger); }
+.callout.key { border-left-color: var(--violet); background: var(--violet-soft); }
+.callout.key .callout__head { color: var(--violet); }
+
+/* ----------------------------- Code blocks ------------------------------- */
+.code { position: relative; margin: 24px 0; border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; background: #0f1729; box-shadow: var(--shadow-sm); }
+.code__bar { display: flex; align-items: center; gap: 8px; padding: 9px 14px; background: #0b1120; border-bottom: 1px solid rgba(255,255,255,.07); }
+.code__lang { color: #8ce0c6; font-size: 12px; font-weight: 700; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: .06em; }
+.code__dots { display: flex; gap: 6px; margin-right: 4px; }
+.code__dots span { width: 11px; height: 11px; border-radius: 50%; background: #33405f; }
+.code__copy { margin-left: auto; background: rgba(255,255,255,.08); color: #cbd5e1; border: none; border-radius: 7px; padding: 5px 10px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; }
+.code__copy:hover { background: rgba(255,255,255,.16); color: #fff; }
+.code pre { margin: 0; padding: 18px; overflow-x: auto; color: #e2e8f0; font-family: var(--font-mono); font-size: 14px; line-height: 1.65; }
+.code pre code { background: none; padding: 0; color: inherit; font-size: inherit; }
+
+/* ------------------------------- Tables ---------------------------------- */
+.table-wrap { overflow-x: auto; margin: 26px 0; border: 1px solid var(--border); border-radius: var(--radius-sm); }
+.article table { border-collapse: collapse; width: 100%; font-size: 15.5px; }
+.article thead th { background: var(--surface-2); text-align: left; padding: 12px 16px; font-weight: 750; font-size: 13px; text-transform: uppercase; letter-spacing: .05em; color: var(--text-soft); border-bottom: 1px solid var(--border-strong); }
+.article tbody td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.article tbody tr:last-child td { border-bottom: none; }
+.article tbody tr:nth-child(even) { background: color-mix(in srgb, var(--surface-2) 45%, transparent); }
+
+/* ------------------------------ Formulas --------------------------------- */
+.formula { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 20px 22px; margin: 26px 0; text-align: center; font-family: var(--font-serif); font-size: 21px; box-shadow: var(--shadow-sm); overflow-x: auto; }
+.formula .label { display: block; font-family: var(--font-sans); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--text-mute); margin-bottom: 10px; font-weight: 700; }
+.formula var { font-style: italic; }
+
+.figure { margin: 30px 0; text-align: center; }
+.figure__box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow-sm); overflow-x: auto; }
+.figure figcaption { margin-top: 12px; font-size: 14px; color: var(--text-mute); font-style: italic; }
+
+/* -------------------------- Key takeaways -------------------------------- */
+.takeaways { margin: 48px 0 20px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 26px 28px; box-shadow: var(--shadow-md); border-top: 4px solid var(--brand); }
+.takeaways h2 { margin: 0 0 16px !important; font-size: 20px !important; padding: 0 !important; display: flex; align-items: center; gap: 10px; }
+.takeaways h2::before { display: none !important; }
+.takeaways h2 .bi { color: var(--brand); }
+.takeaways ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 12px; }
+.takeaways li { display: flex; gap: 12px; align-items: flex-start; font-size: 16px; margin: 0; }
+.takeaways li .bi { color: var(--accent); font-size: 17px; margin-top: 3px; flex: none; }
+
+/* ------------------------------ Quiz ------------------------------------- */
+.quiz { margin: 40px 0; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; background: var(--surface); }
+.quiz__head { background: var(--surface-2); padding: 16px 22px; font-weight: 800; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border); }
+.quiz__head .bi { color: var(--violet); }
+.quiz details { border-bottom: 1px solid var(--border); }
+.quiz details:last-child { border-bottom: none; }
+.quiz summary { padding: 16px 22px; cursor: pointer; font-weight: 650; list-style: none; display: flex; gap: 12px; align-items: flex-start; }
+.quiz summary::-webkit-details-marker { display: none; }
+.quiz summary:hover { background: var(--surface-2); }
+.quiz summary .q-num { color: var(--brand); font-weight: 800; flex: none; }
+.quiz summary .chev { margin-left: auto; color: var(--text-mute); flex: none; }
+.quiz details[open] summary .chev { transform: rotate(180deg); }
+.quiz .answer { padding: 0 22px 18px 50px; color: var(--text-soft); font-size: 16px; }
+.quiz .answer strong { color: var(--accent); }
+
+/* ------------------------------ Pager ------------------------------------ */
+.pager { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 56px; padding-top: 32px; border-top: 1px solid var(--border); }
+.pager a { border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 20px; background: var(--surface); color: var(--text); display: flex; flex-direction: column; gap: 4px; }
+.pager a:hover { border-color: var(--brand); text-decoration: none; }
+.pager a .dir { font-size: 12px; color: var(--text-mute); text-transform: uppercase; letter-spacing: .06em; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+.pager a .ttl { font-weight: 700; }
+.pager a.next { text-align: right; align-items: flex-end; }
+.pager .spacer { visibility: hidden; }
+
+/* --------------------------- Chapter index ------------------------------- */
+.hero { padding: 40px 0 8px; }
+.hero h1 { font-size: clamp(34px, 5vw, 54px); line-height: 1.1; letter-spacing: -.03em; margin: 14px 0 16px; font-weight: 850; }
+.hero p.lede { font-size: 20px; color: var(--text-soft); max-width: 660px; }
+.hero__stats { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
+.stat { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 18px; box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 10px; }
+.stat .bi { color: var(--brand); font-size: 19px; }
+.stat b { font-size: 18px; }
+.stat span { color: var(--text-mute); font-size: 13px; }
+
+.part-block { margin: 46px 0; }
+.part-block__head { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+.part-block__head .part-icon { width: 40px; height: 40px; border-radius: 11px; display: grid; place-items: center; background: var(--brand-soft); color: var(--brand); font-size: 20px; flex: none; }
+.part-block__head h2 { font-size: 24px; margin: 0; letter-spacing: -.02em; }
+.part-block__head p { margin: 2px 0 0; color: var(--text-mute); font-size: 14px; }
+.chapter-grid { display: grid; gap: 12px; margin-top: 16px; }
+.chapter-card { display: flex; gap: 14px; align-items: flex-start; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); padding: 15px 18px; color: var(--text); transition: border-color .15s, transform .15s; }
+.chapter-card:hover { border-color: var(--brand); transform: translateY(-1px); text-decoration: none; }
+.chapter-card .cc-num { font-variant-numeric: tabular-nums; font-weight: 850; color: var(--brand); font-size: 15px; min-width: 30px; }
+.chapter-card .cc-body { flex: 1; }
+.chapter-card .cc-title { font-weight: 750; font-size: 16.5px; }
+.chapter-card .cc-desc { color: var(--text-mute); font-size: 14px; margin-top: 3px; }
+.chapter-card .cc-go { color: var(--text-mute); margin-top: 3px; }
+.chapter-card:hover .cc-go { color: var(--brand); }
+
+/* ------------------------------ Responsive ------------------------------- */
+@media (max-width: 1100px) {
+  :root { --sidebar-w: 280px; }
+}
+@media (max-width: 900px) {
+  .topbar__menu { display: grid; }
+  .sidebar { transform: translateX(-100%); box-shadow: var(--shadow-lg); }
+  body.nav-open .sidebar { transform: translateX(0); }
+  body.nav-open .sidebar__backdrop { display: block; }
+  .main { margin-left: 0; }
+  .container { padding: 30px 20px 100px; }
+  .article { font-size: 17px; }
+  .pager { grid-template-columns: 1fr; }
+  .pager a.next { text-align: left; align-items: flex-start; }
+}
+@media (max-width: 480px) {
+  .container { padding: 24px 16px 90px; }
+  .article h2 { font-size: 23px; }
+  .article h3 { font-size: 19px; }
+}
+
+/* ------------------------------- Print ----------------------------------- */
+@media print {
+  .topbar, .sidebar, .pager, .progress-bar, .sidebar__backdrop { display: none !important; }
+  .main { margin-left: 0; }
+  .container { max-width: 100%; padding: 0; }
+  body { background: #fff; font-size: 12pt; }
+  .code { background: #f4f6fb; }
+  .code pre { color: #111; }
+  .code__bar { background: #e8ecf6; }
+  .code__lang { color: #0b6b52; }
+  .callout, .takeaways, .goals, .formula { break-inside: avoid; }
+  .article h2 { break-after: avoid; }
+}

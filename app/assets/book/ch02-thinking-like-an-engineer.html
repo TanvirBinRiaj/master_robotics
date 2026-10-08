@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>try{var __t=null;try{__t=localStorage.getItem("mr-theme")}catch(e){}if(__t!=="dark"&&__t!=="light"){try{var __m=document.cookie.match(/(?:^|;\s*)mr-theme=(dark|light)/);__t=__m?__m[1]:null}catch(e){__t=null}}if(__t!=="dark"&&__t!=="light"){try{var __w=String(window.name||"").match(/mr-theme=(dark|light)/);__t=__w?__w[1]:null}catch(e){}}if(__t!=="dark"&&__t!=="light"&&window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches){__t="dark"}if(__t==="dark"||__t==="light")document.documentElement.setAttribute("data-theme",__t)}catch(e){}</script>
+  <title>Chapter 2: Thinking Like an Engineer — Master Robotics</title>
+  <meta name="description" content="Learn the simple habits of mind engineers use: the design cycle, turning wishes into measurable requirements, breaking big goals into testable pieces, and debugging with a calm, step-by-step method.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="vendor/bootstrap-icons/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/prose.css">
+  <link rel="stylesheet" href="assets/css/mobile.css">
+</head>
+<body data-file="ch02-thinking-like-an-engineer.html">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="topbar" id="topbar"></header>
+  <div class="progress-bar" id="progressBar"></div>
+
+  <div class="layout">
+    <div class="sidebar__backdrop" id="navBackdrop"></div>
+    <nav class="sidebar" id="sidebar" aria-label="Book contents"></nav>
+
+    <main class="main" id="main">
+      <div class="container">
+
+        <header class="chapter-head">
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="index.html">Home</a>
+            <i class="bi bi-chevron-right"></i>
+            <a href="index.html#foundations">Part 1 &middot; Foundations</a>
+            <i class="bi bi-chevron-right"></i>
+            <span>Chapter 2</span>
+          </nav>
+          <span class="chapter-kicker"><i class="bi bi-rocket-takeoff"></i> Part 1 &middot; Foundations</span>
+          <h1>Thinking Like an Engineer</h1>
+          <p class="lede">Engineering is not just tools and wires. It is a way of thinking. By the end of this chapter, you will be able to turn a vague wish into a clear plan, cut a big goal into small tests, and fix problems one calm step at a time.</p>
+          <div class="chapter-meta">
+            <span><i class="bi bi-clock"></i> ~20 min read</span>
+            <span><i class="bi bi-bar-chart"></i> Beginner</span>
+            <span><i class="bi bi-list-check"></i> Chapter 2 of 30</span>
+          </div>
+          <div class="goals">
+            <h2>What you will learn</h2>
+            <ul>
+              <li><i class="bi bi-check-circle-fill"></i> Use a step-by-step way to solve problems.</li>
+              <li><i class="bi bi-check-circle-fill"></i> Break a big goal into small, testable tasks.</li>
+              <li><i class="bi bi-check-circle-fill"></i> Tell the difference between a wish and a requirement.</li>
+            </ul>
+          </div>
+        </header>
+
+        <article class="article">
+
+          <p class="lead">Imagine two people who both want to build a robot that follows a black line on the floor. The first person buys parts, plugs them together, and hopes it works. The second person writes down what the robot must do, splits the job into small pieces, and tests each piece alone. Only one of them finishes on time. The difference is not talent. It is a way of thinking.</p>
+
+          <p>This chapter is about that way of thinking. It has a name: the <strong>engineering mindset</strong>. It is a set of simple habits that turn a fuzzy wish into a working machine. Anyone can learn these habits, and they work for a school project, a hobby robot, or a factory machine.</p>
+
+          <p>You do not need a lab or an expensive kit to start practising. You only need a pencil, some paper, and the willingness to slow down before you build. Good engineers look slow at the start and fast at the end, because they avoid the traps that beginners fall into.</p>
+
+          <h2>What does an engineer actually do?</h2>
+
+          <p>People often picture an engineer as someone who fixes engines or draws on a computer all day. That is only the surface. At its heart, engineering is the job of solving real problems under real limits.</p>
+
+          <p>An engineer asks: what is the problem, what would a good result look like, what limits do I have, and what is the simplest thing that will work? Then the engineer builds it, tests it, and makes it better. This loop never really ends. It only gets faster and more careful.</p>
+
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> The key idea</div>
+            <p>Engineering is not about having the best idea. It is about turning a real need into a working solution that fits the limits of time, money and materials.</p>
+          </div>
+
+          <p>A scientist explores the world to understand it. An engineer changes the world to solve a problem. The two work together, and engineers borrow the scientist's careful testing. But an engineer always has a goal: something must work, for someone, within a limit.</p>
+
+          <p>That word "limit" matters. A robot that works with unlimited money and unlimited time is easy to imagine. A robot that costs under 50 dollars, runs for two hours, and fits in a shoebox is a real challenge. Limits are what make engineering interesting.</p>
+
+          <h2>The engineering design cycle</h2>
+
+          <p>Engineers solve problems using a repeating set of steps. We call it the <strong>design cycle</strong>. The steps are: ask, imagine, plan, build, test, improve — and then repeat. It is drawn as a circle because you rarely finish after one trip. Each loop makes the design a little better.</p>
+
+          <figure class="figure">
+            <div class="figure__box">
+              <svg viewBox="0 0 640 360" width="100%" role="img" aria-label="A circle of six steps: ask, imagine, plan, build, test, improve, joined by arrows with repeat at the centre">
+                <circle cx="320" cy="180" r="120" fill="none" stroke="#c8cede" stroke-width="2" stroke-dasharray="5 6"></circle>
+                <text x="320" y="174" text-anchor="middle" font-family="Inter, sans-serif" font-size="16" font-weight="800" fill="#1c2230">design cycle</text>
+                <text x="320" y="196" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#7b849b">repeat until good enough</text>
+
+                <rect x="255" y="18" width="130" height="48" rx="10" fill="#e8eeff" stroke="#2d5bff" stroke-width="2"></rect>
+                <text x="320" y="48" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#2d5bff">1. Ask</text>
+
+                <rect x="470" y="92" width="130" height="48" rx="10" fill="#e2f6ef" stroke="#0f9d78" stroke-width="2"></rect>
+                <text x="535" y="122" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#0f9d78">2. Imagine</text>
+
+                <rect x="470" y="220" width="130" height="48" rx="10" fill="#f0e9fd" stroke="#7a4ddb" stroke-width="2"></rect>
+                <text x="535" y="250" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#7a4ddb">3. Plan</text>
+
+                <rect x="255" y="294" width="130" height="48" rx="10" fill="#fdeede" stroke="#d97706" stroke-width="2"></rect>
+                <text x="320" y="324" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#d97706">4. Build</text>
+
+                <rect x="40" y="220" width="130" height="48" rx="10" fill="#fde8ea" stroke="#dc3545" stroke-width="2"></rect>
+                <text x="105" y="250" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#dc3545">5. Test</text>
+
+                <rect x="40" y="92" width="130" height="48" rx="10" fill="#e9eef8" stroke="#4a5266" stroke-width="2"></rect>
+                <text x="105" y="122" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#4a5266">6. Improve</text>
+
+                <path d="M385 42 A120 120 0 0 1 470 92" fill="none" stroke="#7b849b" stroke-width="2" marker-end="url(#cyc)"></path>
+                <path d="M600 140 A120 120 0 0 1 600 220" fill="none" stroke="#7b849b" stroke-width="2" marker-end="url(#cyc)"></path>
+                <path d="M470 268 A120 120 0 0 1 385 318" fill="none" stroke="#7b849b" stroke-width="2" marker-end="url(#cyc)"></path>
+                <path d="M255 318 A120 120 0 0 1 170 268" fill="none" stroke="#7b849b" stroke-width="2" marker-end="url(#cyc)"></path>
+                <path d="M40 220 A120 120 0 0 1 40 140" fill="none" stroke="#7b849b" stroke-width="2" marker-end="url(#cyc)"></path>
+                <path d="M170 92 A120 120 0 0 1 255 42" fill="none" stroke="#7b849b" stroke-width="2" marker-end="url(#cyc)"></path>
+                <defs>
+                  <marker id="cyc" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+                    <path d="M0,0 L9,4.5 L0,9 z" fill="#7b849b"></path>
+                  </marker>
+                </defs>
+              </svg>
+            </div>
+            <figcaption>Figure 2.1 — The engineering design cycle. You move around the circle, testing and improving, until the design meets the requirements.</figcaption>
+          </figure>
+
+          <p>You might look at this circle and think it is just common sense. In a way, it is. The power comes from doing the steps on purpose, in order, and not skipping any of them. Beginners skip "ask" and "plan" because they want to build right away. That is where most trouble begins.</p>
+
+          <h3>Ask — find the real problem</h3>
+          <p>Before you design anything, you must understand the problem. Who is it for? What must it do? What must it never do? What limits do you have for money, time and space?</p>
+          <p>Example: your little brother wants a robot that "helps in the kitchen". That is too vague. Ask questions. Should it carry things, or clean the floor? How heavy are the things? How much can you spend? Slowly, the vague wish becomes a clear problem.</p>
+
+          <h3>Imagine — dream up ideas</h3>
+          <p>Now list as many possible solutions as you can. Do not judge them yet. A small wheeled cart, a moving tray, a robot arm on the counter — write them all down. Ideas are cheap at this stage; building them is not.</p>
+          <p>Example: for a kitchen helper, you might imagine a robot that slowly drives a tray to the table. You might also imagine a fixed arm bolted to the wall. Each has different strengths.</p>
+
+          <h3>Plan — choose and detail</h3>
+          <p>Pick the idea that fits your limits best. Then decide the details: what parts, what sizes, what materials, what order to build in. This is where you turn a rough idea into a shopping list and a set of steps.</p>
+          <p>Example: you choose the wheeled tray. You plan two motors, a plastic box, a battery pack, and a simple program that stops at a black line. You write the plan so clearly that a friend could follow it.</p>
+
+          <h3>Build — make the thing</h3>
+          <p>Follow your plan and put the parts together. Build in small stages, and check each stage before moving on. Do not glue everything shut on day one. Leave room to change things.</p>
+          <p>Example: first you mount the motors and test that the wheels spin. You do not attach the tray yet. Only when the wheels work do you add the next part.</p>
+
+          <h3>Test — check the real world</h3>
+          <p>Run the robot and measure what really happens. Compare it with what you wanted. A test without a measurement is just an opinion, so write down numbers whenever you can.</p>
+          <p>Example: you wanted the robot to follow a line for one full lap without help. You test it and count: it lost the line twice in thirty seconds. Now you have facts, not guesses.</p>
+
+          <h3>Improve — fix and repeat</h3>
+          <p>Use your test results to make the design better. Change one thing, then test again. Then go back around the circle as many times as you need. Each loop should leave the robot a little better than before.</p>
+          <p>Example: the robot lost the line on curves. You slow the motors on turns. You test again. Now it lost the line once. You improve once more and it completes a full lap.</p>
+
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> Tip</div>
+            <p>Keep the cycle short at the start. A quick, rough loop that teaches you something beats a long, perfect plan that you never test. You can always refine later.</p>
+          </div>
+
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> In simple words</div>
+            <p>Ask means "what is the problem?". Imagine means "what are the ways to fix it?". Plan means "which way, and how?". Build means "make it". Test means "try it and measure". Improve means "make it better, then start again".</p>
+          </div>
+
+          <h2>Requirements vs wishes</h2>
+
+          <p>This is the single most useful skill in the whole chapter. A <strong>wish</strong> is a vague hope. A <strong>requirement</strong> is a clear, measurable demand. Wishes feel good but cannot be tested. Requirements can be tested, and if they can be tested, they can be met.</p>
+
+          <p>"I want a cool robot" is a wish. What does "cool" mean? How big is it? How fast? How much does it cost? How long does it run? Nobody knows, so nobody can say whether you succeeded. The robot might be wonderful and you would still feel unsure.</p>
+
+          <p>"The robot must fit in a 20 cm box, weigh under 500 grams, cost under 40 dollars, and run for at least 20 minutes" is a set of requirements. Each one has a number. Each one can be checked with a ruler, a scale, a receipt and a clock.</p>
+
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> The key idea</div>
+            <p>A requirement has a number and a unit. If you cannot measure it, it is a wish, not a requirement.</p>
+          </div>
+
+          <h3>Turning a wish into requirements</h3>
+
+          <p>Here is how to convert one fuzzy wish into clear requirements, step by step. This process is sometimes called writing a <strong>specification</strong>, or spec for short.</p>
+
+          <ol>
+            <li><strong>Write the wish.</strong> "I want a robot that follows a line."</li>
+            <li><strong>Ask "how big?".</strong> "It must fit on an A4 sheet of paper."</li>
+            <li><strong>Ask "how heavy?".</strong> "It must weigh less than 400 grams."</li>
+            <li><strong>Ask "how fast?".</strong> "It must follow the line at 10 to 20 cm per second."</li>
+            <li><strong>Ask "how long?".</strong> "The battery must last at least 30 minutes."</li>
+            <li><strong>Ask "how much?".</strong> "All parts together must cost under 35 dollars."</li>
+            <li><strong>Ask "what must it avoid?".</strong> "It must not fall off the table edge."</li>
+          </ol>
+
+          <p>Now each line can be tested. You can hold a ruler to the robot. You can put it on a scale. You can time a lap. You can add up the receipts. A vague wish has become a scorecard.</p>
+
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> In simple words</div>
+            <p>A wish says "I want something nice". A requirement says "the robot must be shorter than 20 cm". Only the requirement can be checked, so only the requirement can be finished.</p>
+          </div>
+
+          <h3>Must, should and could</h3>
+
+          <p>Not every requirement is equally important. Engineers often split them into three groups, so they know what to protect when time or money runs short.</p>
+
+          <ul>
+            <li><strong>Must</strong> requirements are non-negotiable. Without them, the robot has failed. Example: "it must not roll off the table."</li>
+            <li><strong>Should</strong> requirements are important but can bend a little. Example: "it should run for 30 minutes" might become 25 minutes if the robot gets much lighter.</li>
+            <li><strong>Could</strong> requirements are nice extras. Example: "it could have a small beeper." These are the first things to drop when you run out of time.</li>
+          </ul>
+
+          <p>Writing your requirements this way saves you from a common trap. When you must cut something, you already know what to cut. You drop a "could", not a "must".</p>
+
+          <h2>Breaking a big goal into small pieces</h2>
+
+          <p>A big goal can feel scary. "Build a line-following robot" sounds hard because it hides many small jobs inside it. The cure is <strong>decomposition</strong>: breaking one big problem into smaller problems, then breaking those again, until each piece is small enough to test on its own.</p>
+
+          <p>Think of moving house. It sounds impossible as one task. But it becomes easy when you split it: pack one room, hire a van, move boxes, unpack one room. Each piece is small and clear. Robotics works the same way.</p>
+
+          <figure class="figure">
+            <div class="figure__box">
+              <svg viewBox="0 0 640 300" width="100%" role="img" aria-label="A big goal at the top splitting into sensing, movement, control and power subsystems, each splitting into smaller testable tasks">
+                <rect x="250" y="16" width="140" height="46" rx="10" fill="#e8eeff" stroke="#2d5bff" stroke-width="2"></rect>
+                <text x="320" y="44" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#2d5bff">Follow a line</text>
+
+                <line x1="320" y1="62" x2="320" y2="86" stroke="#7b849b" stroke-width="2"></line>
+                <line x1="105" y1="86" x2="535" y2="86" stroke="#7b849b" stroke-width="2"></line>
+                <line x1="105" y1="86" x2="105" y2="108" stroke="#7b849b" stroke-width="2"></line>
+                <line x1="320" y1="86" x2="320" y2="108" stroke="#7b849b" stroke-width="2"></line>
+                <line x1="535" y1="86" x2="535" y2="108" stroke="#7b849b" stroke-width="2"></line>
+
+                <rect x="35" y="108" width="140" height="44" rx="9" fill="#e2f6ef" stroke="#0f9d78" stroke-width="2"></rect>
+                <text x="105" y="135" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#0f9d78">Sensing</text>
+
+                <rect x="250" y="108" width="140" height="44" rx="9" fill="#f0e9fd" stroke="#7a4ddb" stroke-width="2"></rect>
+                <text x="320" y="135" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#7a4ddb">Movement</text>
+
+                <rect x="465" y="108" width="140" height="44" rx="9" fill="#fdeede" stroke="#d97706" stroke-width="2"></rect>
+                <text x="535" y="135" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#d97706">Power</text>
+
+                <text x="105" y="182" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#4a5266">Can it see the line?</text>
+                <text x="105" y="200" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#4a5266">Test: print readings</text>
+                <text x="320" y="182" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#4a5266">Can it move straight?</text>
+                <text x="320" y="200" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#4a5266">Test: drive one metre</text>
+                <text x="535" y="182" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#4a5266">Does it run 30 min?</text>
+                <text x="535" y="200" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#4a5266">Test: full battery run</text>
+
+                <rect x="180" y="236" width="280" height="46" rx="9" fill="#e9eef8" stroke="#4a5266" stroke-width="2"></rect>
+                <text x="320" y="258" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#4a5266">Control: joins the pieces together</text>
+                <text x="320" y="274" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#7b849b">Test: follow a whole lap</text>
+              </svg>
+            </div>
+            <figcaption>Figure 2.2 — Decomposition. One big goal becomes four smaller subsystems, and each subsystem has its own simple test.</figcaption>
+          </figure>
+
+          <h3>A worked decomposition: the line follower</h3>
+
+          <p>Let us decompose "build a line-following robot" in full. We split it into four <strong>subsystems</strong>. A subsystem is a group of parts that does one clear job inside the whole robot.</p>
+
+          <p><strong>1. Sensing subsystem.</strong> The job is to tell the robot where the line is. It uses two light sensors side by side. When a sensor sees dark (the line), it reports one value; over the light floor, another value. The test: hold the robot over the line and over the floor, and print both numbers. If the numbers are clearly different, sensing works.</p>
+
+          <p><strong>2. Movement subsystem.</strong> The job is to drive the robot forward and turn. It uses two motors, one per wheel. By spinning the wheels at different speeds, the robot turns. The test: make the robot drive straight for one metre, then turn in place. Does it go where you aimed? If yes, movement works.</p>
+
+          <p><strong>3. Control subsystem.</strong> The job is to read the sensors and choose wheel speeds. This is the software. The test: feed it fake sensor readings and check it picks the right speeds. For example, "left sensor on line, right sensor off" should make the robot turn left.</p>
+
+          <p><strong>4. Power subsystem.</strong> The job is to supply steady electricity to the motors and the controller. It uses a battery pack. The test: run the robot until the battery is flat and time how long it lasts. If it beats 30 minutes, power works.</p>
+
+          <p>Notice what happened. One scary task became four friendly tasks. Each has its own job, and each has its own test. You can build and test them almost independently. If the robot fails, you already know which subsystem to look at first.</p>
+
+          <h3>How small should a piece be?</h3>
+
+          <p>A good rule: split a task until you can test it in ten minutes or less. If a test would take a whole afternoon, the piece is probably still too big. Keep splitting until each piece is quick to check.</p>
+
+          <p>Another rule: make each piece do one job. A piece that does two jobs is harder to test, because when it fails you cannot tell which job broke. Small and single-purpose beats big and clever.</p>
+
+          <div class="callout warn">
+            <div class="callout__head"><i class="bi bi-exclamation-triangle-fill"></i> Watch out</div>
+            <p>Do not decompose so far that you drown in tiny tasks. Stop when a piece is easy to test. Four to eight pieces is often the sweet spot for a beginner robot.</p>
+          </div>
+
+          <h2>Thinking in systems</h2>
+
+          <p>Once you have split a robot into subsystems, you need to see how they fit together. This is called <strong>systems thinking</strong>. Instead of staring at one part, you look at the whole and at the connections between parts.</p>
+
+          <p>The simplest way to describe any system is with three words: <strong>input</strong>, <strong>process</strong>, <strong>output</strong>. Something goes in. Something happens. Something comes out. It sounds almost too simple, but it clears up confusion fast.</p>
+
+          <ul>
+            <li><strong>Input</strong> — what the system takes in. For a sensor, the input is light. For a motor, the input is electricity.</li>
+            <li><strong>Process</strong> — what the system does with the input. The sensor turns light into a number. The motor turns electricity into spin.</li>
+            <li><strong>Output</strong> — what the system produces. The sensor outputs a reading. The motor outputs turning force.</li>
+          </ul>
+
+          <p>Try it on a whole robot. Input: light from the floor and electricity from the battery. Process: the controller compares readings and chooses speeds. Output: the wheels turn and the robot moves along the line. You now understand the robot as one system made of smaller systems.</p>
+
+          <h3>Interfaces between parts</h3>
+
+          <p>An <strong>interface</strong> is the meeting point between two parts. It defines how they talk to each other. The interface is where most beginner mistakes hide, because two parts can each be perfect and still fail to work together.</p>
+
+          <p>Think of a phone charger. The plug and the socket are an interface. If the plug is the wrong shape or the wrong voltage, the phone will not charge. Each piece might be fine alone. The problem is at the meeting point.</p>
+
+          <p>In a robot, interfaces appear everywhere. The sensor outputs a number between 0 and 1023. The control software must expect exactly that range. The motor needs a voltage between 1.5 and 6 volts. The power subsystem must supply within that band. When two parts agree on the interface, they connect cleanly.</p>
+
+          <p>A useful habit is to write down each interface in one line. "Sensor output: 0 to 1023, updated every 10 ms." "Motor input: 1.5 to 6 V, up to 1 amp." Now, when you connect them, you can check the numbers match before you build.</p>
+
+          <div class="callout note">
+            <div class="callout__head"><i class="bi bi-info-circle-fill"></i> Note</div>
+            <p>A system diagram with named interfaces is one of the most useful pages in an engineering notebook. It shows what connects to what, and what each connection must carry.</p>
+          </div>
+
+          <h2>The engineering notebook</h2>
+
+          <p>Engineers write things down. This sounds boring, but it is one of the most powerful habits you can build. The <strong>engineering notebook</strong> is where you record what you tried, what happened, and what you will try next.</p>
+
+          <p>Memory is unreliable. A week after a test, you will forget the exact number, the exact wire, the exact mistake. If you wrote it down, you keep it forever. Your notebook becomes the story of the robot.</p>
+
+          <h3>What to write in your notebook</h3>
+
+          <ol>
+            <li><strong>The date.</strong> Every entry starts with a date. Future you will thank present you.</li>
+            <li><strong>What you did.</strong> "I connected the left light sensor to pin A0."</li>
+            <li><strong>What happened.</strong> "Reading was 900 over the line, 120 over the floor."</li>
+            <li><strong>What you learned.</strong> "The sensor sees the line clearly. This part works."</li>
+            <li><strong>What is next.</strong> "Next: test the right sensor the same way."</li>
+          </ol>
+
+          <p>You can keep a paper notebook or a simple text file. Both work. The rule is the same: write it down while you remember, not later. A notebook you never open is useless; a messy one you use every day is gold.</p>
+
+          <div class="callout tip">
+            <div class="callout__head"><i class="bi bi-lightbulb"></i> Tip</div>
+            <p>Write your notebook as if a stranger will read it. That stranger is you in three months, with zero memory of today. Clear notes then, save a lot of pain later.</p>
+          </div>
+
+          <h2>Units and measurement discipline</h2>
+
+          <p>Good engineers measure carefully and always say the unit. A <strong>unit</strong> is the scale you measure with: metres, grams, seconds, volts. A number without a unit is almost meaningless. "The robot is 20" tells you nothing. Twenty centimetres? Twenty kilograms? Twenty minutes?</p>
+
+          <p>Robotics uses a shared system of units called <strong>SI units</strong> (from the French name, Système International). Most of the world and all of science use them. Learning them now saves confusion later.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>What you measure</th><th>SI unit</th><th>Symbol</th><th>Everyday feel</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Length</td><td>metre</td><td>m</td><td>a big step</td></tr>
+                <tr><td>Mass</td><td>kilogram</td><td>kg</td><td>a bag of sugar</td></tr>
+                <tr><td>Time</td><td>second</td><td>s</td><td>one heartbeat</td></tr>
+                <tr><td>Electric current</td><td>ampere</td><td>A</td><td>flow of charge</td></tr>
+                <tr><td>Voltage</td><td>volt</td><td>V</td><td>battery push</td></tr>
+                <tr><td>Force</td><td>newton</td><td>N</td><td>weight of a small apple</td></tr>
+                <tr><td>Speed</td><td>metre per second</td><td>m/s</td><td>how fast you walk</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-mute);font-size:14px;margin-top:-8px;">Table 2.1 — The SI units you will meet most often in robotics.</p>
+
+          <h3>Small and large: prefixes</h3>
+
+          <p>Some numbers are tiny and some are huge. Instead of writing many zeros, SI uses prefixes. A <strong>prefix</strong> is a short word or letter that changes the unit by a fixed amount.</p>
+
+          <ul>
+            <li><strong>milli</strong> (m) means one thousandth. 1000 mm = 1 m. So 250 mm = 0.25 m.</li>
+            <li><strong>kilo</strong> (k) means one thousand. 1 km = 1000 m. 1 kg = 1000 g.</li>
+            <li><strong>micro</strong> (µ) means one millionth. Robot sensors often work in microseconds.</li>
+            <li><strong>mega</strong> (M) means one million. A big motor might use 1 MW.</li>
+          </ul>
+
+          <p>Prefixes save you from writing a wall of zeros and from miscounting them. They are a simple tool, but they prevent real disasters.</p>
+
+          <h3>A units mistake story</h3>
+
+          <p>Units matter more than most beginners believe. In 1999, a spacecraft called the Mars Climate Orbiter was lost near Mars. It cost about 125 million dollars. The cause was a unit mix-up. One team used metric units (newtons), and another team used old units (pounds of force). Nobody converted the numbers, so the spacecraft's course was wrong, and it was destroyed in the atmosphere.</p>
+
+          <p>Two groups of smart people, each doing careful work. The failure was not in their skill. It was in the interface between them, and in the units that crossed it. A single line of conversion would have saved the mission.</p>
+
+          <div class="callout danger">
+            <div class="callout__head"><i class="bi bi-shield-exclamation"></i> Danger</div>
+            <p>Never mix units in one calculation. Always write the unit next to every number. If your answer looks strange, check the units first. Most "impossible" results are unit mistakes.</p>
+          </div>
+
+          <h3>An example calculation</h3>
+
+          <p>Suppose your robot's wheels are 6 cm across. You want to know how far the robot travels in one full turn of a wheel. The distance is the circumference of the wheel. The diameter is 6 cm, so the radius is 3 cm.</p>
+
+          <div class="formula"><span class="label">Circumference of a wheel</span> C = &pi; &times; D = 3.14 &times; 6 cm &asymp; 18.8 cm</div>
+
+          <p>So each wheel turn moves the robot about 18.8 cm. If you want it to move 1 metre (100 cm), the wheel must turn 100 &divide; 18.8 &asymp; 5.3 times. Now you have a real, testable number. You can check it with a ruler on the floor.</p>
+
+          <p>This small calculation is exactly what engineers do all day. Take a wish ("I want it to go one metre"), add a measurement (wheel size), and produce a number you can test (5.3 turns).</p>
+
+          <h2>Trade-offs: you cannot have everything</h2>
+
+          <p>Every design choice has a cost somewhere else. This is a <strong>trade-off</strong>: getting more of one good thing usually means getting less of another. Engineers do not avoid trade-offs; they choose them on purpose.</p>
+
+          <p>The most famous trade-off is called the <strong>iron triangle</strong>: fast, cheap, good. Pick any two, and the third will suffer.</p>
+
+          <ul>
+            <li><strong>Fast and cheap</strong> — the result will not be very good. You rushed and saved money, but quality drops.</li>
+            <li><strong>Fast and good</strong> — it will not be cheap. Speed and quality cost money.</li>
+            <li><strong>Cheap and good</strong> — it will not be fast. Quality takes time, and time costs money.</li>
+          </ul>
+
+          <figure class="figure">
+            <div class="figure__box">
+              <svg viewBox="0 0 420 250" width="100%" role="img" aria-label="The iron triangle with fast, cheap and good at the corners, showing you can pick any two">
+                <polygon points="210,30 40,210 380,210" fill="none" stroke="#2d5bff" stroke-width="3"></polygon>
+                <circle cx="210" cy="30" r="7" fill="#2d5bff"></circle>
+                <circle cx="40" cy="210" r="7" fill="#0f9d78"></circle>
+                <circle cx="380" cy="210" r="7" fill="#d97706"></circle>
+                <text x="210" y="16" text-anchor="middle" font-family="Inter, sans-serif" font-size="15" font-weight="800" fill="#2d5bff">Fast</text>
+                <text x="40" y="234" text-anchor="middle" font-family="Inter, sans-serif" font-size="15" font-weight="800" fill="#0f9d78">Cheap</text>
+                <text x="380" y="234" text-anchor="middle" font-family="Inter, sans-serif" font-size="15" font-weight="800" fill="#d97706">Good</text>
+                <text x="210" y="140" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#4a5266">pick any two</text>
+              </svg>
+            </div>
+            <figcaption>Figure 2.3 — The iron triangle. More of one corner means less of another. Good engineers choose which two matter most.</figcaption>
+          </figure>
+
+          <p>Robotics has its own trade-offs that follow the same pattern. Making a robot <strong>lighter</strong> often makes it <strong>weaker</strong>, because you used less material. Getting <strong>more power</strong> often drains the <strong>battery faster</strong>. A <strong>simpler</strong> design is easier to fix but may do less. A <strong>cheaper</strong> part may break sooner.</p>
+
+          <p>The skill is not to avoid these choices. The skill is to know which side matters most for your goal, then accept the cost. A delivery drone cares about weight. A floor robot cares about battery life. Same trade-offs, different answers.</p>
+
+          <div class="callout simple">
+            <div class="callout__head"><i class="bi bi-translate"></i> In simple words</div>
+            <p>A trade-off means "if I want more of this, I get less of that". There is no free lunch. A good engineer picks what to give up on purpose.</p>
+          </div>
+
+          <h2>The debugging mindset</h2>
+
+          <p>Your robot will break. That is not a sign that you failed. It is a normal part of the work. The skill is not avoiding problems; it is finding and fixing them calmly. This is called <strong>debugging</strong>.</p>
+
+          <p>Beginners often panic when something fails. They change five things at once and hope one of them helps. Professionals stay calm and use a simple method, borrowed from science: the scientific method.</p>
+
+          <h3>Observe, hypothesise, test, fix</h3>
+
+          <ol>
+            <li><strong>Observe.</strong> Look carefully at what actually happens. What do you see, hear, smell? Write down the facts, not your worries.</li>
+            <li><strong>Hypothesise.</strong> Make a guess about the cause. A <strong>hypothesis</strong> is an idea you can test. "Maybe the left sensor wire is loose."</li>
+            <li><strong>Test.</strong> Do one experiment to check your guess. Wiggle only that wire and watch the reading.</li>
+            <li><strong>Fix.</strong> If the guess was right, fix that one thing. If it was wrong, make a new guess.</li>
+            <li><strong>Repeat.</strong> Go back to observing. Keep going until the robot works.</li>
+          </ol>
+
+          <p>The most important rule is this: <strong>change one thing at a time</strong>. If you change three things and the robot starts working, you do not know which change fixed it. Worse, you may have added two new hidden faults. One change, one test, every time.</p>
+
+          <div class="callout warn">
+            <div class="callout__head"><i class="bi bi-exclamation-triangle-fill"></i> Watch out</div>
+            <p>Do not trust the robot's behaviour until you can explain it. A robot that "sometimes works" is a robot with a hidden fault. Find it now, or it will return at the worst moment.</p>
+          </div>
+
+          <h3>Look at the simplest causes first</h3>
+
+          <p>Experienced engineers check the simple things before the clever ones. Is the battery charged? Is the wire plugged in? Is the code uploaded? Nine times out of ten, the fault is boring, not mysterious.</p>
+
+          <p>Do this on purpose. Make a checklist of the simple things and go through it every time, before you start hunting for deep problems. It feels slow, but it is much faster than chasing a fault that turns out to be a dead battery.</p>
+
+          <h2>Worked example: from wish to working robot</h2>
+
+          <p>Now let us put everything together. We will take a tiny project all the way through the design cycle, using every tool in this chapter. The goal is small, so you can follow every step.</p>
+
+          <p><strong>The wish.</strong> "I want a robot that drives along my table and does not fall off the edge."</p>
+
+          <p><strong>Ask.</strong> We turn the wish into requirements. The robot must: (1) fit in a 12 cm box, (2) run for 15 minutes on one charge, (3) stop before the table edge, (4) cost under 30 dollars. We mark (3) as a "must" and the others as "should". The edge rule is the most important one, because a fall destroys the robot.</p>
+
+          <p><strong>Imagine.</strong> We list ideas. Idea A: a small car with a downward light sensor that sees the floor and stops when the floor disappears at the edge. Idea B: a bumper that touches a wall and stops. Idea C: a distance sensor that measures the drop ahead. We pick Idea A because it is cheap and simple.</p>
+
+          <p><strong>Plan.</strong> We decompose the robot into subsystems: power, movement, sensing, control. We write the interfaces. The edge sensor outputs 0 to 1023. The controller reads it and sets motor speed. The motors take up to 5 volts. We draw a system diagram with inputs and outputs.</p>
+
+          <p><strong>Build.</strong> We build in small stages. First the power subsystem: battery pack and switch, tested with a multimeter. Then movement: two motors and wheels, tested by driving straight. Then sensing: the light sensor, tested over floor and over a dark gap. Then control: the code that stops the motors when the sensor sees a gap.</p>
+
+          <p><strong>Test.</strong> We put the robot on the table and run it. Two things happen. First, it drives straight and stops at the edge. Good. Second, it is slow: it takes far too long to cross the table. We count the time: 40 seconds at its current speed. We wanted under 15 seconds.</p>
+
+          <p><strong>Improve.</strong> One change at a time. We raise the motor speed in the code. Test again: now it crosses in 16 seconds, close but not quite. We raise it a little more. Test again: 13 seconds. Good. Now we run the full edge test at the new speed to be sure it still stops in time. It does, with margin to spare.</p>
+
+          <p>That is the whole cycle, from a vague wish to a measured, working robot. Notice how often we tested. Every stage had its own test, and we changed one thing at a time. That is why it worked.</p>
+
+          <h2>Common beginner mistakes</h2>
+
+          <p>Most beginner problems are not about skill. They are about skipping a habit. Here are the ones that cause the most pain, and how to avoid each one.</p>
+
+          <h3>Mistake 1: skipping the requirements</h3>
+          <p>The beginner starts building with only a wish in mind. Halfway through, they realise the robot is too big, too slow or too expensive, and they must start again. The fix is simple: spend ten minutes turning the wish into numbers before you buy or build anything.</p>
+
+          <h3>Mistake 2: changing many things at once</h3>
+          <p>The robot fails, so the beginner rewrites the code, moves a wire, and swaps a battery all together. It works now, but nobody knows why, and the fault may return. The fix: change one thing, test, then change the next.</p>
+
+          <h3>Mistake 3: no notes</h3>
+          <p>The beginner trusts memory. A week later, they cannot remember the working value or the wire that fixed the fault. They repeat old work. The fix: write in the notebook while you work, not afterwards.</p>
+
+          <h3>Mistake 4: no units on numbers</h3>
+          <p>"Set the speed to 200." Two hundred what? Percent, millimetres per second, or counts? The fix: always write the unit. It takes one second and prevents days of confusion.</p>
+
+          <h3>Mistake 5: starting too big</h3>
+          <p>The beginner wants to build a walking humanoid as a first project. It fails, and they feel they are "bad at robotics". The fix: start small. A line follower or an edge-stopping car teaches all the same skills in a week.</p>
+
+          <h3>Mistake 6: not testing the pieces first</h3>
+          <p>The beginner builds the whole robot, then turns it on for the first time and gets no movement. Now every part is suspect. The fix: test each subsystem alone before joining them. Then when the whole robot fails, you can trust the pieces.</p>
+
+          <h2>How professionals do it</h2>
+
+          <p>As projects grow, the same habits grow with them. Professionals use the same cycle and the same mindset, but with stronger tools. Here is what changes at industrial scale, and why each tool exists.</p>
+
+          <h3>Design reviews</h3>
+          <p>A <strong>design review</strong> is a meeting where other engineers look at your plan before you build. They spot problems you cannot see, because you are too close to your own work. It is cheaper to fix a mistake on paper than in metal. Even a friend acting as a reviewer helps.</p>
+
+          <h3>Test plans</h3>
+          <p>A <strong>test plan</strong> is a written list of every test, what you expect, and how you measure it. Professionals write it before building, so testing is a plan, not an afterthought. Each requirement gets at least one test that proves it is met.</p>
+
+          <h3>Requirements traceability</h3>
+          <p><strong>Traceability</strong> means linking each requirement to the test that checks it, and to the part that satisfies it. If a requirement has no test, it will be forgotten. A traceability table makes sure nothing slips. It answers the question: "how do we know this robot meets its goals?"</p>
+
+          <h3>Version control</h3>
+          <p>When many people edit files, changes clash. Professionals use <strong>version control</strong>, a system that records every change and who made it. You can roll back to any earlier version if something breaks. Even alone, the idea of saving dated versions of your code and plans is valuable. Name files with dates, or use a simple tool like Git when you are ready.</p>
+
+          <div class="callout note">
+            <div class="callout__head"><i class="bi bi-info-circle-fill"></i> Note</div>
+            <p>None of these tools is complicated. They are the same habits you learned in this chapter, made more formal. Notebooks become logs, tests become test plans, and saving versions becomes version control.</p>
+          </div>
+
+          <h2>Try it yourself</h2>
+
+          <p>Reading builds understanding. Doing builds skill. Try these exercises in order; each one takes a little more effort than the last. Write your answers in a notebook.</p>
+
+          <ol>
+            <li><strong>Turn a wish into requirements.</strong> Take the wish "I want a robot that cleans my desk". Write five measurable requirements using the "how big, how heavy, how fast, how long, how much" questions. <em>Hint: every requirement needs a number and a unit.</em></li>
+            <li><strong>Sort must, should, could.</strong> Take the five requirements from exercise 1 and label each one must, should or could. <em>Hint: the one that protects safety or basic function is usually a must.</em></li>
+            <li><strong>Decompose a goal.</strong> Break "build a robot that follows my hand" into at least four subsystems. Give each subsystem one test that takes ten minutes or less. <em>Hint: think of sensing, movement, control and power.</em></li>
+            <li><strong>Draw a system diagram.</strong> Choose one subsystem from exercise 3 and draw its inputs, process and outputs. Write one line for each interface. <em>Hint: label the range and unit of every signal crossing an interface.</em></li>
+            <li><strong>Practise debugging on purpose.</strong> Take any small working circuit or program and break it in one small way. Then use observe, hypothesise, test, fix to find the fault without changing more than one thing at a time. <em>Hint: check the boring causes first, like power and connections.</em></li>
+          </ol>
+
+          <h2>Going deeper (optional)</h2>
+
+          <p>This section is for curious readers. You do not need it to understand the chapter, so feel free to skip it and return later.</p>
+
+          <p>Engineers often talk about "good enough". A perfect robot that never ships helps nobody. A robot that meets its must-requirements and most of its should-requirements is a success. Learning to stop at good enough is a real skill, and it protects your time and money.</p>
+
+          <p>One way to decide "good enough" is to score your requirements. Give each met requirement a point, weight the musts more heavily, and set a passing score before you start. This turns a vague feeling into a clear number. It is the same trick you learned for requirements, applied to the whole project.</p>
+
+          <p>Another advanced idea is to plan your tests before your build. Professionals call this test-driven design. You write the test first, then build until the test passes. It feels backwards at first, but it stops you from building features nobody needs.</p>
+
+          <div class="callout key">
+            <div class="callout__head"><i class="bi bi-key-fill"></i> Where this leads</div>
+            <p>Requirements and interface contracts scale into <strong>architecture decision records</strong> and cross-team design reviews. How staff engineers run that process is previewed in the professional chapters and applied throughout <a href="ch27-production-software-robotics.html">Part 7</a>.</p>
+          </div>
+
+          <section class="takeaways">
+            <h2><i class="bi bi-pin-angle-fill"></i> Key takeaways</h2>
+            <ul>
+              <li><i class="bi bi-check2-circle"></i> Engineering is solving real problems within real limits, not just having ideas.</li>
+              <li><i class="bi bi-check2-circle"></i> The design cycle is: ask, imagine, plan, build, test, improve, repeat.</li>
+              <li><i class="bi bi-check2-circle"></i> A requirement has a number and a unit; a wish does not. Only requirements can be tested.</li>
+              <li><i class="bi bi-check2-circle"></i> Decomposition turns one big goal into small pieces, each with its own quick test.</li>
+              <li><i class="bi bi-check2-circle"></i> Systems thinking uses input, process, output, and names the interfaces between parts.</li>
+              <li><i class="bi bi-check2-circle"></i> Debug with observe, hypothesise, test, fix — and change only one thing at a time.</li>
+              <li><i class="bi bi-check2-circle"></i> Keep a notebook, always write units, and choose your trade-offs on purpose.</li>
+            </ul>
+          </section>
+
+          <section class="quiz">
+            <div class="quiz__head"><i class="bi bi-patch-question-fill"></i> Check your understanding</div>
+            <details>
+              <summary><span class="q-num">Q1.</span><span>Name the six steps of the engineering design cycle in order.</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Ask, imagine, plan, build, test, improve — then repeat.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q2.</span><span>Why is the design cycle drawn as a circle instead of a straight line?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Because one trip is rarely enough. You test, improve, and go around again, making the design better each time.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q3.</span><span>What is the difference between a wish and a requirement?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> A wish is vague and cannot be tested. A requirement is clear and measurable, with a number and a unit, so you can check whether it is met.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q4.</span><span>What does decomposition mean, and why is it useful?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Decomposition breaks one big problem into smaller problems. Each small piece is easier to build, easier to test, and easier to fix when something fails.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q5.</span><span>In systems thinking, what are input, process and output? Give one robot example.</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Input is what goes in, process is what the system does, output is what comes out. Example: a sensor takes in light (input), turns it into a reading (process), and outputs a number (output).</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q6.</span><span>Why should you change only one thing at a time when debugging?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> If you change several things at once, you cannot tell which change fixed the problem — or which new fault you added. One change at a time keeps the cause clear.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q7.</span><span>What is the iron triangle, and what does it warn you about?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> The iron triangle is fast, cheap and good. You can pick any two, but not all three. It warns you to choose your trade-offs on purpose instead of expecting everything at once.</div>
+            </details>
+            <details>
+              <summary><span class="q-num">Q8.</span><span>A robot's wheel is 8 cm across. Roughly how far does it travel in one full turn?</span><i class="bi bi-chevron-down chev"></i></summary>
+              <div class="answer"><strong>Answer.</strong> Distance = &pi; &times; diameter = 3.14 &times; 8 = about 25 cm per turn.</div>
+            </details>
+          </section>
+        </article>
+
+        <nav class="pager" id="pager" aria-label="Chapter navigation"></nav>
+      </div>
+    </main>
+  </div>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/book.js"></script>
+</body>
+</html>
