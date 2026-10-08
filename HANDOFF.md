@@ -128,3 +128,25 @@ Fixes applied (commit `7945d72`):
 - Verified with a Node DOM-stub harness simulating blocked storage + dark
   OS: fresh load → dark; toggle writes cookie; next page reads cookie →
   same theme and icon. Validator **PASS**.
+
+## 10. Real root cause + tab-relay fix (same day, after §9 did not hold)
+§9's cookie fallback was not enough: reproduced in headless browsers on
+this machine with probe pages (`localStorage` + `document.cookie` set on
+one page, read on another, same profile):
+- Chromium `file://`: localStorage persists across pages, cookies do not.
+- Firefox `file://` (this browser's engine): **neither persists** — each
+  page load gets fresh, memory-only storage. So no write-based persistence
+  can carry the theme across chapters here.
+
+Fix (commits `d3f9398`, cleanup `ba3c244`): carry the theme in
+`window.name`, which travels with the tab across page loads in every
+browser, no storage needed. `book.js` gained `readRelay()`/`writeRelay()`
+(relay token preserved alongside any other `window.name` content);
+resolution order is now stored → relay → OS → light, and the pre-paint
+script in all 35 files mirrors it. Sidebar/pager links navigate in the
+same tab, so the theme now follows chapter switches; fresh tabs fall back
+to the OS setting. Verified in Node harness against the shipped bytes:
+relay-dark beats OS-light, cookie-light beats OS-dark, empty state keeps
+the old default. Validator **PASS**. (A literal `~/probe-test` dir from
+the Chromium probe was briefly committed with `d3f9398` and removed in
+`ba3c244`; probe files outside the repo were deleted.)
